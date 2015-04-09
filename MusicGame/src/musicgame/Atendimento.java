@@ -35,12 +35,26 @@ public class Atendimento extends Thread {
 
             InetAddress IPAddress = receivePacket.getAddress();
             int port = receivePacket.getPort();
-
-          
-            String sentence = new String(
-				    receivePacket.getData(), 0, receivePacket.getLength());
-               System.out.println("FROM Cliente:" + sentence);
-            if (sentence.equals("01")) {
+            int tam = receivePacket.getLength();
+            receivePacket.setLength(receivePacket.getLength());
+            byte[] res = receivePacket.getData();
+            byte[] data = new byte[tam];
+            System.arraycopy(res, 0, data, 0, tam);
+                
+            System.out.println("RECEBIDOS: " + receivePacket.getLength());
+            for(int i = 0; i < tam; i++){
+                System.out.print(data[i] + "|");
+            }
+            System.out.println();
+            PDU r = new PDU(data);
+            sendPacket = new DatagramPacket(data, data.length, IPAddress, port);
+            System.out.println(r.toString());
+            sendSocket = new DatagramSocket();
+            sendSocket.send(sendPacket);
+            //String sentence = new String(
+		//		    receivePacket.getData(), 0, receivePacket.getLength());
+               //System.out.println("FROM Cliente:" + sentence);
+            /*if (sentence.equals("01")) {
                 String frase = "OK";
                 //String capitalizedSentence = sentence.toUpperCase();
                 //sendData = capitalizedSentence.getBytes();
@@ -51,7 +65,7 @@ public class Atendimento extends Thread {
                 sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                 sendSocket.send(sendPacket);
 
-            }
+            }*/
 
         } catch (Exception e) {
             System.out.println(e.toString());

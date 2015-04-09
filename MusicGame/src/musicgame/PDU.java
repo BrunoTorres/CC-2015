@@ -1,6 +1,5 @@
 package musicgame;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -23,6 +22,7 @@ public class PDU {
         this.seg = 0;
         this.lab = lab;
         this.tipo = (byte) tipo;
+        System.out.println("LAB: " + this.lab);
         this.numCampos = 0;
         this.tamLista = 0;
         this.campos = new ArrayList<>();
@@ -45,23 +45,23 @@ public class PDU {
         Campo c;
         if (numCampos > 0) {
             for (int i = 8; i < tamLista + 8;) {
-                System.out.println("i: " + i);
+                //System.out.println("i: " + i);
                 int k = 0;
                 int id = bytes[i];
                 byte sizeL = bytes[i + 1];
-                
-                System.out.println("Size: " + sizeL);
+
+                //System.out.println("Size: " + sizeL);
                 byte[] valor = new byte[sizeL];
                 int j;
                 for (j = i + 2; j < sizeL + i + 2; j++) {
-                    valor[k] = bytes[j];    
+                    valor[k] = bytes[j];
                     k++;
                 }
                 String v = new String(valor);
                 //System.out.println("Valor: " + v);
                 c = new Campo(id, v);
                 this.campos.add(c);
-                i += sizeL+2;
+                i += sizeL + 2;
             }
         }
     }
@@ -69,9 +69,7 @@ public class PDU {
     public void addCampo(Campo c) {
         this.campos.add(c);
         this.numCampos++;
-        System.out.println("B4: " + this.tamLista);
         this.tamLista += c.getSize();
-        System.out.println("AFT: " + this.tamLista);
     }
 
     private short byteArrayToInt(byte[] b) {
@@ -81,14 +79,14 @@ public class PDU {
 
     private byte[] intToByteArray(short n) {
         byte[] res = new byte[2];
-        
+
         res[0] = (byte) ((n & 0xFF00) >> 8);
         res[1] = (byte) (n & 0x00FF);
-        
-        for(byte b : res){
-            System.out.print(b + "|");
-        }
-        System.out.println();
+
+        /*for(byte b : res){
+         System.out.print(b + "|");
+         }
+         System.out.println();*/
         return res;
     }
 
@@ -109,35 +107,22 @@ public class PDU {
         int soma = 0;
 
         for (Campo c : campos) {
-            System.out.println("Vai somar, a soma estava a: " + soma);
             soma += c.getSize() + 2;
-            System.out.println("O valor do tamanho é: " + c.getSize());
-            System.out.println("Já somou ficou a: " + soma);
         }
-        System.out.println("SOMA: " + soma);
         byte[] s;
         s = this.intToByteArray((short) soma);
-        
-        for(byte b : s){
-            res.add(b);
-            System.out.print(b + "|");
-        }
-        System.out.println();
-        
         campos.stream().forEach((c) -> {
             byte[] cm = c.getBytes();
             for (byte b : cm) {
                 res.add(b);
             }
-        }); // byte[] label= new Byte()
-        //label.
+        });
         byte[] r = new byte[soma + 8];
         int i = 0;
         for (byte b : res) {
             r[i] = b;
             i++;
         }
-
         return r;
     }
 

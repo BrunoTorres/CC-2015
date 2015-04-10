@@ -22,17 +22,13 @@ public class PDU {
         this.seg = 0;
         this.lab = lab;
         this.tipo = (byte) tipo;
-        System.out.println("LAB: " + this.lab);
         this.numCampos = 0;
         this.tamLista = 0;
         this.campos = new ArrayList<>();
     }
 
     public PDU(byte[] bytes) {
-        for (byte b : bytes) {
-            System.out.print(b);
-        }
-        System.out.println();
+        
         this.ver = bytes[0];
         this.seg = bytes[1];
         byte[] l = {bytes[2], bytes[3]};
@@ -70,6 +66,9 @@ public class PDU {
         this.campos.add(c);
         this.numCampos++;
         this.tamLista += c.getSize();
+    }
+    public Campo getCampo(int ind){
+        return campos.get(ind);
     }
 
     private short byteArrayToInt(byte[] b) {
@@ -109,8 +108,13 @@ public class PDU {
         for (Campo c : campos) {
             soma += c.getSize() + 2;
         }
+     
         byte[] s;
         s = this.intToByteArray((short) soma);
+        for(byte b: s){
+            res.add(b);
+        }
+        
         campos.stream().forEach((c) -> {
             byte[] cm = c.getBytes();
             for (byte b : cm) {
@@ -123,7 +127,9 @@ public class PDU {
             r[i] = b;
             i++;
         }
+        
         return r;
+         
     }
 
     public void printBytes() {

@@ -20,21 +20,19 @@ class MusicClient {
         try ( 
             DatagramSocket clientSocket = new DatagramSocket()) {
             InetAddress IPAddress = InetAddress.getByName("localhost");
-            //receiveData = new byte[1024];
-            //String sentence = inFromUser.readLine();
-            // sendData = sentence.getBytes();
             PDU hello = new PDU(label, (byte) 01);
+            PDU login = new PDU((short) 12, (byte) 03);
+        Campo m = new Campo(2, "Antonio");
+        Campo p = new Campo(3, "patricia");
             
-            byte[] data = hello.getBytes();
-            sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
-            
-            /*for (byte b : data) {
-                System.out.print(b + "|");
-            }
+        login.addCampo(m);
+        login.addCampo(p);
+            byte[] data = login.getBytes();
+           
             System.out.println();
-            */
+            sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
             clientSocket.send(sendPacket);
-
+            
             receiveData = new byte[1024];
             
             //RECEBER cenas
@@ -47,10 +45,10 @@ class MusicClient {
             data = new byte[tam];
             System.arraycopy(res, 0, data, 0, tam);  
             System.out.println("FROM SERVER:");
-            for (byte b : data) {
+            /*for (byte b : data) {
                 System.out.print(b + "|");
             }
-            System.out.println();
+            System.out.println();*/
         }
     }
     // Função que imprime o menu principal da aplicação e dependendo da escolha segue para o caminho correto

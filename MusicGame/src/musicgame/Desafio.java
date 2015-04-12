@@ -5,7 +5,10 @@
  */
 package musicgame;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -162,6 +165,24 @@ class Desafio implements Serializable {
 
     public String getResposta(int numQ,int i) {
         return this.questoes.get(numQ).getRespostaIndice(i);
+    }
+
+    public byte[] getImagemQuestao(int i) throws IOException {
+        String img = this.questoes.get(i).getImagem();
+        File f = new File(img);
+        byte[] r = new byte[(int) f.length()];
+        r = Files.readAllBytes(f.toPath());
+              
+        return r;
+    }
+
+    public byte[] getMusicaQuestao(int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
+        String m = this.questoes.get(i).getMusica();
+        File f = new File(m);
+        byte[] r = new byte[(int) f.length()];
+        r = Files.readAllBytes(f.toPath());
+              
+        return r;
     }
     
 }

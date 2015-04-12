@@ -1,10 +1,13 @@
 package musicgame;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ public class Atendimento extends Thread {
     @Override
     public void run() {
         try {
+            //imgTeste();
             InetAddress IPAddress = receivePacket.getAddress();
             int port = receivePacket.getPort();
             int tam = receivePacket.getLength();
@@ -54,6 +58,14 @@ public class Atendimento extends Thread {
             System.out.println(e.toString());
         }
     }
+    
+    /*private void imgTeste() throws IOException{
+        File f = new File("C:\\Users\\John\\Pictures\\2.jpg");
+        byte[] img = Files.readAllBytes(f.toPath());
+        FileOutputStream fos = new FileOutputStream("C:\\Users\\John\\Pictures\\testeeee.jpg");
+        fos.write(img);
+        fos.close();
+    }*/
 
     private byte[] intToByteArray(short n) {
         byte[] res = new byte[2];

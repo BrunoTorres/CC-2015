@@ -55,7 +55,7 @@ public class PDU {
                 }
                 String v = new String(valor);
                 //System.out.println("Valor: " + v);
-                c = new Campo(id, v);
+                c = new Campo(id, v.getBytes());
                 this.campos.add(c);
                 i += sizeL + 2;
             }

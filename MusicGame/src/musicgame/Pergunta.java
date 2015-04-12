@@ -110,6 +110,10 @@ class Pergunta implements Serializable {
         }
         return true;
     }
+
+    public String getRespostaIndice(int i) {
+        return this.respostas.get(i);
+    }
     
     
     

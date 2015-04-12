@@ -11,12 +11,12 @@ class Campo {
     
     private int id;
     private byte size;
-    private String valor;
+    private byte[] valor;
 
-    public Campo(int id, String valor) {
+    public Campo(int id, byte[] valor) {
         this.id = id;
         this.valor = valor;
-        this.size = (byte) valor.getBytes().length;
+        this.size = (byte) valor.length;
     }
 
     public int getId() {
@@ -31,20 +31,20 @@ class Campo {
         return this.size;
     }
 
-    public String getValor() {
+    public byte[] getValor() {
         return valor;
     }
 
-    public void setValor(String valor) {
+    public void setValor(byte[] valor) {
         this.valor = valor;
-        this.size = (byte) this.valor.getBytes().length;
+        this.size = (byte) this.valor.length;
     }
     
     public byte[] getBytes(){
         ArrayList<Byte> res = new ArrayList<>();
         res.add((byte) this.id);
         res.add(this.size);
-        byte[] v = this.valor.getBytes();
+        byte[] v = this.valor;
         
         for(byte b : v){
             res.add(b);

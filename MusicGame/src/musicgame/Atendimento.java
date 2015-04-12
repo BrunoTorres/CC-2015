@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,48 +55,85 @@ public class Atendimento extends Thread {
         }
     }
 
+    private byte[] intToByteArray(short n) {
+        byte[] res = new byte[2];
+
+        int sec = n % 10;
+        int pri = n / 10;
+        res[0] = (byte) pri;
+        res[1] = (byte) sec;
+
+        /*for(byte b : res){
+         System.out.print(b + "|");
+         }
+         System.out.println();*/
+        return res;
+    }
+
+    private short byteArrayToInt(byte[] b) {
+        ByteBuffer bb = ByteBuffer.wrap(b);
+        return bb.getShort();
+    }
+
     private void analisaPacote(byte[] data, InetAddress add, int port) {
         PDU reply;
+        short s;
+        Campo c;
+        byte[] tl = {data[2], data[3]};
+        System.out.println("Opcao:"+data[4]);
         switch (data[4]) {
             case 0:
                 System.out.println("Reply");
                 break;
             case 1:
-                System.out.println("Hello");
-                reply = new PDU((short) 12, (byte) 0);
+                s = (short) byteArrayToInt(tl);
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(0, "OK".getBytes());
+                reply.addCampo(c);
                 responde(reply, add, port);
                 break;
             case 2:
-                System.out.println("Register");
-                reply = new PDU((short) 12, (byte) 0);
-                responde(reply, add, port);
+                processaRegisto(data, add, port);
                 break;
             case 3:
-                System.out.println("Login");
-                processaLogin(data);
+                processaLogin(data, add, port);
                 break;
             case 4:
-                System.out.println("Logout");
-                reply = new PDU((short) 12, (byte) 0);
+                s = (short) byteArrayToInt(tl);
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(0, "OK".getBytes());
+                reply.addCampo(c);
                 responde(reply, add, port);
                 break;
             case 5:
-                System.out.println("Quit");
-                reply = new PDU((short) 12, (byte) 0);
+                s = (short) byteArrayToInt(tl);
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(0, "OK".getBytes());
+                reply.addCampo(c);
                 responde(reply, add, port);
                 break;
             case 6:
                 System.out.println("End");
                 break;
             case 7:
-                System.out.println("List Challenges");
+                listaDesafios(data, add, port);
                 break;
             case 8:
                 System.out.println("Make challenge");
+        {
+            try {
+                criaDesafio(data, add, port);
+            } catch (UserInexistenteException ex) {
+                Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
                 break;
             case 9:
                 System.out.println("Accept challenge");
-                reply = new PDU((short) 12, (byte) 0);
+                s = (short) byteArrayToInt(tl);
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(0, "OK".getBytes());
+                reply.addCampo(c);
                 responde(reply, add, port);
                 break;
             case 10:
@@ -122,16 +164,129 @@ public class Atendimento extends Thread {
         }
     }
 
-    private void processaLogin(byte[] data) {
+    private void processaLogin(byte[] data, InetAddress add, int port) {
         PDU pacote = new PDU(data);
-        String alc = pacote.getCampo(0).getValor();
-        Utilizador u = new Utilizador();
+        String alc = new String(pacote.getCampo(0).getValor());        
+        PDU resposta;
+        Campo c;
+        byte[] tl = {data[2], data[3]};
+        short s = (short) byteArrayToInt(tl);
         try {
-            u = bd.getUser(alc);
-            byte[] pass = pacote.getCampo(1).getValor().getBytes();
+            Utilizador u;
+            u = this.bd.getUser(alc);
+            byte[] passATestar = pacote.getCampo(1).getValor();
+            byte[] pass = u.getPass();
+            if (Arrays.equals(passATestar, pass)) { //Se a passe for correta
+                resposta = new PDU(s, (byte) 0);
+                c = new Campo(1, u.getUserName().getBytes());
+                resposta.addCampo(c);
+                this.bd.updateUser(u.getAlcunha(), add, port);
+                responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
+            } else { //Pacote de erro passe incorreta
+                resposta = new PDU(s, (byte) 0);
+                c = new Campo(255, "Password incorreta!".getBytes());
+                resposta.addCampo(c);
+                responde(resposta, add, port);
+            }
         } catch (UserInexistenteException ex) {
-            //pacote de erro
+            //pacote de erro            
+            resposta = new PDU(s, (byte) 0);
+            c = new Campo(255, "Utilizador inexistente!".getBytes());
+            resposta.addCampo(c);
+            responde(resposta, add, port);
         }
 
     }
+
+    private void processaRegisto(byte[] data, InetAddress add, int port) {
+        PDU pacote = new PDU(data);
+        byte[] tl = {data[2], data[3]};
+        Short s = (short) byteArrayToInt(tl);
+        PDU reply;
+        Campo c;
+        String nome = new String(pacote.getCampo(0).getValor());
+        String alc = new String(pacote.getCampo(1).getValor());
+        byte pass[] = pacote.getCampo(2).getValor();
+        boolean e = this.bd.existeUser(alc);
+        if (e) {
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(255, "Utilizador existente!".getBytes());
+            reply.addCampo(c);
+            responde(reply, add, port);
+        } else {
+            Utilizador novo = new Utilizador(nome, alc, pass, add, port);
+            this.bd.addUser(novo);
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(0, "OK".getBytes());
+            reply.addCampo(c);
+            responde(reply, add, port);
+        }
+
+    }
+
+    private void listaDesafios(byte[] data, InetAddress add, int port) {
+        ArrayList<Desafio> desafios = bd.getDesafios();
+        byte[] tl = {data[2], data[3]};
+        Short s = (short) byteArrayToInt(tl);
+        PDU reply;
+        Campo c, da, h, f;
+        int tam = desafios.size();
+        int t = 0;
+        for (Desafio d : desafios) {
+            t++;
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(7, d.getNome().getBytes());
+            reply.addCampo(c);
+            da = new Campo(4, d.getData().getBytes());
+            reply.addCampo(da);
+            h = new Campo(5, d.getTempo().getBytes());
+            reply.addCampo(h);
+            if (t < tam) {
+                f = new Campo(254, "0".getBytes());
+                reply.addCampo(f);
+            }
+            responde(reply, add, port);
+        }
+    }
+
+    private void criaDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
+        PDU pacote = new PDU(data);
+        byte[] tl = {data[2], data[3]};
+        Short s = (short) byteArrayToInt(tl);
+        PDU reply;
+        Campo c,dat;
+        String nome = new String(pacote.getCampo(0).getValor());
+        boolean e = bd.existeDesafio(nome);
+        if (e) {
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(255, "Desafio existente!".getBytes());
+            reply.addCampo(c);
+            responde(reply, add, port);
+        } else {
+            LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
+            int aux = tempo.getYear() % 100;
+            int pri = aux / 10;
+            int sec = aux % 10;
+            byte[] ano = {(byte) pri, (byte) sec};
+            byte[] mes = intToByteArray((short) tempo.getMonthValue());
+            byte[] dia = intToByteArray((short) tempo.getDayOfMonth());
+            byte[] hora = intToByteArray((short) tempo.getHour());
+            byte[] minuto = intToByteArray((short) tempo.getMinute());
+            byte[] segundo = intToByteArray((short) tempo.getSecond());
+            Desafio d = new Desafio("as", ano, dia,mes, hora, minuto, segundo);
+            Utilizador u = bd.getUserByIP(add);
+            d.addUser(u, tl);
+            this.bd.addDesafio(d);            
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(07, d.getNome().getBytes());
+            reply.addCampo(c);
+            dat = new Campo(04,d.getDataByte().getBytes());
+            reply.addCampo(dat);
+            responde(reply, add, port);
+            Jogo j = new Jogo(tempo,d,this.bd);
+            j.start();
+            
+        }
+    }
+
 }

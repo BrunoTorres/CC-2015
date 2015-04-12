@@ -16,6 +16,7 @@ public class UserInexistenteException extends Exception {
      * detail message.
      */
     public UserInexistenteException() {
+        super();
     }
 
     /**

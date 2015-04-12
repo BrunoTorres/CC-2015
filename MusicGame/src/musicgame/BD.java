@@ -6,6 +6,7 @@
 package musicgame;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -58,6 +59,38 @@ class BD implements Serializable{
         }
         else throw new UserInexistenteException("Utilizador inexistente!");
     }
-    
+    public Utilizador getUserByIP(InetAddress ip) throws UserInexistenteException {
+        boolean enc = false; 
+        Utilizador us = new Utilizador();
+        for( Utilizador u : users.values()){
+            if(u.getIp().equals(ip)){
+                us = u;
+                enc = true;
+            }
+        }
+        if(!enc){
+            throw new UserInexistenteException("Utilizador inexistente!");
+        }
+        else{
+            return us;
+        }
+    }
+
+    void updateUser(String alcunha, InetAddress add, int port) {
+        this.users.get(alcunha).setIp(add);
+        this.users.get(alcunha).setPort(port);
+    }
+
+    ArrayList<Desafio> getDesafios() {
+        ArrayList<Desafio> des = new ArrayList<>();
+        for( Desafio d : desafios.values()){
+            des.add(d);
+        }
+        return des;
+    }
+
+    boolean existeDesafio(String nome) {
+        return desafios.containsKey(nome);
+    }
     
 }

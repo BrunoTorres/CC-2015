@@ -20,9 +20,9 @@ public class Utilizador implements Serializable {
 
     }
 
-    public Utilizador(String nick, String pw, byte[] pass, InetAddress ip, int port) {
+    public Utilizador(String nick, String al, byte[] pass, InetAddress ip, int port) {
         this.userName = nick;
-        this.alcunha = pw;
+        this.alcunha = al;
         this.pass = pass;
         this.port = port;
         this.ip = ip;

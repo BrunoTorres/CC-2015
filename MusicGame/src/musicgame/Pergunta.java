@@ -28,6 +28,15 @@ class Pergunta implements Serializable {
         this.respostaCerta = respostaCerta;
     }
 
+    public Pergunta() {
+        this.musica = null;
+        this.imagem = null;
+        this.pergunta = null;
+        this.respostas = new ArrayList<>();
+        this.respostaCerta = 0;
+        
+    }
+
     public void setMusica(String musica) {
         this.musica = musica;
     }
@@ -38,6 +47,9 @@ class Pergunta implements Serializable {
 
     public void setPergunta(String pergunta) {
         this.pergunta = pergunta;
+    }
+    public void setRespostas(String res){
+        this.respostas.add(res);
     }
 
     public void setRespostas(ArrayList<String> respostas) {

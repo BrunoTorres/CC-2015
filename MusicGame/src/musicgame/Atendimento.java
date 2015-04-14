@@ -160,11 +160,11 @@ public class Atendimento extends Thread {
     }
 
     private void processaLogin(byte[] data, InetAddress add, int port) {
-        System.out.println("0");
+      
         PDU pacote = new PDU(data);
-        System.out.println("1");
+   
         String alc = new String(pacote.getCampo(0).getValor());   
-        System.out.println("2");
+      
         PDU resposta;
         Campo c;
         byte[] tl = {data[2], data[3]};
@@ -254,10 +254,10 @@ public class Atendimento extends Thread {
         PDU reply;
         Campo c,dat;
         String nome = new String(pacote.getCampo(0).getValor());
-        System.out.println(nome);
+  
         
         boolean e = bd.existeDesafio(nome);
-        System.out.println(e);
+        
         
         if (e) {
             reply = new PDU(s, (byte) 0);
@@ -265,7 +265,8 @@ public class Atendimento extends Thread {
             reply.addCampo(c);
             responde(reply, add, port);
         } else {
-            LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
+            //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
+             LocalDateTime tempo = LocalDateTime.now().plusSeconds(30);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -275,7 +276,8 @@ public class Atendimento extends Thread {
             byte[] hora = PDU.intToByteArray( tempo.getHour());
             byte[] minuto = PDU.intToByteArray(tempo.getMinute());
             byte[] segundo = PDU.intToByteArray( tempo.getSecond());
-            Desafio d = new Desafio("as", ano, dia,mes, hora, minuto, segundo);
+            Desafio d = new Desafio(nome, ano, dia,mes, hora, minuto, segundo);
+            criaPerguntas(d);
             Utilizador u = bd.getUserByIP(add);
             d.addUser(u, tl);
             this.bd.addDesafio(d);
@@ -285,10 +287,26 @@ public class Atendimento extends Thread {
             dat = new Campo(04,d.getDataByte().getBytes());
             reply.addCampo(dat);
             responde(reply, add, port);
+            
+        //System.out.println("cecec"+tempo.toString());
             Jogo j = new Jogo(tempo,d,this.bd);
             j.start();
             
         }
+    }
+
+    private void criaPerguntas(Desafio d) {
+        for(int i=0;i<10;i++){
+        
+       Pergunta p= this.bd.getPergunta();
+       boolean b = d.addPergunta(p);
+       while(!b){
+           p = this.bd.getPergunta();
+           b=d.addPergunta(p);
+           
+       }
+        }
+      
     }
 
 }

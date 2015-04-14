@@ -38,10 +38,17 @@ public class Jogo extends Thread {
         byte[] label;
         Campo c;
         int numQuestao = 1;
-        while (this.data.isBefore(agora));
         
         
         try {
+           
+       /*
+             while (this.data.isAfter(agora)){
+                 agora=LocalDateTime.now();
+                 System.out.println("passu");
+         
+        }
+               */
             for (Utilizador u : this.desafio.getUsers().values()) {
                 label = this.desafio.getLabelByUser(u);
                 int s =  PDU.byteArrayToInt(label);
@@ -55,21 +62,21 @@ public class Jogo extends Thread {
                 resposta.addCampo(c);
                 int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
                 int i;
-                for (i = 1; i <= tam; i++) {
+                for (i = 1; i <= 3; i++) {
                     q = new byte[]{(byte) i};
                     c = new Campo(12, q);
                     resposta.addCampo(c);
-                    c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i).getBytes());
+                    c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i-1).getBytes());
                     resposta.addCampo(c);
                 }
 
-                c = new Campo(16, this.desafio.getImagemQuestao(numQuestao - 1));
+                c = new Campo(16, this.desafio.getImagemQuestao(this.bd.getPathImage(), numQuestao - 1));
 
                 resposta.addCampo(c);
                 c = new Campo(254, "0".getBytes());
                 resposta.addCampo(c);
                 
-                byte[] m = this.desafio.getMusicaQuestao(numQuestao - 1);
+                byte[] m = this.desafio.getMusicaQuestao(this.bd.getPathMusic(), numQuestao - 1);
                 int nPackets = m.length / 255;
                 int lastPackBytes = m.length % 255;
                 

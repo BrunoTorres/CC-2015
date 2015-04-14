@@ -17,10 +17,11 @@ import java.util.HashMap;
  * @author patricia
  */
 class Desafio implements Serializable {
+
     private String nome;
-    private ArrayList<Pergunta> questoes ;
-    private HashMap<String,Utilizador> users;
-    private HashMap<String,byte[]> labels;
+    private ArrayList<Pergunta> questoes;
+    private HashMap<String, Utilizador> users;
+    private HashMap<String, byte[]> labels;
     private byte[] ano;
     private byte[] dia;
     private byte[] mes;
@@ -36,25 +37,35 @@ class Desafio implements Serializable {
         this.hora = hora;
         this.minuto = minuto;
         this.segundo = segundo;
-        this.users= new HashMap<>();
-        this.labels= new HashMap<>();
+        this.users = new HashMap<>();
+        this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
     }
-    
 
-    public void addUser(Utilizador u, byte[] label){
-        users.put(u.getAlcunha(), u); 
+    public void addUser(Utilizador u, byte[] label) {
+        users.put(u.getAlcunha(), u);
         labels.put(u.getAlcunha(), label);
     }
- 
-    public void addPergunta(Pergunta p){
-        this.questoes.add(p);
+
+    public boolean addPergunta(Pergunta p) {
+        boolean flag = true;
+        for (Pergunta pp : this.questoes) {
+            if (p.getPergunta().equals(pp.getPergunta())) {
+                flag = false;
+                break;
+            }
+        }
+        if (flag) {
+            this.questoes.add(p);
+        }
+        return flag;
     }
+    
 
     public HashMap<String, Utilizador> getUsers() {
         return users;
     }
-    
+
     public String getNome() {
         return nome;
     }
@@ -125,35 +136,30 @@ class Desafio implements Serializable {
         return sb.toString();
     }
 
-    public String getTempo() {        
+    public String getTempo() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.hora).append(this.minuto).append(this.segundo);
         return sb.toString();
     }
 
     public String getDataByte() {
-            
-            StringBuilder sb = new StringBuilder();
-            sb.append(this.ano[0]).append(this.ano[1]);
-            sb.append(this.mes[0]).append(this.mes[1]);
-            sb.append(this.dia[0]).append(this.dia[1]);
-            System.out.println(sb.toString());
-            return sb.toString();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.ano[0]).append(this.ano[1]);
+        sb.append(this.mes[0]).append(this.mes[1]);
+        sb.append(this.dia[0]).append(this.dia[1]);
+        System.out.println(sb.toString());
+        return sb.toString();
     }
-    
- 
-    
-    
-    
+
     /*
     
-            byte[] resdata = new byte[6];
-            System.arraycopy(ano, 0, resdata, 0, 2);
-            System.arraycopy(mes, 0, resdata, 2, 2);
-            System.arraycopy(dia, 0, resdata, 4, 2);
+     byte[] resdata = new byte[6];
+     System.arraycopy(ano, 0, resdata, 0, 2);
+     System.arraycopy(mes, 0, resdata, 2, 2);
+     System.arraycopy(dia, 0, resdata, 4, 2);
     
-    */
-
+     */
     public byte[] getLabelByUser(Utilizador u) {
         return this.labels.get(u.getAlcunha());
     }
@@ -166,26 +172,39 @@ class Desafio implements Serializable {
         return this.questoes.get(id).getRespostas().size();
     }
 
-    public String getResposta(int numQ,int i) {
+    public String getResposta(int numQ, int i) {
         return this.questoes.get(numQ).getRespostaIndice(i);
     }
 
-    public byte[] getImagemQuestao(int i) throws IOException {
-        String img = this.questoes.get(i).getImagem();
+    public byte[] getImagemQuestao(String pImage, int i) throws IOException {
+        
+        //System.out.println("nome imagem = " + this.questoes.get(i).getImagem());
+        String img = pImage.concat(this.questoes.get(i).getImagem());
+        System.out.println(img);
         File f = new File(img);
-        byte[] r = new byte[(int) f.length()];
-        r = Files.readAllBytes(f.toPath());
-              
+        byte[] r = Files.readAllBytes(f.toPath());
+        //r = Files.readAllBytes(f.toPath());
+
         return r;
     }
 
-    public byte[] getMusicaQuestao(int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
-        String m = this.questoes.get(i).getMusica();
+    public byte[] getMusicaQuestao(String pMusica, int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
+        System.out.println("quest= "+ this.questoes.get(i).getMusica());
+        String m = pMusica.concat(this.questoes.get(i).getMusica());
         File f = new File(m);
-        byte[] r = new byte[(int) f.length()];
-        r = Files.readAllBytes(f.toPath());
-              
+        byte[] r = Files.readAllBytes(f.toPath());
+        //r = Files.readAllBytes(f.toPath());
+
         return r;
     }
     
+    @Override
+    public String toString(){
+        StringBuilder sb= new StringBuilder();
+        sb.append("nome= ").append(this.nome);
+        for(Pergunta p :this.questoes)
+            p.toString();
+        return sb.toString();
+    }
+
 }

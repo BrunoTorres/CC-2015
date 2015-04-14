@@ -134,11 +134,13 @@ public class PDU {
          
     }
 
-    public void printBytes() {
-        byte[] b = this.getBytes();
+    public static void printBytes(byte[] b) {
+       // byte[] b = this.getBytes();
         for (byte a : b) {
-            System.out.println(a);
+            System.out.print(a +"|");
         }
+        System.out.println("");
+        
     }
 
     @Override

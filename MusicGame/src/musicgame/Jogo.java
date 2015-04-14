@@ -7,6 +7,7 @@ package musicgame;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
@@ -35,6 +36,8 @@ public class Jogo extends Thread {
     public void run() {
         LocalDateTime agora = LocalDateTime.now();
         PDU resposta;
+        DatagramSocket sendSocket;
+        byte[] dateSend;
         byte[] label;
         Campo c;
         int numQuestao = 1;
@@ -42,13 +45,11 @@ public class Jogo extends Thread {
         
         try {
            
-       /*
-             while (this.data.isAfter(agora)){
+       /* while (this.data.isAfter(agora)){
                  agora=LocalDateTime.now();
                  System.out.println("passu");
          
-        }
-               */
+        } */
             for (Utilizador u : this.desafio.getUsers().values()) {
                 label = this.desafio.getLabelByUser(u);
                 int s =  PDU.byteArrayToInt(label);
@@ -77,30 +78,46 @@ public class Jogo extends Thread {
                 resposta.addCampo(c);
                 
                 byte[] m = this.desafio.getMusicaQuestao(this.bd.getPathMusic(), numQuestao - 1);
-                int nPackets = m.length / 255;
-                int lastPackBytes = m.length % 255;
+                
+                int nPackets = m.length / 49152;
+                System.out.println("TAMANHO   " + nPackets);
+                int lastPackBytes = m.length % 49152;
                 
                 PDU music;
+                
                 byte[] p;
                 for(i = 0; i < nPackets; i++){
+                    
                     music = new PDU(s, (byte) 0);
                     c = new Campo(17, new byte[] {(byte) (i+1)});
                     music.addCampo(c);
-                    p = new byte[255];
-                    for(int j = 0; j < 255; j++){
-                        p[j] = m[i * 255 + j];
+                    p = new byte[49152];
+                    for(int j = 0; j < 49152; j++){
+                        p[j] = m[i * 49152 + j];
                     }
-                    music.addCampo(new Campo(18, p));
+                    
+                    //falta se t label..
+                    music.addCampo(new Campo(18, p));  ////////////////////////////////////////////////FALTA
                     music.addCampo(new Campo(254, new byte[] {0}));
+                    dateSend = music.getBytes();
+                    sendPacket = new DatagramPacket(dateSend, dateSend.length, u.getIp(), u.getPort());
+                    sendSocket = new DatagramSocket();
+                    sendSocket.send(sendPacket);
+                    System.out.println(i);
                     //send bloco
                 }
                 p = new byte[lastPackBytes];
                 for(int j = 0; j < lastPackBytes; j++){
-                    p[j] = m[i * 255 + j];
+                    p[j] = m[i * 49152 + j];
                 }
                 music = new PDU(s, (byte) 0);
                 music.addCampo(new Campo(17, new byte[] {(byte) (i+1)}));
                 music.addCampo(new Campo(18, p));
+                
+                dateSend = music.getBytes();
+                sendPacket = new DatagramPacket(dateSend, dateSend.length, u.getIp(), u.getPort());
+                sendSocket = new DatagramSocket();
+                sendSocket.send(sendPacket);
                 // send last bloco
                 
 

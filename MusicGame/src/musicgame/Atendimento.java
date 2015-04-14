@@ -149,7 +149,7 @@ public class Atendimento extends Thread {
 
     }
 
-    private void responde(PDU pack, InetAddress add, int port) {
+    public void responde(PDU pack, InetAddress add, int port) {
         try {
             byte[] data = pack.getBytes();
             sendPacket = new DatagramPacket(data, data.length, add, port);

@@ -65,6 +65,47 @@ public class PDU {
             }
         }
     }
+
+    public byte getVer() {
+        return ver;
+    }
+
+    public void setVer(byte ver) {
+        this.ver = ver;
+    }
+
+    public byte getSeg() {
+        return seg;
+    }
+
+    public void setSeg(byte seg) {
+        this.seg = seg;
+    }
+
+    public byte getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(byte tipo) {
+        this.tipo = tipo;
+    }
+
+    public byte getNumCampos() {
+        return numCampos;
+    }
+
+    public void setNumCampos(byte numCampos) {
+        this.numCampos = numCampos;
+    }
+
+    public int getTamLista() {
+        return tamLista;
+    }
+
+    public void setTamLista(int tamLista) {
+        this.tamLista = tamLista;
+    }
+    
     
     public static int byteArrayToInt(byte[] b) {
         int res =  b[1] & 0xFF | (b[0] & 0xFF) << 8 ;
@@ -108,7 +149,8 @@ public class PDU {
         int soma = 0;
 
         for (Campo c : campos) {
-            soma += c.getSize()[0]+c.getSize()[1] + 3;
+            soma += PDU.byteArrayToInt(c.getSize()) +3;
+                    //c.getSize()[0]+c.getSize()[1] + 3;
         }
      
         byte[] s;

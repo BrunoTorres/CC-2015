@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 class MusicClient {
 
@@ -16,18 +17,18 @@ class MusicClient {
     private static BufferedReader inFromUser;
     private static byte[] sendData;
     private static byte[] receiveData;
-
- 
+    private static InetAddress IPAddress;
+    private static DatagramSocket clientSocket;
+    private static DatagramPacket receivePacket;
 
     public static void main(String args[]) throws Exception {
 
-        try (
-                
-                DatagramSocket clientSocket = new DatagramSocket()) {
-            InetAddress IPAddress = InetAddress.getByName("localhost");
+        try {
+            clientSocket = new DatagramSocket();
+            IPAddress = InetAddress.getByName("localhost");
             PDU hello = new PDU(label, (byte) 01);
 
-              receiveData = new byte[1024];
+            receiveData = new byte[50000];
 
             PDU login = new PDU(12, (byte) 3);
             Campo m1 = new Campo(2, "tita".getBytes());
@@ -40,13 +41,13 @@ class MusicClient {
                 System.out.print(b + "|");
             }
             label++;
-            
+
             byte[] data;
 
             sendPacket = new DatagramPacket(data1, data1.length, IPAddress, 55555);
             clientSocket.send(sendPacket);
-             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-             
+            receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
             clientSocket.receive(receivePacket);
             int tam = receivePacket.getLength();
             receivePacket.setLength(receivePacket.getLength());
@@ -62,49 +63,45 @@ class MusicClient {
             for (byte b : data) {
                 System.out.print(b + "|");
             }
-            
-            
-            
-            
-            
-            
+            System.out.println("");
 
-            PDU fazDesafio = new PDU(label, (byte) 8);
-            Campo m = new Campo(7, "desafio1".getBytes());
-
-            fazDesafio.addCampo(m);
-            data = fazDesafio.getBytes();
-            for (byte b : data) {
-                System.out.print(b + "|");
-            }
+           
             label++;
 
-            sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
-            clientSocket.send(sendPacket);
-
-          
+            menuMakeChallenge("desafio1");
             //RECEBER cenas
-             receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-             tam = receivePacket.getLength();
-            receivePacket.setLength(receivePacket.getLength());
-           res = receivePacket.getData();
-            data = new byte[tam];
-            System.arraycopy(res, 0, data, 0, tam);
-             pacote = new PDU(data);
-             nome = new String(pacote.getCampo(0).getValor());
-            System.out.println("FROM SERVER:");
-            //partir desafio mostra   
-            //            
-            System.out.println("Mensagem: " + nome);
-            for (byte b : data) {
-                System.out.print(b + "|");
+            /*int i = 0;
+            while (true) {
+                receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                clientSocket.receive(receivePacket);
+                tam = receivePacket.getLength();
+                receivePacket.setLength(receivePacket.getLength());
+                res = receivePacket.getData();
+                data = new byte[tam];
+                System.arraycopy(res, 0, data, 0, tam);
+                pacote = new PDU(data);
+                //nome = new String(pacote.getCampo(0).getValor());
+                int n = (int) pacote.getNumCampos();
+                byte[] b = pacote.getCampo(0).getValor();
+                for (byte bb : b) {
+                    System.out.print(((int) bb) + "|");
+                }
+                System.out.println("FROM SERVER:");
+                //partir desafio mostra   
+                //            
+                System.out.println("Mensagem: " + i + " Nome= " + n);
+                i++;
+                // for (byte b : data) {
+                //     System.out.print(b + "|");
+                // }
             }
+            */
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     // Função que imprime o menu principal da aplicação e dependendo da escolha segue para o caminho correto
-
     public static void menuPrincipal() throws IOException, ClassNotFoundException {
         System.out.println("################# Menu de Principal ######################");
         System.out.println("#                                                        #");
@@ -143,6 +140,64 @@ class MusicClient {
 
         login.addCampo(m);
         login.addCampo(p);
+
+    }
+
+    private static void menuMakeChallenge(String nome) throws IOException {
+
+        PDU fazDesafio = new PDU(label, (byte) 8);
+        Campo m = new Campo(7, nome.getBytes());
+        TreeMap<Integer, byte[]> blocos = new TreeMap<>();
+        
+        System.out.println("make");
+        fazDesafio.addCampo(m);
+        byte[] data = fazDesafio.getBytes();
+        sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
+        clientSocket.send(sendPacket);
+
+        receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(receivePacket);
+        int tam = receivePacket.getLength();
+        receivePacket.setLength(receivePacket.getLength());
+        byte[] res = receivePacket.getData();
+        data = new byte[tam];
+        System.arraycopy(res, 0, data, 0, tam);
+        PDU pacote = new PDU(data);
+        System.out.println("antes do while");
+
+        
+        
+        int numero = pacote.getCampo(2).getId();   //// MUDAR NUMRO DE CAMPO
+        System.out.println("cenas");
+        
+        
+        
+        
+        
+        
+        while (numero == 254) {
+            System.out.println("while");
+            byte[] b = pacote.getCampo(0).getValor();
+            int num = PDU.byteArrayToInt(b);
+            blocos.put(num, pacote.getCampo(1).getValor());
+
+            receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            clientSocket.receive(receivePacket);
+            tam = receivePacket.getLength();
+            receivePacket.setLength(receivePacket.getLength());
+            res = receivePacket.getData();
+            data = new byte[tam];
+            System.arraycopy(res, 0, data, 0, tam);
+            pacote = new PDU(data);
+            numero = pacote.getCampo(2).getId();
+        }
+            byte[] b = pacote.getCampo(0).getValor();
+            int num = PDU.byteArrayToInt(b);
+            blocos.put(num, pacote.getCampo(1).getValor());
+            
+            for(Integer i : blocos.keySet()){
+                System.out.println("ora num= " + i);
+            }
 
     }
 

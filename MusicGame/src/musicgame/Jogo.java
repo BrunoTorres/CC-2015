@@ -30,11 +30,8 @@ public class Jogo extends Thread {
 
     }
 
-    private short byteArrayToInt(byte[] b) {
-        ByteBuffer bb = ByteBuffer.wrap(b);
-        return bb.getShort();
-    }
 
+    @SuppressWarnings("empty-statement")
     public void run() {
         LocalDateTime agora = LocalDateTime.now();
         PDU resposta;
@@ -42,10 +39,12 @@ public class Jogo extends Thread {
         Campo c;
         int numQuestao = 1;
         while (this.data.isBefore(agora));
+        
+        
         try {
             for (Utilizador u : this.desafio.getUsers().values()) {
                 label = this.desafio.getLabelByUser(u);
-                Short s = (short) byteArrayToInt(label);
+                int s =  PDU.byteArrayToInt(label);
                 resposta = new PDU(s, (byte) 0);
                 c = new Campo(07, this.desafio.getNome().getBytes());
                 resposta.addCampo(c);

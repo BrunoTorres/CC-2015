@@ -67,29 +67,12 @@ public class Atendimento extends Thread {
         fos.close();
     }*/
 
-    private byte[] intToByteArray(short n) {
-        byte[] res = new byte[2];
 
-        int sec = n % 10;
-        int pri = n / 10;
-        res[0] = (byte) pri;
-        res[1] = (byte) sec;
-
-        /*for(byte b : res){
-         System.out.print(b + "|");
-         }
-         System.out.println();*/
-        return res;
-    }
-
-    private short byteArrayToInt(byte[] b) {
-        ByteBuffer bb = ByteBuffer.wrap(b);
-        return bb.getShort();
-    }
+   
 
     private void analisaPacote(byte[] data, InetAddress add, int port) {
         PDU reply;
-        short s;
+        int s;
         Campo c;
         byte[] tl = {data[2], data[3]};
         System.out.println("Opcao:"+data[4]);
@@ -98,7 +81,7 @@ public class Atendimento extends Thread {
                 System.out.println("Reply");
                 break;
             case 1:
-                s = (short) byteArrayToInt(tl);
+                s = PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(0, "OK".getBytes());
                 reply.addCampo(c);
@@ -111,14 +94,14 @@ public class Atendimento extends Thread {
                 processaLogin(data, add, port);
                 break;
             case 4:
-                s = (short) byteArrayToInt(tl);
+                s =  PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(0, "OK".getBytes());
                 reply.addCampo(c);
                 responde(reply, add, port);
                 break;
             case 5:
-                s = (short) byteArrayToInt(tl);
+                s =  PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(0, "OK".getBytes());
                 reply.addCampo(c);
@@ -142,7 +125,7 @@ public class Atendimento extends Thread {
                 break;
             case 9:
                 System.out.println("Accept challenge");
-                s = (short) byteArrayToInt(tl);
+                s =  PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(0, "OK".getBytes());
                 reply.addCampo(c);
@@ -172,17 +155,20 @@ public class Atendimento extends Thread {
             sendPacket = new DatagramPacket(data, data.length, add, port);
             sendSocket.send(sendPacket);
         } catch (IOException ex) {
-            Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Responde");
         }
     }
 
     private void processaLogin(byte[] data, InetAddress add, int port) {
+        System.out.println("0");
         PDU pacote = new PDU(data);
-        String alc = new String(pacote.getCampo(0).getValor());        
+        System.out.println("1");
+        String alc = new String(pacote.getCampo(0).getValor());   
+        System.out.println("2");
         PDU resposta;
         Campo c;
         byte[] tl = {data[2], data[3]};
-        short s = (short) byteArrayToInt(tl);
+        int s =  PDU.byteArrayToInt(tl);
         try {
             Utilizador u;
             u = this.bd.getUser(alc);
@@ -213,7 +199,7 @@ public class Atendimento extends Thread {
     private void processaRegisto(byte[] data, InetAddress add, int port) {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
-        Short s = (short) byteArrayToInt(tl);
+        int s = PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c;
         String nome = new String(pacote.getCampo(0).getValor());
@@ -239,7 +225,7 @@ public class Atendimento extends Thread {
     private void listaDesafios(byte[] data, InetAddress add, int port) {
         ArrayList<Desafio> desafios = bd.getDesafios();
         byte[] tl = {data[2], data[3]};
-        Short s = (short) byteArrayToInt(tl);
+        int s =  PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c, da, h, f;
         int tam = desafios.size();
@@ -264,11 +250,15 @@ public class Atendimento extends Thread {
     private void criaDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
-        Short s = (short) byteArrayToInt(tl);
+        int s =  PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c,dat;
         String nome = new String(pacote.getCampo(0).getValor());
+        System.out.println(nome);
+        
         boolean e = bd.existeDesafio(nome);
+        System.out.println(e);
+        
         if (e) {
             reply = new PDU(s, (byte) 0);
             c = new Campo(255, "Desafio existente!".getBytes());
@@ -280,15 +270,15 @@ public class Atendimento extends Thread {
             int pri = aux / 10;
             int sec = aux % 10;
             byte[] ano = {(byte) pri, (byte) sec};
-            byte[] mes = intToByteArray((short) tempo.getMonthValue());
-            byte[] dia = intToByteArray((short) tempo.getDayOfMonth());
-            byte[] hora = intToByteArray((short) tempo.getHour());
-            byte[] minuto = intToByteArray((short) tempo.getMinute());
-            byte[] segundo = intToByteArray((short) tempo.getSecond());
+            byte[] mes = PDU.intToByteArray( tempo.getMonthValue());
+            byte[] dia = PDU.intToByteArray( tempo.getDayOfMonth());
+            byte[] hora = PDU.intToByteArray( tempo.getHour());
+            byte[] minuto = PDU.intToByteArray(tempo.getMinute());
+            byte[] segundo = PDU.intToByteArray( tempo.getSecond());
             Desafio d = new Desafio("as", ano, dia,mes, hora, minuto, segundo);
             Utilizador u = bd.getUserByIP(add);
             d.addUser(u, tl);
-            this.bd.addDesafio(d);            
+            this.bd.addDesafio(d);
             reply = new PDU(s, (byte) 0);
             c = new Campo(07, d.getNome().getBytes());
             reply.addCampo(c);

@@ -10,14 +10,16 @@ import java.util.Objects;
 class Campo {
     
     private int id;
-    private byte size;
+    private byte[] size;
     private byte[] valor;
 
     public Campo(int id, byte[] valor) {
         this.id = id;
         this.valor = valor;
-        this.size = (byte) valor.length;
+        this.size = PDU.intToByteArray(valor.length);
     }
+    
+     
 
     public int getId() {
         return id;
@@ -27,7 +29,7 @@ class Campo {
         this.id = id;
     }
     
-    public byte getSize(){
+    public byte[] getSize(){
         return this.size;
     }
 
@@ -37,13 +39,17 @@ class Campo {
 
     public void setValor(byte[] valor) {
         this.valor = valor;
-        this.size = (byte) this.valor.length;
+        this.size = PDU.intToByteArray(valor.length);
     }
     
     public byte[] getBytes(){
         ArrayList<Byte> res = new ArrayList<>();
         res.add((byte) this.id);
-        res.add(this.size);
+         for (byte b : this.size) {
+            res.add(b);
+        }
+        
+        //res.add(this.size);
         byte[] v = this.valor;
         
         for(byte b : v){

@@ -36,6 +36,9 @@ class Desafio implements Serializable {
         this.hora = hora;
         this.minuto = minuto;
         this.segundo = segundo;
+        this.users= new HashMap<>();
+        this.labels= new HashMap<>();
+        this.questoes = new ArrayList<>();
     }
     
 

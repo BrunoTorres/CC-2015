@@ -8,6 +8,7 @@ package musicgame;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  *
@@ -34,7 +35,6 @@ class Pergunta implements Serializable {
         this.pergunta = null;
         this.respostas = new ArrayList<>();
         this.respostaCerta = 0;
-        
     }
 
     public void setMusica(String musica) {

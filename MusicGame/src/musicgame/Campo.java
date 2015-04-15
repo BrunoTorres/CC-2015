@@ -44,7 +44,7 @@ class Campo {
     
     public byte[] getBytes(){
         ArrayList<Byte> res = new ArrayList<>();
-        res.add((byte) this.id);
+        res.add((byte) (this.id+128));
          for (byte b : this.size) {
             res.add(b);
         }

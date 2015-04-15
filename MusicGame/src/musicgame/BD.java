@@ -143,17 +143,21 @@ class BD implements Serializable {
         }
     }
 
-    void updateUser(String alcunha, InetAddress add, int port) {
+    public void updateUser(String alcunha, InetAddress add, int port) {
         this.users.get(alcunha).setIp(add);
         this.users.get(alcunha).setPort(port);
     }
 
-    ArrayList<Desafio> getDesafios() {
+    public ArrayList<Desafio> getDesafios() {
         ArrayList<Desafio> des = new ArrayList<>();
         for (Desafio d : desafios.values()) {
             des.add(d);
         }
         return des;
+    }
+    
+    public Desafio getDesafio(String nome){
+        return this.desafios.get(nome);
     }
 
     public boolean existeDesafio(String nome) {

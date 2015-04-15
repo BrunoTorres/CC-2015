@@ -1,6 +1,5 @@
 package musicgame;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -17,6 +16,17 @@ public class PDU {
     private int tamLista;
     private ArrayList<Campo> campos;
     
+    public String getMusicPath(){
+        return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/musica/");
+    }
+    
+    public String getImagesPath(){
+        return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/imagens/");
+    }
+    
+    public String getDesafiosPath(){
+        return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/desafios/");
+    }
     
 
     public PDU(int lab, int tipo) {
@@ -35,7 +45,6 @@ public class PDU {
         this.seg = bytes[1];
         byte[] l = {bytes[2], bytes[3]};
         this.lab = PDU.byteArrayToInt(l);
-        System.out.println("label "+ lab);
         this.tipo = bytes[4];
         this.numCampos = bytes[5];
         byte[] tl = {bytes[6], bytes[7]};
@@ -108,9 +117,12 @@ public class PDU {
     
     
     public static int byteArrayToInt(byte[] b) {
-        int res =  b[1] & 0xFF | (b[0] & 0xFF) << 8 ;
-        return res;
-        
+        int res;
+        if(b.length > 1)
+            res =  b[1] & 0xFF | (b[0] & 0xFF) << 8 ;
+        else
+            res = b[0];
+        return res;        
     }
 
     public static byte[] intToByteArray(int n) {

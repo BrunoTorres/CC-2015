@@ -180,7 +180,6 @@ class Desafio implements Serializable {
         
         //System.out.println("nome imagem = " + this.questoes.get(i).getImagem());
         String img = pImage.concat(this.questoes.get(i).getImagem());
-        System.out.println(img);
         File f = new File(img);
         byte[] r = Files.readAllBytes(f.toPath());
         //r = Files.readAllBytes(f.toPath());
@@ -189,7 +188,6 @@ class Desafio implements Serializable {
     }
 
     public byte[] getMusicaQuestao(String pMusica, int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
-        System.out.println("quest= "+ this.questoes.get(i).getMusica());
         String m = pMusica.concat(this.questoes.get(i).getMusica());
         File f = new File(m);
         byte[] r = Files.readAllBytes(f.toPath());

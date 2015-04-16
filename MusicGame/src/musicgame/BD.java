@@ -22,6 +22,7 @@ import java.util.Random;
 class BD implements Serializable {
 
     private HashMap<String, Utilizador> users;
+    private HashMap<String, Float> ranking;
     private HashMap<String, Desafio> desafios;
     private ArrayList<Pergunta> perguntas;
     private String pastaMusica;
@@ -33,10 +34,18 @@ class BD implements Serializable {
         this.pastaMusica = pMusica;
         this.users = new HashMap<>();
         this.desafios = new HashMap<>();
+        this.ranking = new HashMap<>();
     }
 
     public void addUser(Utilizador u) {
         users.put(u.getAlcunha(), u);
+        ranking.put(u.getAlcunha(), 0f);
+    }
+    
+    public float addPontuacao(String alcunha, float p){
+        float r = p + ranking.get(alcunha);
+        ranking.put(alcunha, r);
+        return r;
     }
 
     public void addDesafio(Desafio d) {

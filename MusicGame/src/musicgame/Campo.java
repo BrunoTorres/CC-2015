@@ -16,6 +16,7 @@ class Campo {
     public Campo(int id, byte[] valor) {
         this.id = id;
         this.valor = valor;
+        
         this.size = PDU.intToByteArray(valor.length);
     }
     

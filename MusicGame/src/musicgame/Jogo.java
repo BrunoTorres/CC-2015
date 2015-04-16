@@ -5,6 +5,9 @@
  */
 package musicgame;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,6 +16,8 @@ import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 /**
  *
@@ -96,6 +101,7 @@ public class Jogo extends Thread {
         PDU image;
 
         byte[] p;
+        System.out.println("NPACK: " + (nPackets+1));
         for (i = 0; i < nPackets; i++) {
 
             image = new PDU(s, (byte) 0);
@@ -112,7 +118,7 @@ public class Jogo extends Thread {
             image.addCampo(new Campo(16, p));
             image.addCampo(new Campo(254, new byte[]{0}));
             responde(image, add, port);
-            System.out.println(i);
+            System.out.println(i+1);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -126,6 +132,7 @@ public class Jogo extends Thread {
         image.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         image.addCampo(new Campo(16, p));
         image.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
+        System.out.println(i+1);
         responde(image, add, port);
     }
 
@@ -139,25 +146,28 @@ public class Jogo extends Thread {
         int lastPackBytes = m.length % 49152;
 
         PDU music;
-
         byte[] p;
+        System.out.println("NPACK: " + (nPackets+1));
         for (i = 0; i < nPackets; i++) {
+            if (i != 1) {
+                music = new PDU(s, (byte) 0);
+                c = new Campo(7, desafio.getNome().getBytes());
+                music.addCampo(c);
+                c = new Campo(10, PDU.intToByteArray(numQuestao));
+                music.addCampo(c);
+                c = new Campo(17, new byte[]{(byte) (i + 1)});
+                music.addCampo(c);
+                p = new byte[49152];
+                for (int j = 0; j < 49152; j++) {
+                    p[j] = m[i * 49152 + j];
+                }
 
-            music = new PDU(s, (byte) 0);
-            c = new Campo(7, desafio.getNome().getBytes());
-            music.addCampo(c);
-            c = new Campo(10, PDU.intToByteArray(numQuestao));
-            music.addCampo(c);
-            c = new Campo(17, new byte[]{(byte) (i + 1)});
-            music.addCampo(c);
-            p = new byte[49152];
-            for (int j = 0; j < 49152; j++) {
-                p[j] = m[i * 49152 + j];
+                music.addCampo(new Campo(18, p));
+                music.addCampo(new Campo(254, new byte[]{0}));
+
+                responde(music, add, port);
+                System.out.println(i+1);
             }
-            music.addCampo(new Campo(18, p));
-            music.addCampo(new Campo(254, new byte[]{0}));
-            responde(music, add, port);
-            System.out.println(i);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -171,6 +181,7 @@ public class Jogo extends Thread {
         music.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(18, p));
         music.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
+        System.out.println(i+1);
         responde(music, add, port);
     }
 

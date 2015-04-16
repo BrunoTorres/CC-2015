@@ -1,21 +1,26 @@
 package musicgame;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.util.converter.LocalDateTimeStringConverter;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 class MusicClient {
 
@@ -178,12 +183,16 @@ class MusicClient {
         System.out.println("Desafio: " + nome);
         System.out.println("Data: " + new String(pacote.getCampo(1).getValor()));
 
-        //// IFACE CHAMA O JOGAR
-        jogar();
+        try {
+            //// IFACE CHAMA O JOGAR
+            jogar();
+        } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException ex) {
+            Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
-    private static void jogar() throws SocketException, IOException {
+    private static void jogar() throws SocketException, IOException, UnsupportedAudioFileException, LineUnavailableException {
         byte[] b, res, data;
         PDU pacote;
         int num = 0;
@@ -212,24 +221,21 @@ class MusicClient {
             respostas.add(new String(pacote.getCampo(8).getBytes()));
             System.out.println("Nome: " + nome);
             System.out.println(pergunta);
+
             for (String s : respostas) {
                 System.out.println(s);
             }
-            
-            blocosImagem = (TreeMap) recebeBlocos();
-            
-            blocosMusica = (TreeMap) recebeBlocos();
 
-            // 2º pacote -> primeiro pacote de com uma imagem
+            // 2ª parte -> receber pacotes de uma imagem
+            blocosImagem = (TreeMap) recebeBlocos();
+            checkBlocos(blocosImagem, nome, nQuestao, 16);
+            String fImage = constroiFicheiroImagem(blocosImagem);
+
+            // 3º parte -> receber pacotes de uma musica
+            blocosMusica = (TreeMap) recebeBlocos();
+            System.out.println("B4");
             checkBlocos(blocosMusica, nome, nQuestao, 18);
-            
-            
-            
-            ////   ACABAR RETRANSMIT ///////////////
-            
-            
-            
-            
+            String fMusic = constroiFicheiroAudio(blocosMusica);
         } catch (SocketTimeoutException e) {
             PDU tout = new PDU(label, 0);
             tout.addCampo(new Campo(255, new byte[]{0}));
@@ -255,7 +261,6 @@ class MusicClient {
         System.arraycopy(res, 0, data, 0, tam);
         pacote = new PDU(data);
         int i = 1;
-
         int numero = pacote.getCampo(4).getId() + 128;
         while (numero == 254) {
             b = pacote.getCampo(2).getValor();
@@ -275,13 +280,11 @@ class MusicClient {
             pacote = new PDU(data);
             numero = pacote.getCampo(4).getId() + 128;
         }
+        System.out.println("ID: " + numero);
         b = pacote.getCampo(2).getValor();
-        if (b.length > 1) {
-            num = PDU.byteArrayToInt(b);
-        } else {
-            num = (int) b[0];
-        }
-        blocos.put(num, pacote.getCampo(4).getValor());
+        num = PDU.byteArrayToInt(b);
+        
+        blocos.put(num, pacote.getCampo(3).getValor());
 
         for (Integer c : blocos.keySet()) {
             System.out.println(c);
@@ -323,6 +326,7 @@ class MusicClient {
         ret.addCampo(c);
         c = new Campo(16, PDU.intToByteArray(n));
         ret.addCampo(c);
+        PDU.printBytes(c.getValor());
 
         sendPacket = new DatagramPacket(ret.getBytes(), ret.getBytes().length, IPAddress, 55555);
         clientSocket.send(sendPacket);
@@ -336,10 +340,9 @@ class MusicClient {
         byte[] data = new byte[tam];
         System.arraycopy(res, 0, data, 0, tam);
         PDU pacote = new PDU(data);
-        byte[] b = pacote.getCampo(1).getValor();
+        byte[] b = pacote.getCampo(2).getValor();
         num = PDU.byteArrayToInt(b);
-        blocos.put(num, pacote.getCampo(1).getValor());
-
+        blocos.put(num, pacote.getCampo(3).getValor());
     }
 
     private static void checkBlocos(TreeMap<Integer, byte[]> blocos, String nome, int nQuestao, int tipo) {
@@ -355,5 +358,36 @@ class MusicClient {
             Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private static String constroiFicheiroAudio(Map<Integer, byte[]> blocos) throws UnsupportedAudioFileException, IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            for (byte[] a : blocos.values()) {
+                os.write(a);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        File f = new File("m.mp3");
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(os.toByteArray());
+
+        return f.getAbsolutePath();
+    }
+
+    private static String constroiFicheiroImagem(TreeMap<Integer, byte[]> blocosImagem) throws FileNotFoundException, IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            for (byte[] a : blocosImagem.values()) {
+                os.write(a);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        File f = new File("i.jpg");
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(os.toByteArray());
+        return f.getAbsolutePath();
     }
 }

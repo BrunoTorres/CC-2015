@@ -15,19 +15,18 @@ public class PDU {
     private byte numCampos;
     private int tamLista;
     private ArrayList<Campo> campos;
-    
-    public String getMusicPath(){
+
+    public String getMusicPath() {
         return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/musica/");
     }
-    
-    public String getImagesPath(){
+
+    public String getImagesPath() {
         return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/imagens/");
     }
-    
-    public String getDesafiosPath(){
+
+    public String getDesafiosPath() {
         return getClass().getProtectionDomain().getCodeSource().getLocation().toString().concat("/musicgame/desafios/");
     }
-    
 
     public PDU(int lab, int tipo) {
         this.ver = 0;
@@ -40,7 +39,7 @@ public class PDU {
     }
 
     public PDU(byte[] bytes) {
-        
+
         this.ver = bytes[0];
         this.seg = bytes[1];
         byte[] l = {bytes[2], bytes[3]};
@@ -56,8 +55,8 @@ public class PDU {
                 //System.out.println("i: " + i);
                 int k = 0;
                 int id = bytes[i];
-                byte[] sizeL = new byte[]{bytes[i + 1], bytes[i+2]};
-                int sizeNew= byteArrayToInt(sizeL);
+                byte[] sizeL = new byte[]{bytes[i + 1], bytes[i + 2]};
+                int sizeNew = byteArrayToInt(sizeL);
 
                 //System.out.println("Size: " + sizeL);
                 byte[] valor = new byte[sizeNew];
@@ -66,9 +65,8 @@ public class PDU {
                     valor[k] = bytes[j];
                     k++;
                 }
-                String v = new String(valor);
-                //System.out.println("Valor: " + v);
-                c = new Campo(id, v.getBytes());
+                
+                c = new Campo(id, valor);
                 this.campos.add(c);
                 i += sizeNew + 3;
             }
@@ -114,15 +112,15 @@ public class PDU {
     public void setTamLista(int tamLista) {
         this.tamLista = tamLista;
     }
-    
-    
+
     public static int byteArrayToInt(byte[] b) {
         int res;
-        if(b.length > 1)
-            res =  b[1] & 0xFF | (b[0] & 0xFF) << 8 ;
-        else
+        if (b.length > 1) {
+            res = b[1] & 0xFF | (b[0] & 0xFF) << 8;
+        } else {
             res = b[0];
-        return res;        
+        }
+        return res;
     }
 
     public static byte[] intToByteArray(int n) {
@@ -133,17 +131,16 @@ public class PDU {
         return res;
     }
 
-
     public void addCampo(Campo c) {
         this.campos.add(c);
         this.numCampos++;
-        this.tamLista += c.getSize()[0]+c.getSize()[1];
+        this.tamLista += c.getSize()[0] + c.getSize()[1];
     }
-    public Campo getCampo(int ind){
+
+    public Campo getCampo(int ind) {
         return campos.get(ind);
     }
 
- 
     public byte[] getBytes() {
         ArrayList<Byte> res = new ArrayList<>();
         byte versao = (byte) this.ver;
@@ -161,16 +158,16 @@ public class PDU {
         int soma = 0;
 
         for (Campo c : campos) {
-            soma += PDU.byteArrayToInt(c.getSize()) +3;
-                    //c.getSize()[0]+c.getSize()[1] + 3;
+            soma += PDU.byteArrayToInt(c.getSize()) + 3;
+            //c.getSize()[0]+c.getSize()[1] + 3;
         }
-     
+
         byte[] s;
-        s = PDU.intToByteArray( soma);
-        for(byte b: s){
+        s = PDU.intToByteArray(soma);
+        for (byte b : s) {
             res.add(b);
         }
-        
+
         campos.stream().forEach((c) -> {
             byte[] cm = c.getBytes();
             for (byte b : cm) {
@@ -183,18 +180,18 @@ public class PDU {
             r[i] = b;
             i++;
         }
-        
+
         return r;
-         
+
     }
 
     public static void printBytes(byte[] b) {
-       // byte[] b = this.getBytes();
+        // byte[] b = this.getBytes();
         for (byte a : b) {
-            System.out.print(a +"|");
+            System.out.print(a + "|");
         }
         System.out.println("");
-        
+
     }
 
     @Override

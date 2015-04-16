@@ -317,7 +317,7 @@ public class Atendimento extends Thread {
         PDU image;
 
         byte[] p;
-        for (i = 1; i <= nPackets; i++) {
+        for (i = 1; i < nPackets; i++) {
             p = new byte[49152];
             for (int j = 0; j < 49152; j++) {
                 p[j] = m[i * 49152 + j];
@@ -353,7 +353,6 @@ public class Atendimento extends Thread {
             }
             int bloco = PDU.byteArrayToInt(pacote.getCampo(3).getValor());
             TreeMap<Integer, byte[]> blocos = (TreeMap) this.getBlocos(ca);
-            
             byte b[] = blocos.get(bloco);
             
             PDU music = new PDU(s, (byte) 0);

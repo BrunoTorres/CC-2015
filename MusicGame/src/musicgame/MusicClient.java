@@ -145,7 +145,7 @@ class MusicClient {
         }
     }
 
-    private static void menuLogin() {
+    public static void menuLogin() {
 
         PDU login = new PDU(12, (byte) 3);
         Campo m = new Campo(2, "Manuel".getBytes());
@@ -155,8 +155,19 @@ class MusicClient {
         login.addCampo(p);
 
     }
+    
+    public static void menuListChallenge(){
+    
+    
+    
+    
+    
+    
+    
+    
+    }
 
-    private static void menuMakeChallenge(String nome) throws IOException {
+    public static void menuMakeChallenge(String nome) throws IOException {
 
         PDU fazDesafio = new PDU(label, (byte) 8);
         Campo m = new Campo(7, nome.getBytes());
@@ -186,13 +197,13 @@ class MusicClient {
         try {
             //// IFACE CHAMA O JOGAR
             jogar();
-        } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException ex) {
+        } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
             Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    private static void jogar() throws SocketException, IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public static void jogar() throws SocketException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
         byte[] b, res, data;
         PDU pacote;
         int num = 0;
@@ -214,28 +225,38 @@ class MusicClient {
             System.arraycopy(res, 0, data, 0, tam);
             pacote = new PDU(data);
             nome = new String(pacote.getCampo(0).getValor());
-            nQuestao = pacote.getCampo(1).getValor()[0];
-            pergunta = new String(pacote.getCampo(2).getValor());
-            respostas.add(new String(pacote.getCampo(4).getBytes()));
-            respostas.add(new String(pacote.getCampo(6).getBytes()));
-            respostas.add(new String(pacote.getCampo(8).getBytes()));
-            System.out.println("Nome: " + nome);
-            System.out.println(pergunta);
+            System.out.println("Desafio: " + nome);
+            int id = pacote.getCampo(1).getId();
+            // se == 255 -> Não existem jogadores suficientes -> Exception
+            // se não -> jogar
+            
+            
+           // if (id != 255) {
+                nQuestao = pacote.getCampo(1).getValor()[0];
+                pergunta = new String(pacote.getCampo(2).getValor());
+                respostas.add(new String(pacote.getCampo(4).getBytes()));
+                respostas.add(new String(pacote.getCampo(6).getBytes()));
+                respostas.add(new String(pacote.getCampo(8).getBytes()));
+                System.out.println("Nome: " + nome);
+                System.out.println(pergunta);
 
-            for (String s : respostas) {
-                System.out.println(s);
-            }
+                for (String s : respostas) {
+                    System.out.println(s);
+                }
 
-            // 2ª parte -> receber pacotes de uma imagem
-            blocosImagem = (TreeMap) recebeBlocos();
-            checkBlocos(blocosImagem, nome, nQuestao, 16);
-            String fImage = constroiFicheiroImagem(blocosImagem);
+                // 2ª parte -> receber pacotes de uma imagem
+                blocosImagem = (TreeMap) recebeBlocos();
+                checkBlocos(blocosImagem, nome, nQuestao, 16);
+                String fImage = constroiFicheiroImagem(blocosImagem);
 
-            // 3º parte -> receber pacotes de uma musica
-            blocosMusica = (TreeMap) recebeBlocos();
-            System.out.println("B4");
-            checkBlocos(blocosMusica, nome, nQuestao, 18);
-            String fMusic = constroiFicheiroAudio(blocosMusica);
+                // 3º parte -> receber pacotes de uma musica
+                blocosMusica = (TreeMap) recebeBlocos();
+                checkBlocos(blocosMusica, nome, nQuestao, 18);
+                String fMusic = constroiFicheiroAudio(blocosMusica);
+          //  }
+          //  else{
+          //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
+           // }
         } catch (SocketTimeoutException e) {
             PDU tout = new PDU(label, 0);
             tout.addCampo(new Campo(255, new byte[]{0}));
@@ -283,7 +304,7 @@ class MusicClient {
         System.out.println("ID: " + numero);
         b = pacote.getCampo(2).getValor();
         num = PDU.byteArrayToInt(b);
-        
+
         blocos.put(num, pacote.getCampo(3).getValor());
 
         for (Integer c : blocos.keySet()) {
@@ -293,7 +314,7 @@ class MusicClient {
         return blocos;
     }
 
-    private static void menuRegista() {
+    public static void menuRegista() {
         System.out.println("#################### Registar Utilizador #####################");
         System.out.println("                                                              ");
         in.nextLine();

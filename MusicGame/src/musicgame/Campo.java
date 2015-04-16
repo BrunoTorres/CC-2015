@@ -23,7 +23,7 @@ class Campo {
      
 
     public int getId() {
-        return id;
+        return id+128;
     }
 
     public void setId(int id) {

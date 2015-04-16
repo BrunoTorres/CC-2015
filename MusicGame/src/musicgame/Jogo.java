@@ -5,19 +5,14 @@
  */
 package musicgame;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 /**
  *
@@ -54,34 +49,47 @@ public class Jogo extends Thread {
                 agora = LocalDateTime.now();
             }
 
-            for (Utilizador u : this.desafio.getUsers().values()) {
-                label = this.desafio.getLabelByUser(u);
-                int s = PDU.byteArrayToInt(label);
-                resposta = new PDU(s, (byte) 0);
-                c = new Campo(07, this.desafio.getNome().getBytes());
-                resposta.addCampo(c);
-                byte[] q = {(byte) numQuestao};
-
-                c = new Campo(10, q);
-                resposta.addCampo(c);
-                c = new Campo(11, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
-                resposta.addCampo(c);
-                int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
-                int i;
-                for (i = 1; i <= 3; i++) {
-                    q = new byte[]{(byte) i};
-                    c = new Campo(12, q);
-                    resposta.addCampo(c);
-                    c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
-                    resposta.addCampo(c);
+            if (this.desafio.getUsers().size() < 2) {
+                Utilizador u = new Utilizador();
+                for (Utilizador ut : this.desafio.getUsers().values()) {
+                    u = ut;
                 }
-                responde(resposta, u.getIp(), u.getPort());
 
-                ////////////////// END REPLY //////////////////
-                sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+                PDU reply;
+                reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(u)), (byte) 0);
+                reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
+                reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
+                responde(reply, u.getIp(), u.getPort());
+            } else {
+                for (Utilizador u : this.desafio.getUsers().values()) {
+                    label = this.desafio.getLabelByUser(u);
+                    int s = PDU.byteArrayToInt(label);
+                    resposta = new PDU(s, (byte) 0);
+                    c = new Campo(07, this.desafio.getNome().getBytes());
+                    resposta.addCampo(c);
+                    byte[] q = {(byte) numQuestao};
 
-                sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+                    c = new Campo(10, q);
+                    resposta.addCampo(c);
+                    c = new Campo(11, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
+                    resposta.addCampo(c);
+                    int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
+                    int i;
+                    for (i = 1; i <= 3; i++) {
+                        q = new byte[]{(byte) i};
+                        c = new Campo(12, q);
+                        resposta.addCampo(c);
+                        c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
+                        resposta.addCampo(c);
+                    }
+                    responde(resposta, u.getIp(), u.getPort());
 
+                    ////////////////// END REPLY //////////////////
+                    sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+
+                    sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
@@ -101,7 +109,7 @@ public class Jogo extends Thread {
         PDU image;
 
         byte[] p;
-        System.out.println("NPACK: " + (nPackets+1));
+        System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
 
             image = new PDU(s, (byte) 0);
@@ -118,7 +126,7 @@ public class Jogo extends Thread {
             image.addCampo(new Campo(16, p));
             image.addCampo(new Campo(254, new byte[]{0}));
             responde(image, add, port);
-            System.out.println(i+1);
+            System.out.println(i + 1);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -132,7 +140,7 @@ public class Jogo extends Thread {
         image.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         image.addCampo(new Campo(16, p));
         image.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
-        System.out.println(i+1);
+        System.out.println(i + 1);
         responde(image, add, port);
     }
 
@@ -147,7 +155,7 @@ public class Jogo extends Thread {
 
         PDU music;
         byte[] p;
-        System.out.println("NPACK: " + (nPackets+1));
+        System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
             if (i != 1) {
                 music = new PDU(s, (byte) 0);
@@ -166,7 +174,7 @@ public class Jogo extends Thread {
                 music.addCampo(new Campo(254, new byte[]{0}));
 
                 responde(music, add, port);
-                System.out.println(i+1);
+                System.out.println(i + 1);
             }
         }
         p = new byte[lastPackBytes];
@@ -181,7 +189,7 @@ public class Jogo extends Thread {
         music.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(18, p));
         music.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
-        System.out.println(i+1);
+        System.out.println(i + 1);
         responde(music, add, port);
     }
 

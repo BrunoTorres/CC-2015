@@ -5,12 +5,15 @@
  */
 package musicgame;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javafx.util.converter.LocalDateTimeStringConverter;
 
 /**
  *
@@ -40,6 +43,27 @@ class Desafio implements Serializable {
         this.users = new HashMap<>();
         this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
+    }
+    
+    public LocalDateTime getLocalDate(){
+        int anos,ano2,mes,dia,hora,min,seg;
+        System.out.println("locall");
+        anos=this.ano[1];
+        System.out.println("anoo "+ anos);
+        ano2=this.ano[0];
+        ano2*=10;
+        anos+=ano2+2000;
+        //System.out.println("anooooo "+  PDU.byteArrayToInt(this.ano));
+        mes=PDU.byteArrayToInt(this.mes);
+        dia=PDU.byteArrayToInt(this.dia);
+        hora=PDU.byteArrayToInt(this.hora);
+        min=PDU.byteArrayToInt(this.minuto);
+        seg=PDU.byteArrayToInt(this.segundo);
+        
+        LocalDateTime d = LocalDateTime.of(anos, mes, dia, hora, min, seg);
+        System.out.println("************************************* * "  +d.toString());
+        return d;
+        
     }
 
     public void addUser(Utilizador u, byte[] label) {
@@ -130,6 +154,7 @@ class Desafio implements Serializable {
         this.segundo = segundo;
     }
 
+    
     public String getData() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.ano).append(this.mes).append(this.dia);
@@ -199,7 +224,7 @@ class Desafio implements Serializable {
     @Override
     public String toString(){
         StringBuilder sb= new StringBuilder();
-        sb.append("nome= ").append(this.nome);
+        sb.append("nome====== ").append(this.nome);
         for(Pergunta p :this.questoes)
             p.toString();
         return sb.toString();

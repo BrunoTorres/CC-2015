@@ -47,10 +47,14 @@ public class Jogo extends Thread {
 
             while (this.data.isAfter(agora)) {
                 agora = LocalDateTime.now();
+                
+                /// vai ter aqui cenas para recber pacote de delete//
+                
+                
             }
 
-            if (this.desafio.getUsers().size() < 2) {
-                Utilizador u = new Utilizador();
+           /* if (this.desafio.getUsers().size() < 2) {
+               Utilizador u = new Utilizador();
                 for (Utilizador ut : this.desafio.getUsers().values()) {
                     u = ut;
                 }
@@ -60,8 +64,9 @@ public class Jogo extends Thread {
                 reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
                 reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
                 responde(reply, u.getIp(), u.getPort());
-            } else {
+            } else */{
                 for (Utilizador u : this.desafio.getUsers().values()) {
+                    System.out.println("alcoo " + u.getAlcunha());
                     label = this.desafio.getLabelByUser(u);
                     int s = PDU.byteArrayToInt(label);
                     resposta = new PDU(s, (byte) 0);
@@ -99,7 +104,7 @@ public class Jogo extends Thread {
 
     public void sendImage(String nome, int s, int numQuestao, InetAddress add, int port) throws IOException {
         Campo c;
-        System.out.println("IMAGEM");
+        //System.out.println("IMAGEM");
         int i;
         byte[] dateSend, m = this.desafio.getImagemQuestao(this.bd.getPathImage(), numQuestao - 1);
 
@@ -109,7 +114,7 @@ public class Jogo extends Thread {
         PDU image;
 
         byte[] p;
-        System.out.println("NPACK: " + (nPackets + 1));
+        //System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
 
             image = new PDU(s, (byte) 0);
@@ -126,7 +131,7 @@ public class Jogo extends Thread {
             image.addCampo(new Campo(16, p));
             image.addCampo(new Campo(254, new byte[]{0}));
             responde(image, add, port);
-            System.out.println(i + 1);
+           // System.out.println(i + 1);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -140,13 +145,13 @@ public class Jogo extends Thread {
         image.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         image.addCampo(new Campo(16, p));
         image.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
-        System.out.println(i + 1);
+        //System.out.println(i + 1);
         responde(image, add, port);
     }
 
     public void sendMusic(String nome, int s, int numQuestao, InetAddress add, int port) throws IOException {
         Campo c;
-        System.out.println("MUSICA");
+       // System.out.println("MUSICA");
         int i;
         byte[] m = this.desafio.getMusicaQuestao(this.bd.getPathMusic(), numQuestao - 1);
 
@@ -155,7 +160,7 @@ public class Jogo extends Thread {
 
         PDU music;
         byte[] p;
-        System.out.println("NPACK: " + (nPackets + 1));
+       // System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
             if (i != 1) {
                 music = new PDU(s, (byte) 0);
@@ -174,7 +179,7 @@ public class Jogo extends Thread {
                 music.addCampo(new Campo(254, new byte[]{0}));
 
                 responde(music, add, port);
-                System.out.println(i + 1);
+               // System.out.println(i + 1);
             }
         }
         p = new byte[lastPackBytes];
@@ -189,7 +194,7 @@ public class Jogo extends Thread {
         music.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(18, p));
         music.addCampo(new Campo(250, new byte[]{0}));  ////////////////////////////// last block
-        System.out.println(i + 1);
+        //System.out.println(i + 1);
         responde(music, add, port);
     }
 

@@ -68,7 +68,7 @@ public class Atendimento extends Thread {
      fos.write(img);
      fos.close();
      }*/
-    private void analisaPacote(byte[] data, InetAddress add, int port) {
+    private void analisaPacote(byte[] data, InetAddress add, int port) throws IOException, UserInexistenteException {
         PDU reply;
         int s;
         Campo c;
@@ -125,9 +125,16 @@ public class Atendimento extends Thread {
                 System.out.println("Accept challenge");
                 s = PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
-                c = new Campo(0, "OK".getBytes());
+                c = new Campo(0, PDU.intToByteArray(0));
                 reply.addCampo(c);
+                PDU p = new PDU(data);
+                Desafio d =bd.getDesafio(new String(p.getCampo(0).getValor()));
+                d.addUser(bd.getUserByIP(add), tl);
                 responde(reply, add, port);
+                
+                Jogo j = new Jogo(d.getLocalDate(), d, this.bd);
+                j.start();
+                
                 break;
             case 10:
                 System.out.println("Delete challenge");
@@ -221,7 +228,7 @@ public class Atendimento extends Thread {
 
     }
 
-    private void listaDesafios(byte[] data, InetAddress add, int port) {
+    private void listaDesafios(byte[] data, InetAddress add, int port) throws IOException {
         ArrayList<Desafio> desafios = bd.getDesafios();
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
@@ -234,7 +241,8 @@ public class Atendimento extends Thread {
             reply = new PDU(s, (byte) 0);
             c = new Campo(7, d.getNome().getBytes());
             reply.addCampo(c);
-            da = new Campo(4, d.getData().getBytes());
+            da = new Campo(4, d.getDataByte().getBytes());
+            System.out.println("dataaaa "+ new String(da.getValor()));
             reply.addCampo(da);
             h = new Campo(5, d.getTempo().getBytes());
             reply.addCampo(h);

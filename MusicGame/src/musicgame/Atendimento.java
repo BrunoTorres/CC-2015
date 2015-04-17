@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +54,7 @@ public class Atendimento extends Thread {
              System.out.print(b + "|");
              }*/
             analisaPacote(data, IPAddress, port);
-        } catch (Exception e) {
+        } catch (IOException | UserInexistenteException e) {
             System.out.println(e.toString());
         }
     }
@@ -182,20 +180,22 @@ public class Atendimento extends Thread {
             byte[] pass = u.getPass();
             if (Arrays.equals(passATestar, pass)) { //Se a passe for correta
                 resposta = new PDU(s, (byte) 0);
-                c = new Campo(1, u.getUserName().getBytes());
+                c = new Campo(1, u.getAlcunha().getBytes());
+                resposta.addCampo(c);
+                c= new Campo(20,PDU.intToByteArray(bd.getRanking(u.getAlcunha())));
                 resposta.addCampo(c);
                 this.bd.updateUser(u.getAlcunha(), add, port);
                 responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
             } else { //Pacote de erro passe incorreta
                 resposta = new PDU(s, (byte) 0);
-                c = new Campo(255, "Password incorreta!".getBytes());
+                c = new Campo(255, "Password".getBytes());
                 resposta.addCampo(c);
                 responde(resposta, add, port);
             }
         } catch (UserInexistenteException ex) {
             //pacote de erro            
             resposta = new PDU(s, (byte) 0);
-            c = new Campo(255, "Utilizador inexistente!".getBytes());
+            c = new Campo(255, "Utilizador".getBytes());
             resposta.addCampo(c);
             responde(resposta, add, port);
         }
@@ -263,6 +263,8 @@ public class Atendimento extends Thread {
         String nome = new String(pacote.getCampo(0).getValor());
 
         boolean e = bd.existeDesafio(nome);
+        
+        System.out.println("cria desafio "+ e);
 
         if (e) {
             reply = new PDU(s, (byte) 0);
@@ -321,22 +323,23 @@ public class Atendimento extends Thread {
         int nPackets = m.length / 49152;
         int lastPackBytes = m.length % 49152;
         int i;
-
         PDU image;
 
         byte[] p;
-        for (i = 1; i < nPackets; i++) {
+        for (i = 0; i < nPackets; i++) {
             p = new byte[49152];
             for (int j = 0; j < 49152; j++) {
                 p[j] = m[i * 49152 + j];
             }
-            blocos.put(i, p);
+            
+            blocos.put(i+1, p);
+            
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
             p[j] = m[i * 49152 + j];
         }
-        blocos.put(i, p);
+        blocos.put(i+1, p);
 
         return blocos;
     }
@@ -348,28 +351,43 @@ public class Atendimento extends Thread {
             int s = PDU.byteArrayToInt(tl);
             PDU reply;
             Campo c;
-            String nome = new String(pacote.getCampo(0).getValor());
+            String nome = new String(pacote.getCampo(0).getValor()); //nome
             Desafio d = this.bd.getDesafio(nome);
-            int nQ = pacote.getCampo(1).getValor()[0];
+            int nQ = pacote.getCampo(1).getValor()[0];               //n questao
             Pergunta p = d.getPergunta(nQ);
-            int tipo = pacote.getCampo(2).getValor()[0];
+            int tipo = pacote.getCampo(2).getValor()[0];             //imagem ou audio
             String ca;
             if (tipo == 16) {
                 ca = this.bd.getPathImage().concat(p.getImagem());
             } else {
                 ca = this.bd.getPathMusic().concat(p.getMusica());
             }
-            int bloco = PDU.byteArrayToInt(pacote.getCampo(3).getValor());
+            int bloco = PDU.byteArrayToInt(pacote.getCampo(3).getValor());      //n bloco
+            
             TreeMap<Integer, byte[]> blocos = (TreeMap) this.getBlocos(ca);
             byte b[] = blocos.get(bloco);
             
+            
+            //byte b[] = this.bd.partes.get(bloco);
+            
+            
+            
+            
+            System.out.println("b.size  "+ b.length);
+            System.out.println("numeroooo bloocooooo "+ bloco);
+            
             PDU music = new PDU(s, (byte) 0);
-            c = new Campo(7, nome.getBytes());
-            music.addCampo(c);
+            c = new Campo(7, nome.getBytes());                         
+            System.out.println("nome do desafio "+ nome);
+            music.addCampo(c);                                      //nome
             c = new Campo(10, PDU.intToByteArray(nQ));
-            music.addCampo(c);
-            music.addCampo(new Campo(17, new byte[]{(byte) (bloco)}));
-            music.addCampo(new Campo(tipo, b));
+            System.out.println("numero da questao "+ nQ);
+            music.addCampo(c);                                      //nQuestao
+            c=new Campo(17, PDU.intToByteArray(bloco));
+            music.addCampo(c);                                          //nBloco
+            System.out.println("blocooo "+ bloco);
+            c=new Campo(tipo, b);
+            music.addCampo(c);                                      //bloco
             responde(music, add, port);
         } catch (IOException ex) {
             Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);

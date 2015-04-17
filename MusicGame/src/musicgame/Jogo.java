@@ -5,12 +5,13 @@
  */
 package musicgame;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,14 +108,14 @@ public class Jogo extends Thread {
         //System.out.println("IMAGEM");
         int i;
         byte[] dateSend, m = this.desafio.getImagemQuestao(this.bd.getPathImage(), numQuestao - 1);
-
+        
         int nPackets = m.length / 49152;
         int lastPackBytes = m.length % 49152;
-
+       
         PDU image;
 
         byte[] p;
-        //System.out.println("NPACK: " + (nPackets + 1));
+       // System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
 
             image = new PDU(s, (byte) 0);
@@ -131,7 +132,7 @@ public class Jogo extends Thread {
             image.addCampo(new Campo(16, p));
             image.addCampo(new Campo(254, new byte[]{0}));
             responde(image, add, port);
-           // System.out.println(i + 1);
+            //System.out.println(i + 1);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -154,7 +155,7 @@ public class Jogo extends Thread {
        // System.out.println("MUSICA");
         int i;
         byte[] m = this.desafio.getMusicaQuestao(this.bd.getPathMusic(), numQuestao - 1);
-
+        
         int nPackets = m.length / 49152;
         int lastPackBytes = m.length % 49152;
 
@@ -174,12 +175,22 @@ public class Jogo extends Thread {
                 for (int j = 0; j < 49152; j++) {
                     p[j] = m[i * 49152 + j];
                 }
-
+                //this.bd.partes.put(i+1, p);  /////////////////////////////////#####################
                 music.addCampo(new Campo(18, p));
                 music.addCampo(new Campo(254, new byte[]{0}));
 
                 responde(music, add, port);
                // System.out.println(i + 1);
+            
+            
+            }
+            else{
+                p = new byte[49152];
+                for (int j = 0; j < 49152; j++) {
+                    p[j] = m[i * 49152 + j];
+                }
+               // this.bd.partes.put(i+1, p);
+                
             }
         }
         p = new byte[lastPackBytes];
@@ -190,6 +201,9 @@ public class Jogo extends Thread {
         c = new Campo(7, desafio.getNome().getBytes());
         music.addCampo(c);
         c = new Campo(10, PDU.intToByteArray(numQuestao));
+        
+        //this.bd.partes.put(i+1, p);
+        
         music.addCampo(c);
         music.addCampo(new Campo(17, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(18, p));

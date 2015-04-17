@@ -1,0 +1,41 @@
+private static final int HELLO                   = 1;
+    private static final int REGISTER            = 2;
+    private static final int LOGIN               = 3;
+    private static final int LOGOUT              = 4;
+    private static final int QUIT                = 5;
+    private static final int END                 = 6;
+    private static final int LIST_CHALLENGES     = 7;
+    private static final int MAKE_CHALLENGE      = 8;
+    private static final int ACCEPT_CHALLENGE    = 9;
+    private static final int DELETE_CHALLENGE    = 10;
+    private static final int ANSWER              = 11;
+    private static final int RETRANSMIT          = 12;
+    private static final int LIST_RANKING        = 13;
+    
+    
+    private static final int OK                  = 0;
+    private static final int ERRO                = 255;
+    private static final int CONTINUA            = 254;
+    private static final int NOME                = 1;
+    private static final int ALCUNHA             = 2;
+    private static final int PASSWORD            = 3;
+    private static final int DATA                = 4;
+    private static final int HORA                = 5;
+    private static final int ESCOLHA             = 6;
+    private static final int DESAFIO             = 7;
+    private static final int NQUESTAO            = 10;
+    private static final int QUESTAO             = 11;
+    private static final int NRESPOSTA           = 12;
+    private static final int RESPOSTA            = 13;
+    private static final int CERTA               = 14;
+    private static final int PONTOS              = 15;
+    private static final int IMAGEM              = 16;
+    private static final int BLOCO               = 17;
+    private static final int AUDIO               = 18;
+    private static final int SCORE               = 20;
+
+desafio
+questao
+bloco
+imagem
+254-getid()

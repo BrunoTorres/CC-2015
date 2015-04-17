@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 /**
  *
@@ -21,9 +22,9 @@ import java.util.Random;
  */
 class BD implements Serializable {
 
-    private HashMap<String, Utilizador> users;
-    private HashMap<String, Float> ranking;
-    private HashMap<String, Desafio> desafios;
+    private HashMap<String, Utilizador> users; /// syc
+    private HashMap<String, Integer> ranking;     /// syc
+    private HashMap<String, Desafio> desafios; // syc
     private ArrayList<Pergunta> perguntas;
     private String pastaMusica;
     private String pastaImagem;
@@ -36,14 +37,17 @@ class BD implements Serializable {
         this.desafios = new HashMap<>();
         this.ranking = new HashMap<>();
     }
+    public int getRanking(String nome){
+        return this.ranking.get(nome);
+    }
 
     public void addUser(Utilizador u) {
         users.put(u.getAlcunha(), u);
-        ranking.put(u.getAlcunha(), 0f);
+        ranking.put(u.getAlcunha(), 0);
     }
     
-    public float addPontuacao(String alcunha, float p){
-        float r = p + ranking.get(alcunha);
+    public int addPontuacao(String alcunha, int p){
+        int r = p + ranking.get(alcunha);
         ranking.put(alcunha, r);
         return r;
     }

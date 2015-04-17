@@ -44,6 +44,10 @@ class Desafio implements Serializable {
         this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
     }
+
+    public Desafio() {
+    }
+    
     
     public LocalDateTime getLocalDate(){
         int anos,ano2,mes,dia,hora,min,seg;
@@ -214,6 +218,7 @@ class Desafio implements Serializable {
 
     public byte[] getMusicaQuestao(String pMusica, int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
         String m = pMusica.concat(this.questoes.get(i).getMusica());
+        
         File f = new File(m);
         byte[] r = Files.readAllBytes(f.toPath());
         //r = Files.readAllBytes(f.toPath());

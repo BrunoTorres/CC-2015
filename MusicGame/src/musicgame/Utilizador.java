@@ -7,6 +7,7 @@ public class Utilizador implements Serializable {
 
     private String userName;
     private String alcunha;
+    private int score;
     private byte[] pass;
     private InetAddress ip;
     private int port;
@@ -17,6 +18,15 @@ public class Utilizador implements Serializable {
         this.pass = null;
         this.port = -1;
         this.ip = null;
+
+    }
+     public Utilizador(String al, int score) {
+        this.userName = null;
+        this.alcunha = al;
+        this.pass = null;
+        this.port = 0;
+        this.ip = null;
+        this.score=score;
 
     }
 

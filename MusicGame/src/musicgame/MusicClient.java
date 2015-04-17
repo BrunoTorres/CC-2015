@@ -17,12 +17,46 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 class MusicClient {
+
+    private static final int HELLO               = 1;
+    private static final int REGISTER            = 2;
+    private static final int LOGIN               = 3;
+    private static final int LOGOUT              = 4;
+    private static final int QUIT                = 5;
+    private static final int END                 = 6;
+    private static final int LIST_CHALLENGES     = 7;
+    private static final int MAKE_CHALLENGE      = 8;
+    private static final int ACCEPT_CHALLENGE    = 9;
+    private static final int DELETE_CHALLENGE    = 10;
+    private static final int ANSWER              = 11;
+    private static final int RETRANSMIT          = 12;
+    private static final int LIST_RANKING        = 13;
+    
+    
+    private static final int OK                  = 0;
+    private static final int ERRO                = 255;
+    private static final int CONTINUA            = 254;
+    private static final int NOME                = 1;
+    private static final int ALCUNHA             = 2;
+    private static final int PASSWORD            = 3;
+    private static final int DATA                = 4;
+    private static final int HORA                = 5;
+    private static final int ESCOLHA             = 6;
+    private static final int DESAFIO             = 7;
+    private static final int NQUESTAO            = 10;
+    private static final int QUESTAO             = 11;
+    private static final int NRESPOSTA           = 12;
+    private static final int RESPOSTA            = 13;
+    private static final int CERTA               = 14;
+    private static final int PONTOS              = 15;
+    private static final int IMAGEM              = 16;
+    private static final int BLOCO               = 17;
+    private static final int AUDIO               = 18;
+    private static final int SCORE               = 20;
 
     private static final Scanner in = new Scanner(System.in);
     private static int label = 1;
@@ -34,14 +68,25 @@ class MusicClient {
     private static DatagramSocket clientSocket;
     private static DatagramPacket receivePacket;
 
+    //construtor com timeout
     public static void main(String args[]) throws Exception {
 
         try {
             clientSocket = new DatagramSocket();
             IPAddress = InetAddress.getByName("localhost");
-            PDU hello = new PDU(label, (byte) 01);
-
             receiveData = new byte[50000];
+            menuInit();
+            //menuRegista("patricia", "tita", "123");                                           funciona
+            Utilizador u = new Utilizador("patricia", "tita", "123".getBytes(), null, 0);
+            menuLogin(u);                                                                     //funciona
+            menuMakeChallenge("desafio1");
+            
+            /*
+            
+            
+            PDU hello = new PDU(label, (byte) 01);
+            byte[] data;
+            
 
             PDU login = new PDU(12, (byte) 3);
             Campo m1 = new Campo(2, "tita".getBytes());
@@ -49,17 +94,7 @@ class MusicClient {
 
             login.addCampo(m1);
             login.addCampo(p);
-            byte[] data1 = login.getBytes();
-            for (byte b : data1) {
-                System.out.print(b + "|");
-            }
 
-            byte[] data;
-
-            sendPacket = new DatagramPacket(data1, data1.length, IPAddress, 55555);
-            clientSocket.send(sendPacket);
-
-            label++;
             receivePacket = new DatagramPacket(receiveData, receiveData.length);
 
             clientSocket.receive(receivePacket);
@@ -84,99 +119,177 @@ class MusicClient {
             menuMakeChallenge("desafio1");
             menuListChallenge();
             acceptChallenge("desafio1");
-
-            //RECEBER cenas
-            /*int i = 0;
-             while (true) {
-             receivePacket = new DatagramPacket(receiveData, receiveData.length);
-             clientSocket.receive(receivePacket);
-             tam = receivePacket.getLength();
-             receivePacket.setLength(receivePacket.getLength());
-             res = receivePacket.getData();
-             data = new byte[tam];
-             System.arraycopy(res, 0, data, 0, tam);
-             pacote = new PDU(data);
-             //nome = new String(pacote.getCampo(0).getValor());
-             int n = (int) pacote.getNumCampos();
-             byte[] b = pacote.getCampo(0).getValor();
-             for (byte bb : b) {
-             System.out.print(((int) bb) + "|");
-             }
-             System.out.println("FROM SERVER:");
-             //partir desafio mostra   
-             //            
-             System.out.println("Mensagem: " + i + " Nome= " + n);
-             i++;
-             // for (byte b : data) {
-             //     System.out.print(b + "|");
-             // }
-             }
-             */
-        } catch (Exception e) {
+*/
+        } catch (IOException | UserInexistenteException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    // Função que imprime o menu principal da aplicação e dependendo da escolha segue para o caminho correto
-    public static void menuPrincipal() throws IOException, ClassNotFoundException {
-        System.out.println("################# Menu de Principal ######################");
-        System.out.println("#                                                        #");
-        System.out.println("#   Bem Vindo                                            #");
-        System.out.println("#                                                        #");
-        System.out.println("#   1 - Registar                                         #");
-        System.out.println("#   2 - Login                                            #");
-        System.out.println("#   0 - Sair                                             #");
-        System.out.println("#   Escolha uma opção                                    #");
-        System.out.println("##########################################################");
-        String opt = in.next();
-        while (true) {
-            switch (opt) {
-                case "1":
-                    menuRegista();
-                    break;
-                case "2":
-                    menuLogin();
-                    break;
-                case "0":
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Opcão inválida!");
-                    menuPrincipal();
-                    break;
+    private static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
+        byte[] data;
+        label++;
+        PDU packet = new PDU(label, (byte) id);
+        if(campos!=null)
+            for(Campo c:campos){
+                packet.addCampo(c);
             }
-        }
-    }
-
-    public static void menuLogin() {
-
-        PDU login = new PDU(12, (byte) 3);
-        Campo m = new Campo(2, "Manuel".getBytes());
-        Campo p = new Campo(3, "123".getBytes());
-
-        login.addCampo(m);
-        login.addCampo(p);
-
-    }
-
-    public static ArrayList<Desafio> menuListChallenge() throws IOException {
-        System.out.println("LISTA DESAFIOS");
-        
-        PDU list = new PDU(label, (byte) 7);
-
-        byte[] data = list.getBytes();
+        data = packet.getBytes();
         sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
         clientSocket.send(sendPacket);
         label++;
+        
+    }
 
+    private static PDU receivePDU() throws IOException, SocketTimeoutException {
+        int tam;
+        byte[] data, res;
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
-        int tam = receivePacket.getLength();
+        tam = receivePacket.getLength();
         receivePacket.setLength(receivePacket.getLength());
-        byte[] res = receivePacket.getData();
+        res = receivePacket.getData();
         data = new byte[tam];
         System.arraycopy(res, 0, data, 0, tam);
         PDU pacote = new PDU(data);
+        return pacote;
+    }
+
+    public static void menuInit() throws IOException {
+        System.out.println("hello");
+        sendPDU(HELLO,null);
+        PDU pacote = receivePDU();
+        System.out.println("cenas "+ pacote.getCampo(0).getId());
+    }
+
+    public static boolean menuRegista(String nome, String al, String pass) throws IOException, SocketTimeoutException {
+        ArrayList<Campo> campos=new ArrayList<>();
+        Campo nomeCampo=new Campo(NOME,nome.getBytes());
+        campos.add(nomeCampo);
+        Campo alcunha= new Campo(ALCUNHA,al.getBytes());
+        campos.add(alcunha);
+        Campo password= new Campo(PASSWORD,pass.getBytes());
+        campos.add(alcunha);
+        sendPDU(REGISTER,campos);
+        PDU pacote = receivePDU();
+        System.out.println(pacote.getCampo(0).getId() != 255);
+        return pacote.getCampo(0).getId() != 255;
+
+    }
+
+    public static Utilizador menuLogin(Utilizador u) throws IOException, SocketTimeoutException, UserInexistenteException {
+        ArrayList<Campo> campos=new ArrayList<>();
+        int score;
+        Campo m = new Campo(ALCUNHA, u.getAlcunha().getBytes());
+        Campo p = new Campo(PASSWORD, u.getPass());
+        campos.add(m);
+        campos.add(p);
+        sendPDU(LOGIN, campos);
+
+        
+        PDU pacote = receivePDU();
+        Utilizador utilizador = new Utilizador();
+
+        if (pacote.getCampo(0).getId() == 255) {
+            throw new UserInexistenteException(new String(pacote.getCampo(0).getValor()));// Utilizador e Password apanhar
+        } else {
+            String nome = new String(pacote.getCampo(0).getValor());
+            score = PDU.byteArrayToInt(pacote.getCampo(1).getValor());
+            utilizador = new Utilizador(nome, score);
+           
+
+        }
+        return utilizador;
+
+    }
+
+    public static void menuLogout() throws SocketTimeoutException, IOException {
+       sendPDU(LOGOUT, null);
+       PDU p = receivePDU();
+    }
+
+    public static void menuQuit() throws IOException {
+        sendPDU(QUIT, null);
+        PDU p = receivePDU();
+
+    }
+    
+    ///SERVIDOR EM FALTA
+    public static Map<String,Integer> menuEnd() throws IOException {   
+        TreeMap<String,Integer> lista= new TreeMap<>();
+        sendPDU(END, null);
+        PDU p = receivePDU();
+        for(int i=1;i<p.getNumCampos();i+=2){
+            lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i+1).getValor()));
+        }
+        
+        return lista;
+       
+
+    }
+    /////SERVIDOR EM FALTA
+    public static Desafio menuDelete() throws IOException, ChallengeException{   
+        sendPDU(DELETE_CHALLENGE, null);
+        boolean flag;
+        PDU pacote = receivePDU();
+        Desafio d;
+        if(pacote.getCampo(0).getId()==255)
+            throw new ChallengeException("Data");
+        else{
+            String nome = new String(pacote.getCampo(0).getValor());
+            byte[] b = pacote.getCampo(1).getValor();
+            byte[] ano = new byte[]{b[0], b[1]};
+            byte[] mes = new byte[]{b[2], b[3]};
+            byte[] dia = new byte[]{b[4], b[5]};
+            b = pacote.getCampo(2).getValor();
+            System.out.println("c  " + ano[0]);
+            byte[] hora = new byte[]{b[0], b[1]};
+            byte[] min = new byte[]{b[2], b[3]};
+            byte[] seg = new byte[]{b[4], b[5]};
+            d = new Desafio(nome, ano, dia, mes, hora, min, seg);
+        
+        }
+        return d;
+    }
+    //SERVIDOR EM FALTA
+    public static int answer(String nDesafio,int escolha,int nQuestao) throws IOException{
+        ArrayList<Campo>campos = new ArrayList<>();
+        Campo c = new Campo(ESCOLHA,new byte[]{(byte)escolha});
+        campos.add(c);
+        c= new Campo(DESAFIO,nDesafio.getBytes());
+        campos.add(c);
+        c= new Campo(NQUESTAO,new byte[]{(byte)nQuestao});
+        campos.add(c);
+        
+        sendPDU(ANSWER, campos);
+        
+        PDU pacote = receivePDU();
+        
+        int resposta = pacote.getCampo(0).getValor()[0];
+        int pontos = pacote.getCampo(1).getValor()[0];
+        
+        
+        return pontos;    
+        
+    } 
+    
+ 
+    //SERVIDOR EM FALTA
+    public static Map<String,Integer> menuListRankings() throws IOException {   
+        TreeMap<String,Integer> lista= new TreeMap<>();
+        sendPDU(LIST_RANKING, null);
+        PDU p = receivePDU();
+        for(int i=1;i<p.getNumCampos();i+=2){
+            lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i+1).getValor()));
+        }
+        
+        return lista;
+       
+
+    }
+    public static ArrayList<Desafio> menuListChallenge() throws IOException, SocketTimeoutException {
+       
+        sendPDU(LIST_CHALLENGES, null);
+        PDU pacote = receivePDU();
 
         int numCampos = pacote.getNumCampos();
         System.out.println("nu campos " + numCampos);
@@ -197,70 +310,36 @@ class MusicClient {
             byte[] seg = new byte[]{b[4], b[5]};
             d = new Desafio(nome, ano, dia, mes, hora, min, seg);
             desafios.add(d);
-            System.out.println("ano" + new String(d.getAno()));
-
         }
         return desafios;
 
     }
-    
-    public static void acceptChallenge(String nome) throws IOException{
-        System.out.println("cheguei");
-        PDU fazDesafio = new PDU(label, (byte) 9);
-        Campo m = new Campo(7, nome.getBytes());
-        byte[] b;
 
-        fazDesafio.addCampo(m);
-        byte[] data = fazDesafio.getBytes();
-        sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
-        clientSocket.send(sendPacket);
-        label++;
-
-        receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        int tam = receivePacket.getLength();
-        receivePacket.setLength(receivePacket.getLength());
-        byte[] res = receivePacket.getData();
-        data = new byte[tam];
-        System.arraycopy(res, 0, data, 0, tam);
-        PDU pacote = new PDU(data);
-        System.out.println(" idiiii "+ pacote.getCampo(0).getValor()[0]);
-        if(pacote.getCampo(0).getValor()[0] == 0)
+    public static void acceptChallenge(String nome) throws IOException, SocketTimeoutException {
+        ArrayList<Campo>campos = new ArrayList<>();
+        Campo m = new Campo(DESAFIO, nome.getBytes());
+        campos.add(m);
+        sendPDU(ACCEPT_CHALLENGE, campos);
+        PDU pacote = receivePDU();
+        System.out.println(" idiiii " + pacote.getCampo(0).getValor()[0]);
+        if (pacote.getCampo(0).getValor()[0] == 0) {
             try {
-                System.out.println("vamoss jogar");
+                System.out.println("vamos jogar");
                 jogar();
-        } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
-            Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
+                Logger.getLogger(MusicClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-        
-        
-    
-}
-           
 
-    public static void menuMakeChallenge(String nome) throws IOException {
+    }
 
-        PDU fazDesafio = new PDU(label, (byte) 8);
+    public static void menuMakeChallenge(String nome) throws IOException, SocketTimeoutException {
+        ArrayList<Campo>campos = new ArrayList<>();
         Campo m = new Campo(7, nome.getBytes());
-        byte[] b;
-        int num = 0;
-        int nQuestao;
-
-        fazDesafio.addCampo(m);
-        byte[] data = fazDesafio.getBytes();
-        sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
-        clientSocket.send(sendPacket);
-        label++;
-
-        receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        int tam = receivePacket.getLength();
-        receivePacket.setLength(receivePacket.getLength());
-        byte[] res = receivePacket.getData();
-        data = new byte[tam];
-        System.arraycopy(res, 0, data, 0, tam);
-        PDU pacote = new PDU(data);
+        campos.add(m);
+        sendPDU(MAKE_CHALLENGE, campos);
+        System.out.println("chegouuu");
+        PDU pacote = receivePDU();
 
         nome = new String(pacote.getCampo(0).getValor());
         System.out.println("Desafio: " + nome);
@@ -275,7 +354,7 @@ class MusicClient {
 
     }
 
-    public static void jogar() throws SocketException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    private static void jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
         byte[] b, res, data;
         PDU pacote;
         int num = 0;
@@ -283,19 +362,11 @@ class MusicClient {
         int tam;
         String nome, pergunta;
         ArrayList<String> respostas = new ArrayList<>();
-        TreeMap<Integer, byte[]> blocosImagem = new TreeMap<>();
-        TreeMap<Integer, byte[]> blocosMusica = new TreeMap<>();
-        clientSocket.setSoTimeout(10000);
+        TreeMap<Integer, byte[]> blocosImagem;
+        TreeMap<Integer, byte[]> blocosMusica;
         try {
             // 1ª pacote -> estrutura da pergunta
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-            tam = receivePacket.getLength();
-            receivePacket.setLength(receivePacket.getLength());
-            res = receivePacket.getData();
-            data = new byte[tam];
-            System.arraycopy(res, 0, data, 0, tam);
-            pacote = new PDU(data);
+            pacote =receivePDU();
             nome = new String(pacote.getCampo(0).getValor());
             System.out.println("Desafio: " + nome);
             int id = pacote.getCampo(1).getId();
@@ -324,117 +395,70 @@ class MusicClient {
             blocosMusica = (TreeMap) recebeBlocos();
             checkBlocos(blocosMusica, nome, nQuestao, 18);
             String fMusic = constroiFicheiroAudio(blocosMusica);
-          //  }
+            //  }
             //  else{
             //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
             // }
         } catch (SocketTimeoutException e) {
-            PDU tout = new PDU(label, 0);
-            tout.addCampo(new Campo(255, new byte[]{0}));
-            sendPacket = new DatagramPacket(tout.getBytes(), tout.getBytes().length, IPAddress, 55555);
-            clientSocket.send(sendPacket);
+            sendPDU(QUIT, null);
         }
     }
 
     private static Map<Integer, byte[]> recebeBlocos() throws IOException, SocketTimeoutException {
-        byte[] b, res, data;
+        byte[] b ;
         PDU pacote;
         int num;
-        int tam;
         TreeMap<Integer, byte[]> blocos = new TreeMap<>();
-        clientSocket.setSoTimeout(10000);
         // 2º pacote -> primeiro pacote de com uma imagem
-        receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        tam = receivePacket.getLength();
-        receivePacket.setLength(receivePacket.getLength());
-        res = receivePacket.getData();
-        data = new byte[tam];
-        System.arraycopy(res, 0, data, 0, tam);
-        pacote = new PDU(data);
+        
+        pacote = receivePDU();
         int i = 1;
-        int numero = pacote.getCampo(4).getId() + 128;
+        int numero = pacote.getCampo(4).getId();
+        
+        
         while (numero == 254) {
             b = pacote.getCampo(2).getValor();
-            if (b.length > 1) {
-                num = PDU.byteArrayToInt(b);
-            } else {
-                num = (int) b[0];
-            }
+         
+            num = PDU.byteArrayToInt(b);
+            System.out.println("##################### "+ num);
             blocos.put(num, pacote.getCampo(3).getValor());
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-            tam = receivePacket.getLength();
-            receivePacket.setLength(receivePacket.getLength());
-            res = receivePacket.getData();
-            data = new byte[tam];
-            System.arraycopy(res, 0, data, 0, tam);
-            pacote = new PDU(data);
-            numero = pacote.getCampo(4).getId() + 128;
+            pacote = receivePDU();
+            numero = pacote.getCampo(4).getId();
         }
-        System.out.println("ID: " + numero);
         b = pacote.getCampo(2).getValor();
         num = PDU.byteArrayToInt(b);
 
         blocos.put(num, pacote.getCampo(3).getValor());
-
+/*
         for (Integer c : blocos.keySet()) {
             System.out.println(c);
         }
-
+*/
         return blocos;
     }
 
-    public static void menuRegista() {
-        System.out.println("#################### Registar Utilizador #####################");
-        System.out.println("                                                              ");
-        in.nextLine();
-        System.out.println("   Defina um Nome                                             ");
-        String nome = in.nextLine();
-        System.out.println("  Defina uma Alcunha                                          ");
-        String al = in.nextLine();
-        System.out.println("  Defina uma password                                         ");
-        String pass = in.nextLine();
-
-        Campo name = new Campo(1, nome.getBytes());
-        Campo alcunha = new Campo(2, al.getBytes());
-        Campo password = new Campo(3, pass.getBytes());
-
-        label++;
-        PDU packet = new PDU(label, (byte) 01);
-        packet.addCampo(name);
-        packet.addCampo(alcunha);
-        packet.addCampo(password);
-
-    }
-
-    private static void askBlockRetransmit(TreeMap<Integer, byte[]> blocos, int n, String nome, int nQuestao, int tipo) throws IOException {
-        PDU ret = new PDU(label, (byte) 12);
-        Campo c = new Campo(7, nome.getBytes());
-        ret.addCampo(c);
-        c = new Campo(10, PDU.intToByteArray(nQuestao));
-        ret.addCampo(c);
-        c = new Campo(tipo, new byte[]{(byte) tipo});
-        ret.addCampo(c);
-        c = new Campo(16, PDU.intToByteArray(n));
-        ret.addCampo(c);
-        PDU.printBytes(c.getValor());
-
-        sendPacket = new DatagramPacket(ret.getBytes(), ret.getBytes().length, IPAddress, 55555);
-        clientSocket.send(sendPacket);
-
-        receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
+    private static void askBlockRetransmit(TreeMap<Integer, byte[]> blocos, int n, String nome, int nQuestao, int tipo) throws SocketTimeoutException, IOException {
+        ArrayList<Campo>campos= new ArrayList<>();
         int num;
-        int tam = receivePacket.getLength();
-        receivePacket.setLength(receivePacket.getLength());
-        byte[] res = receivePacket.getData();
-        byte[] data = new byte[tam];
-        System.arraycopy(res, 0, data, 0, tam);
-        PDU pacote = new PDU(data);
+        Campo c = new Campo(DESAFIO, nome.getBytes());
+        campos.add(c);
+        c = new Campo(NQUESTAO, PDU.intToByteArray(nQuestao));
+        campos.add(c);
+        c = new Campo(tipo, new byte[]{(byte) tipo});
+        campos.add(c);
+        c = new Campo(BLOCO, PDU.intToByteArray(n));
+        campos.add(c);
+        sendPDU(RETRANSMIT, campos);
+
+
+
+        PDU pacote = receivePDU();
         byte[] b = pacote.getCampo(2).getValor();
+        PDU.printBytes(b);
         num = PDU.byteArrayToInt(b);
         blocos.put(num, pacote.getCampo(3).getValor());
+       
+        System.out.println("b.size "+ pacote.getCampo(3).getValor().length);
     }
 
     private static void checkBlocos(TreeMap<Integer, byte[]> blocos, String nome, int nQuestao, int tipo) {
@@ -442,7 +466,7 @@ class MusicClient {
         try {
             for (i = 1; i < blocos.lastKey(); i++) {
                 if (!blocos.containsKey(i)) {
-                    System.out.println("NO BLOCK: " + i);
+                  //  System.out.println("NO BLOCK: " + i);
                     askBlockRetransmit(blocos, i, nome, nQuestao, tipo);
                 }
             }

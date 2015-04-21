@@ -137,6 +137,8 @@ public class PDU {
         this.tamLista += c.getSize()[0] + c.getSize()[1];
     }
 
+    
+    
     public Campo getCampo(int ind) {
         return campos.get(ind);
     }

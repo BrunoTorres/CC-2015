@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -39,6 +40,17 @@ class BD implements Serializable {
     }
     public int getRanking(String nome){
         return this.ranking.get(nome);
+    }
+    public Map<String,Integer> getRanking(){
+        return this.ranking;
+        
+    }
+    public void actRanking(Utilizador u){
+        if(this.ranking.containsKey(u.getAlcunha()))
+            this.ranking.put(u.getAlcunha(),this.ranking.get(u.getAlcunha())+u.getPontuacao());
+        else
+            this.ranking.put(u.getAlcunha(),u.getPontuacao());
+        
     }
 
     public void addUser(Utilizador u) {

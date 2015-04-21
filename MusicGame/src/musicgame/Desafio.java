@@ -5,7 +5,6 @@
  */
 package musicgame;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,7 +12,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javafx.util.converter.LocalDateTimeStringConverter;
+import java.util.Map;
 
 /**
  *
@@ -25,6 +24,8 @@ class Desafio implements Serializable {
     private ArrayList<Pergunta> questoes;
     private HashMap<String, Utilizador> users;
     private HashMap<String, byte[]> labels;
+    private HashMap<String, Utilizador> usersEnd;
+    
     private byte[] ano;
     private byte[] dia;
     private byte[] mes;
@@ -43,11 +44,28 @@ class Desafio implements Serializable {
         this.users = new HashMap<>();
         this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
+        this.usersEnd = new HashMap<>();
     }
 
     public Desafio() {
     }
+    public int getTamanhoUtilizadoresEnd(){
+        return this.usersEnd.size();
+    }
     
+    public int getTamanhoUsers(){
+        return this.users.size();
+    }
+    
+    public Map<String,Utilizador> getUserEnd(){
+        return this.usersEnd;
+    }
+    
+    
+    
+    public void addUserEnd(Utilizador u){
+        this.usersEnd.put(u.getAlcunha(), u);
+    }
     
     public LocalDateTime getLocalDate(){
         int anos,ano2,mes,dia,hora,min,seg;
@@ -68,6 +86,9 @@ class Desafio implements Serializable {
         System.out.println("************************************* * "  +d.toString());
         return d;
         
+    }
+    public void removeUtilizador(String alc){
+        this.users.remove(alc);
     }
 
     public void addUser(Utilizador u, byte[] label) {

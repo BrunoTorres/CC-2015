@@ -35,9 +35,11 @@ class MusicClient {
     private static final int ANSWER              = 11;
     private static final int RETRANSMIT          = 12;
     private static final int LIST_RANKING        = 13;
+    private static final int NEXT_QUESTION       = 14;
     
     
     private static final int OK                  = 0;
+    private static final int FIM                 = 250;
     private static final int ERRO                = 255;
     private static final int CONTINUA            = 254;
     private static final int NOME                = 1;
@@ -57,6 +59,8 @@ class MusicClient {
     private static final int BLOCO               = 17;
     private static final int AUDIO               = 18;
     private static final int SCORE               = 20;
+    private static final int TIME                = 21;
+    
 
     private static final Scanner in = new Scanner(System.in);
     private static int label = 1;
@@ -80,6 +84,9 @@ class MusicClient {
             Utilizador u = new Utilizador("patricia", "tita", "123".getBytes(), null, 0);
             menuLogin(u);                                                                     //funciona
             menuMakeChallenge("desafio1");
+            answer("desafio1", 3, 1, 20);
+            proximaPergunta("desafio1", 2);
+            answer("desafio1", 3, 2, 20);
             
             /*
             
@@ -213,10 +220,15 @@ class MusicClient {
 
     }
     
-    ///SERVIDOR EM FALTA
-    public static Map<String,Integer> menuEnd() throws IOException {   
+    ///SERVIDOR EM FALTA  ///LER MEHOR
+    public static Map<String,Integer> menuEnd(String nomeDesafio) throws IOException {   
         TreeMap<String,Integer> lista= new TreeMap<>();
-        sendPDU(END, null);
+        ArrayList<Campo> campos= new ArrayList<>();
+        Campo c = new Campo(NOME,nomeDesafio.getBytes());
+        campos.add(c);
+        sendPDU(END, campos);
+        
+        
         PDU p = receivePDU();
         for(int i=1;i<p.getNumCampos();i+=2){
             lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i+1).getValor()));
@@ -250,8 +262,8 @@ class MusicClient {
         }
         return d;
     }
-    //SERVIDOR EM FALTA
-    public static int answer(String nDesafio,int escolha,int nQuestao) throws IOException{
+   
+    public static Resposta answer(String nDesafio,int escolha,int nQuestao,int tempo) throws IOException{
         ArrayList<Campo>campos = new ArrayList<>();
         Campo c = new Campo(ESCOLHA,new byte[]{(byte)escolha});
         campos.add(c);
@@ -260,18 +272,40 @@ class MusicClient {
         c= new Campo(NQUESTAO,new byte[]{(byte)nQuestao});
         campos.add(c);
         
+        c= new Campo(TIME, new byte[]{(byte)tempo});
+        campos.add(c);
+        
         sendPDU(ANSWER, campos);
         
         PDU pacote = receivePDU();
         
-        int resposta = pacote.getCampo(0).getValor()[0];
-        int pontos = pacote.getCampo(1).getValor()[0];
+        int resposta = pacote.getCampo(2).getValor()[0];
+        System.out.println("RESPOSTA "+resposta);
+        int pontos = pacote.getCampo(3).getValor()[0];
+        System.out.println("PONTOS "+ pontos);
+         
+        boolean flag = pacote.getCampo(4).getId() != 250;
+            
+        Resposta r = new Resposta(nQuestao, resposta, pontos, flag);
         
-        
-        return pontos;    
+        return r;    
         
     } 
     
+    public static void proximaPergunta( String nomeDesafio,int nQuestao) throws IOException, SocketException, SocketTimeoutException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException{
+        ArrayList<Campo>campos = new ArrayList<>();
+        Campo c = new Campo(NOME,nomeDesafio.getBytes());
+        campos.add(c);
+        c= new Campo(NQUESTAO,new byte[]{(byte)nQuestao});
+        campos.add(c);
+        sendPDU(NEXT_QUESTION, campos);
+        
+        
+        
+        jogar();
+        
+        
+    }
  
     //SERVIDOR EM FALTA
     public static Map<String,Integer> menuListRankings() throws IOException {   
@@ -286,6 +320,7 @@ class MusicClient {
        
 
     }
+    
     public static ArrayList<Desafio> menuListChallenge() throws IOException, SocketTimeoutException {
        
         sendPDU(LIST_CHALLENGES, null);
@@ -376,9 +411,9 @@ class MusicClient {
             //if (id != 255) {
             nQuestao = pacote.getCampo(1).getValor()[0];
             pergunta = new String(pacote.getCampo(2).getValor());
-            respostas.add(new String(pacote.getCampo(4).getBytes()));
-            respostas.add(new String(pacote.getCampo(6).getBytes()));
-            respostas.add(new String(pacote.getCampo(8).getBytes()));
+            respostas.add(new String(pacote.getCampo(4).getValor()));
+            respostas.add(new String(pacote.getCampo(6).getValor()));
+            respostas.add(new String(pacote.getCampo(8).getValor()));
             System.out.println("Nome: " + nome);
             System.out.println(pergunta);
 

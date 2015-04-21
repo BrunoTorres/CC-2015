@@ -11,6 +11,8 @@ public class Utilizador implements Serializable {
     private byte[] pass;
     private InetAddress ip;
     private int port;
+    private int pontuacao;
+    private int tempoRespostaTotal;
 
     public Utilizador() {
         this.userName = "";
@@ -18,6 +20,8 @@ public class Utilizador implements Serializable {
         this.pass = null;
         this.port = -1;
         this.ip = null;
+        this.pontuacao=0;
+        this.tempoRespostaTotal=10000000;
 
     }
      public Utilizador(String al, int score) {
@@ -26,7 +30,9 @@ public class Utilizador implements Serializable {
         this.pass = null;
         this.port = 0;
         this.ip = null;
+        this.pontuacao=0;
         this.score=score;
+        this.tempoRespostaTotal=0;
 
     }
 
@@ -35,7 +41,9 @@ public class Utilizador implements Serializable {
         this.alcunha = al;
         this.pass = pass;
         this.port = port;
+        this.pontuacao=0;
         this.ip = ip;
+        this.tempoRespostaTotal=0;
 
     }
 
@@ -46,6 +54,33 @@ public class Utilizador implements Serializable {
         this.port = c.getPort();
         this.ip = c.getIp();
 
+    }
+    public void initPontuacao(){
+        this.pontuacao=0;
+    }
+     public void initTempoResposta(){
+        this.tempoRespostaTotal=0;
+    }
+    
+     public void addTempoResposta(int tempo){
+         this.tempoRespostaTotal +=tempo;
+     }
+      public int getTempoResposta(){
+         return this.tempoRespostaTotal;
+     }
+    
+    
+    public void addPontuacao(int p){
+        this.pontuacao+=p;
+    }
+    public void subPontuacao(int p){
+        if((this.pontuacao-p)<0)
+            this.pontuacao=0;
+        else
+            this.pontuacao-=p;
+    }
+    public int getPontuacao(){
+        return this.pontuacao;
     }
 
     public byte[] getPass() {

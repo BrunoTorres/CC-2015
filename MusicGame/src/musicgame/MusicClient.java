@@ -214,17 +214,21 @@ class MusicClient {
        PDU p = receivePDU();
     }
 
-    public static void menuQuit() throws IOException {
-        sendPDU(QUIT, null);
+    public static void menuQuit(String nomeDesafio) throws IOException {
+        ArrayList<Campo> campos= new ArrayList<>();
+        Campo c= new Campo(DESAFIO,nomeDesafio.getBytes());
+        campos.add(c);
+        sendPDU(QUIT, campos);
         PDU p = receivePDU();
+        
 
     }
     
-    ///SERVIDOR EM FALTA  ///LER MEHOR
+  
     public static Map<String,Integer> menuEnd(String nomeDesafio) throws IOException {   
         TreeMap<String,Integer> lista= new TreeMap<>();
         ArrayList<Campo> campos= new ArrayList<>();
-        Campo c = new Campo(NOME,nomeDesafio.getBytes());
+        Campo c = new Campo(DESAFIO,nomeDesafio.getBytes());
         campos.add(c);
         sendPDU(END, campos);
         

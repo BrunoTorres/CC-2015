@@ -121,11 +121,7 @@ public class Atendimento extends Thread {
                 responde(reply, add, port);
                 break;
             case 5:
-                s = PDU.byteArrayToInt(tl);
-                reply = new PDU(s, (byte) 0);
-                c = new Campo(OK, "OK".getBytes());
-                reply.addCampo(c);
-                responde(reply, add, port);
+                quitDesafio(data, add, port);
                 break;
             case 6:
                 System.out.println("End");
@@ -209,6 +205,26 @@ public class Atendimento extends Thread {
         }
     }
 
+    public void quitDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException{
+        PDU pacote = new PDU(data);
+        byte[] tl = {data[2], data[3]};
+        int s = PDU.byteArrayToInt(tl);
+        PDU reply;
+        Campo c, dat;
+
+        Utilizador user = bd.getUserByIP(add);
+
+        Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
+        d.remUtilizadoresEnd(user.getAlcunha());
+        reply = new PDU(s, (byte) 0);
+        c = new Campo(OK, "OK".getBytes());
+        reply.addCampo(c);
+        responde(reply, add, port);
+        
+        
+        
+        
+    }
     @SuppressWarnings("empty-statement")
     public void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
         PDU pacote = new PDU(data);
@@ -256,6 +272,7 @@ public class Atendimento extends Thread {
             c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
             resposta.addCampo(c);
         }
+        
 
         responde(resposta, add, port);
 

@@ -49,6 +49,9 @@ class Desafio implements Serializable {
 
     public Desafio() {
     }
+    public void remUtilizadoresEnd(String alcunha){
+        this.usersEnd.remove(alcunha);
+    }
     public int getTamanhoUtilizadoresEnd(){
         return this.usersEnd.size();
     }

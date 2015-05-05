@@ -1,0 +1,193 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 9/nov/2014, 19:06:48
+    Author     : JoaoMano
+*/
+
+.button_search_bar{
+    -fx-graphic: url('find-20.png');
+}
+
+.button_menu_projetos{
+    -fx-graphic: url('add-48.png');
+}
+
+.button_entrar{
+	-fx-graphic: url('checked-48.png');
+}
+
+.button_menu_voluntarios {
+    -fx-graphic: url('voluntarios-48.png');
+}
+
+.button_menu_stock{
+    -fx-graphic: url('stock-48.png');
+}
+
+.button_menu_eventos{
+    -fx-graphic: url('eventos-48.png');
+}
+
+.button_menu_candidaturas{
+    -fx-graphic: url('candidaturas-48.png');
+}
+
+.button_menu_doadores{
+    -fx-graphic: url('doadores-48.png');
+}
+
+.button_menu_logout{
+    -fx-graphic: url('logout-48.png');
+}
+
+.button_menu_funcionarios{
+    -fx-graphic: url('funcionarios-48.png');
+}
+
+.button_candidatura_add{
+    -fx-graphic: url('candidatura_add-26.png');
+}
+
+.button_candidatura_edit{
+    -fx-graphic: url('candidatura_edit-26.png');
+}
+
+.button_candidatura_rem{
+    -fx-graphic: url('candidatura_rem-26.png');
+}
+
+.button_candidatura_save{
+    -fx-graphic: url('candidatura_save-26.png');
+}
+
+.button_login_login{
+    -fx-graphic: url('login-16.png');
+}
+
+.button_login_limpar{
+    -fx-graphic: url('limpar-16.png');
+}
+
+.button_projeto_tempo{
+    -fx-graphic: url('button_projeto_tempo-16.png');
+}
+
+.button_voluntario_add{
+    -fx-graphic: url('button_voluntario_add-16.png');
+}
+
+.button_voluntario_rem{
+    -fx-graphic: url('button_voluntario_rem-16.png');
+}
+
+.button_export_pdf{
+    -fx-graphic: url('button_export_pdf-26.png');
+}
+
+.button_export_excel{
+    -fx-graphic: url('button_export_excel-26.png');
+}
+
+.button_tarefa_add{
+    -fx-graphic: url('button_tarefa_add-26.png');
+}
+
+.button_tarefa_rem{
+    -fx-graphic: url('button_tarefa_rem-26.png');
+}
+
+.button_voluntario_grupo{
+    -fx-graphic: url('voluntario_grupo-20.png');
+}
+
+.button_voluntario_add_low{
+    -fx-graphic: url('button_voluntario_add-20.png');
+}
+
+.button_voluntario_rem_low{
+    -fx-graphic: url('button_voluntario_rem-20.png');
+}
+
+.button_tarefa_add_low{
+    -fx-graphic: url('button_tarefa_add-20.png');
+}
+
+.button_tarefa_rem_low{
+    -fx-graphic: url('button_tarefa_rem-20.png');
+}
+
+.button_cancelar{
+    -fx-graphic: url('cancelar-26.png');
+}
+
+.button_cancelar2{
+    -fx-graphic: url('cancelar2-26.png');
+}
+
+.button_proj_grupo{
+    -fx-graphic: url('group-26.png');
+}
+
+.button_vol_edit{
+    -fx-graphic: url('vol-edit-26.png');
+}
+
+.button_equipa_grupos{
+    -fx-graphic: url('groups-26.png');
+}
+
+.comboTextField {
+    -fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1 0 1 1;
+    -fx-padding: 1 3 1 3;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+}
+
+.comboTextField:focused {
+   -fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+   -fx-background-insets: 0, 1 0 1 1;
+    
+}
+
+.comboButton {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 5 5 0, 0 4 4 0, 0 3 3 0;
+}
+
+.comboButton:focused {
+    -fx-color: -fx-focused-base;
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 5 5 0, 0 4 4 0, 0 3 3 0;
+}
+
+.combo-down-arrow {
+    -fx-background-color: #919191;
+    -fx-padding: 0.666667em 0.416667em 0.0em 0.416667em;  /* 8 5 0 5 */
+    -fx-shape: "M0 0 L1 0 L.5 1 Z";
+    -fx-effect: innershadow( two-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+.comboFocus{
+        -fx-border-color:-fx-focus-color;       
+        -fx-border-insets: -1;
+        -fx-border-radius: 0 5 5 0;
+}
+.comboFocusOut{
+        -fx-border-color:transparent;   
+        -fx-border-insets: 0;
+        -fx-border-radius: 0 5 5 0;
+}
+
+.tab-label{
+    -fx-font-weight: bold;
+}
+
+
+

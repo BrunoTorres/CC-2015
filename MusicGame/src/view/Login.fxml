@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="174.0" prefWidth="468.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pt.uminho.lei.dss.view.Login_Controller">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="264.0">
+         <children>
+            <ImageView fitHeight="206.0" fitWidth="219.0" layoutX="23.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="38.0">
+               <image>
+                  <Image url="@logo.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="255.0" prefHeight="174.0" prefWidth="227.0">
+         <children>
+            <TextField fx:id="tf_login" alignment="CENTER" layoutX="39.0" layoutY="41.0" promptText="Utilizador" />
+            <PasswordField fx:id="pf_pass" alignment="CENTER" layoutX="39.0" layoutY="81.0" promptText="Password" />
+            <Button fx:id="button_auth" layoutX="39.0" layoutY="122.0" mnemonicParsing="false" onAction="#autenticaButtonAction" styleClass="button_login_login" stylesheets="@Habitat_Interface_CSS.css" text="Entrar" />
+            <Button fx:id="b_limpar" layoutX="122.0" layoutY="122.0" mnemonicParsing="false" onAction="#limparButtonAction" styleClass="button_login_limpar" stylesheets="@Habitat_Interface_CSS.css" text="Limpar" />
+            <ImageView fitHeight="16.0" fitWidth="16.0" layoutX="17.0" layoutY="46.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@username-16.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="16.0" fitWidth="16.0" layoutX="17.0" layoutY="86.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@password-16.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

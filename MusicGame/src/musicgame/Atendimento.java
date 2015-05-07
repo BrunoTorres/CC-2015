@@ -350,6 +350,7 @@ public class Atendimento extends Thread {
         PDU reply;
         Campo c, da, h, f;
         int tam = desafios.size();
+        System.out.println("SIZE: " + tam);
         int t = 0;
         for (Desafio d : desafios) {
             t++;

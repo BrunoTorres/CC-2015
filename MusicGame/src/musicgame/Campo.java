@@ -7,7 +7,7 @@ import java.util.Objects;
  * 
  * @author Bruno Pereira
  */
-class Campo {
+public class Campo {
     
     private int id;
     private byte[] size;

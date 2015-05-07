@@ -1,5 +1,6 @@
 package musicgame;
 
+import controller.Login_Controller;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,49 +18,55 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-class MusicClient {
+public class MusicClient{
 
-    private static final int HELLO               = 1;
-    private static final int REGISTER            = 2;
-    private static final int LOGIN               = 3;
-    private static final int LOGOUT              = 4;
-    private static final int QUIT                = 5;
-    private static final int END                 = 6;
-    private static final int LIST_CHALLENGES     = 7;
-    private static final int MAKE_CHALLENGE      = 8;
-    private static final int ACCEPT_CHALLENGE    = 9;
-    private static final int DELETE_CHALLENGE    = 10;
-    private static final int ANSWER              = 11;
-    private static final int RETRANSMIT          = 12;
-    private static final int LIST_RANKING        = 13;
-    private static final int NEXT_QUESTION       = 14;
+    public static final int HELLO               = 1;
+    public static final int REGISTER            = 2;
+    public static final int LOGIN               = 3;
+    public static final int LOGOUT              = 4;
+    public static final int QUIT                = 5;
+    public static final int END                 = 6;
+    public static final int LIST_CHALLENGES     = 7;
+    public static final int MAKE_CHALLENGE      = 8;
+    public static final int ACCEPT_CHALLENGE    = 9;
+    public static final int DELETE_CHALLENGE    = 10;
+    public static final int ANSWER              = 11;
+    public static final int RETRANSMIT          = 12;
+    public static final int LIST_RANKING        = 13;
+    public static final int NEXT_QUESTION       = 14;
     
     
-    private static final int OK                  = 0;
-    private static final int FIM                 = 250;
-    private static final int ERRO                = 255;
-    private static final int CONTINUA            = 254;
-    private static final int NOME                = 1;
-    private static final int ALCUNHA             = 2;
-    private static final int PASSWORD            = 3;
-    private static final int DATA                = 4;
-    private static final int HORA                = 5;
-    private static final int ESCOLHA             = 6;
-    private static final int DESAFIO             = 7;
-    private static final int NQUESTAO            = 10;
-    private static final int QUESTAO             = 11;
-    private static final int NRESPOSTA           = 12;
-    private static final int RESPOSTA            = 13;
-    private static final int CERTA               = 14;
-    private static final int PONTOS              = 15;
-    private static final int IMAGEM              = 16;
-    private static final int BLOCO               = 17;
-    private static final int AUDIO               = 18;
-    private static final int SCORE               = 20;
-    private static final int TIME                = 21;
+    public static final int OK                  = 0;
+    public static final int FIM                 = 250;
+    public static final int ERRO                = 255;
+    public static final int CONTINUA            = 254;
+    public static final int NOME                = 1;
+    public static final int ALCUNHA             = 2;
+    public static final int PASSWORD            = 3;
+    public static final int DATA                = 4;
+    public static final int HORA                = 5;
+    public static final int ESCOLHA             = 6;
+    public static final int DESAFIO             = 7;
+    public static final int NQUESTAO            = 10;
+    public static final int QUESTAO             = 11;
+    public static final int NRESPOSTA           = 12;
+    public static final int RESPOSTA            = 13;
+    public static final int CERTA               = 14;
+    public static final int PONTOS              = 15;
+    public static final int IMAGEM              = 16;
+    public static final int BLOCO               = 17;
+    public static final int AUDIO               = 18;
+    public static final int SCORE               = 20;
+    public static final int TIME                = 21;
     
 
     private static final Scanner in = new Scanner(System.in);
@@ -71,68 +78,12 @@ class MusicClient {
     private static InetAddress IPAddress;
     private static DatagramSocket clientSocket;
     private static DatagramPacket receivePacket;
+ 
 
-    //construtor com timeout
-    public static void main(String args[]) throws Exception {
-
-        try {
-            clientSocket = new DatagramSocket();
-            IPAddress = InetAddress.getByName("localhost");
-            receiveData = new byte[50000];
-            menuInit();
-            //menuRegista("patricia", "tita", "123");                                           funciona
-            Utilizador u = new Utilizador("patricia", "tita", "123".getBytes(), null, 0);
-            menuLogin(u);                                                                     //funciona
-            menuMakeChallenge("desafio1");
-            answer("desafio1", 3, 1, 20);
-            proximaPergunta("desafio1", 2);
-            answer("desafio1", 3, 2, 20);
-            
-            /*
-            
-            
-            PDU hello = new PDU(label, (byte) 01);
-            byte[] data;
-            
-
-            PDU login = new PDU(12, (byte) 3);
-            Campo m1 = new Campo(2, "tita".getBytes());
-            Campo p = new Campo(3, "123".getBytes());
-
-            login.addCampo(m1);
-            login.addCampo(p);
-
-            receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-            clientSocket.receive(receivePacket);
-            int tam = receivePacket.getLength();
-            receivePacket.setLength(receivePacket.getLength());
-            byte[] res = receivePacket.getData();
-            data = new byte[tam];
-            System.arraycopy(res, 0, data, 0, tam);
-            PDU pacote = new PDU(data);
-            String nome = new String(pacote.getCampo(0).getValor());
-            System.out.println("FROM SERVER:");
-            //partir desafio mostra   
-            //            
-            System.out.println("Mensagem: " + nome);
-            for (byte b : data) {
-                System.out.print(b + "|");
-            }
-            System.out.println("");
-
-            label++;
-
-            menuMakeChallenge("desafio1");
-            menuListChallenge();
-            acceptChallenge("desafio1");
-*/
-        } catch (IOException | UserInexistenteException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
+    public static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
+        clientSocket = new DatagramSocket();
+        IPAddress = InetAddress.getByName("localhost");
+        receiveData = new byte[50000];
         byte[] data;
         label++;
         PDU packet = new PDU(label, (byte) id);
@@ -147,7 +98,7 @@ class MusicClient {
         
     }
 
-    private static PDU receivePDU() throws IOException, SocketTimeoutException {
+    public static PDU receivePDU() throws IOException, SocketTimeoutException {
         int tam;
         byte[] data, res;
         receivePacket = new DatagramPacket(receiveData, receiveData.length);

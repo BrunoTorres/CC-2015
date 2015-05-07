@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view;
+package controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -14,7 +14,7 @@ import javafx.fxml.Initializable;
  *
  * @author Sammy Guergachi <sguergachi at gmail.com>
  */
-public class MenuJogadorController implements Initializable {
+public class RankingController implements Initializable {
 
     /**
      * Initializes the controller class.

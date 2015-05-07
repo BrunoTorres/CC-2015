@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author patricia
  */
-class Desafio implements Serializable {
+public class Desafio implements Serializable {
 
     private String nome;
     private ArrayList<Pergunta> questoes;
@@ -72,7 +72,7 @@ class Desafio implements Serializable {
     
     public LocalDateTime getLocalDate(){
         int anos,ano2,mes,dia,hora,min,seg;
-        System.out.println("locall");
+        System.out.println("local");
         anos=this.ano[1];
         System.out.println("anoo "+ anos);
         ano2=this.ano[0];

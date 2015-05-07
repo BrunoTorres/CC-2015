@@ -12,18 +12,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxWidth="400.0" minWidth="500.0" prefHeight="438.0" prefWidth="493.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pt.uminho.lei.dss.view.Menu_Controller">
+<AnchorPane id="AnchorPane" maxWidth="400.0" minWidth="500.0" prefHeight="438.0" prefWidth="493.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Menu_Controller">
    <children>
       <Pane layoutX="19.0" layoutY="144.0" prefHeight="253.0" prefWidth="760.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button fx:id="b_projetos" layoutX="68.0" layoutY="28.0" mnemonicParsing="false" onAction="#projetosButtonAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_projetos" stylesheets="@Habitat_Interface_CSS.css" text="   Criar Desafio " />
-            <Button fx:id="b_voluntarios" layoutX="258.0" layoutY="28.0" mnemonicParsing="false" onAction="#voluntariosButtonAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_voluntarios" stylesheets="@Habitat_Interface_CSS.css" text="Lista de Desafios">
+            <Button fx:id="buttonCriar" layoutX="68.0" layoutY="28.0" mnemonicParsing="false" onAction="#criarDesafioAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_projetos" stylesheets="@Habitat_Interface_CSS.css" text="   Criar Desafio " />
+            <Button fx:id="buttonListar" layoutX="258.0" layoutY="28.0" mnemonicParsing="false" onAction="#listarDesafiosAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_voluntarios" stylesheets="@Habitat_Interface_CSS.css" text="Lista de Desafios">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </Button>
-            <Button fx:id="b_candidaturas" layoutX="68.0" layoutY="150.0" mnemonicParsing="false" onAction="#candidaturasButtonAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_candidaturas" stylesheets="@Habitat_Interface_CSS.css" text="   Ranking   " />
-            <Button fx:id="b_sair" layoutX="258.0" layoutY="150.0" mnemonicParsing="false" onAction="#logoutButtonAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_logout" stylesheets="@Habitat_Interface_CSS.css" text=" Terminar Sessão" />
+            <Button fx:id="buttonRanking" layoutX="68.0" layoutY="150.0" mnemonicParsing="false" onAction="#listarRankingAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_candidaturas" stylesheets="@Habitat_Interface_CSS.css" text="   Ranking   " />
+            <Button fx:id="buttonSair" layoutX="258.0" layoutY="150.0" mnemonicParsing="false" onAction="#logoutAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_logout" stylesheets="@Habitat_Interface_CSS.css" text=" Terminar Sessão" />
          </children>
       </Pane>
       <Separator layoutX="6.0" layoutY="107.0" prefHeight="0.0" prefWidth="794.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />

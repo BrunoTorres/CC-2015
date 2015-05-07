@@ -8,50 +8,50 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="view.ListarDesafiosController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ListarDesafiosController">
     <stylesheets>
         <URL value="@Habitat_Interface_CSS.css" />
     </stylesheets>
    <children>
       <AnchorPane prefHeight="380.0" prefWidth="584.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TableView prefHeight="400.0" prefWidth="474.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <TableView fx:id="tableDesafios" prefHeight="400.0" prefWidth="474.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="126.0" AnchorPane.topAnchor="0.0">
               <columns>
-                <TableColumn prefWidth="220.66668701171875" text="Desafio" />
-                <TableColumn prefWidth="51.0" text="Data" />
-                  <TableColumn prefWidth="75.0" text="Hora" />
+                <TableColumn editable="false" prefWidth="220.66668701171875" sortable="false" text="Desafio" />
+                <TableColumn editable="false" prefWidth="51.0" sortable="false" text="Data" />
+                  <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Hora" />
               </columns>
                <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  <!--<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />-->
                </columnResizePolicy>
             </TableView>
-            <Button layoutX="481.0" layoutY="330.0" mnemonicParsing="false" prefHeight="56.0" prefWidth="113.0" styleClass="button_entrar" stylesheets="@Habitat_Interface_CSS.css" text="Entrar" />
-            <ImageView layoutX="477.0" layoutY="54.0">
+            <Button fx:id="buttonEntrar" layoutX="481.0" layoutY="330.0" mnemonicParsing="false" onAction="#buttonEntrarAction" prefHeight="56.0" prefWidth="113.0" styleClass="button_entrar" stylesheets="@Habitat_Interface_CSS.css" text="Entrar" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="6.0" />
+            <ImageView layoutX="477.0" layoutY="54.0" AnchorPane.rightAnchor="59.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>
             </ImageView>
-            <ImageView layoutX="509.0" layoutY="118.0">
+            <ImageView layoutX="506.0" layoutY="214.0" AnchorPane.rightAnchor="30.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>
             </ImageView>
-            <ImageView layoutX="481.0" layoutY="150.0">
+            <ImageView layoutX="477.0" layoutY="239.0" AnchorPane.rightAnchor="59.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>
             </ImageView>
-            <ImageView layoutX="506.0" layoutY="214.0">
+            <ImageView layoutX="506.0" layoutY="29.0" AnchorPane.rightAnchor="30.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>
             </ImageView>
-            <ImageView layoutX="477.0" layoutY="239.0">
+            <ImageView layoutX="525.0" layoutY="119.0" AnchorPane.rightAnchor="11.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>
             </ImageView>
-            <ImageView layoutX="506.0" layoutY="29.0">
+            <ImageView layoutX="496.0" layoutY="144.0" AnchorPane.rightAnchor="40.0">
                <image>
                   <Image url="@Music-64.png" />
                </image>

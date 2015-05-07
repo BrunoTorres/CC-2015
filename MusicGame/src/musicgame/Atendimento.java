@@ -21,29 +21,29 @@ import java.util.logging.Logger;
  * @author Bruno Pereira
  */
 public class Atendimento extends Thread {
-   
-    private static final int OK                  = 0;
-    private static final int FIM                 = 250;
-    private static final int ERRO                = 255;
-    private static final int CONTINUA            = 254;
-    private static final int NOME                = 1;
-    private static final int ALCUNHA             = 2;
-    private static final int PASSWORD            = 3;
-    private static final int DATA                = 4;
-    private static final int HORA                = 5;
-    private static final int ESCOLHA             = 6;
-    private static final int DESAFIO             = 7;
-    private static final int NQUESTAO            = 10;
-    private static final int QUESTAO             = 11;
-    private static final int NRESPOSTA           = 12;
-    private static final int RESPOSTA            = 13;
-    private static final int CERTA               = 14;
-    private static final int PONTOS              = 15;
-    private static final int IMAGEM              = 16;
-    private static final int BLOCO               = 17;
-    private static final int AUDIO               = 18;
-    private static final int SCORE               = 20;
-    private static final int TIME                = 21;
+
+    private static final int OK = 0;
+    private static final int FIM = 250;
+    private static final int ERRO = 255;
+    private static final int CONTINUA = 254;
+    private static final int NOME = 1;
+    private static final int ALCUNHA = 2;
+    private static final int PASSWORD = 3;
+    private static final int DATA = 4;
+    private static final int HORA = 5;
+    private static final int ESCOLHA = 6;
+    private static final int DESAFIO = 7;
+    private static final int NQUESTAO = 10;
+    private static final int QUESTAO = 11;
+    private static final int NRESPOSTA = 12;
+    private static final int RESPOSTA = 13;
+    private static final int CERTA = 14;
+    private static final int PONTOS = 15;
+    private static final int IMAGEM = 16;
+    private static final int BLOCO = 17;
+    private static final int AUDIO = 18;
+    private static final int SCORE = 20;
+    private static final int TIME = 21;
 
     private final DatagramPacket receivePacket;
     private DatagramSocket sendSocket;
@@ -158,15 +158,15 @@ public class Atendimento extends Thread {
 
                 //}
                 /*
-                if (!f) {
-                    d.removeUtilizador(bd.getUserByIP(add).getAlcunha());
-                    reply = new PDU(s, (byte) 0);
-                    c = new Campo(01, "Ok".getBytes());
-                    reply.addCampo(c);
-                    responde(reply, add, port);
+                 if (!f) {
+                 d.removeUtilizador(bd.getUserByIP(add).getAlcunha());
+                 reply = new PDU(s, (byte) 0);
+                 c = new Campo(01, "Ok".getBytes());
+                 reply.addCampo(c);
+                 responde(reply, add, port);
 
-                }
-*/
+                 }
+                 */
                 break;
             case 10:
                 System.out.println("Delete challenge");
@@ -205,7 +205,7 @@ public class Atendimento extends Thread {
         }
     }
 
-    public void quitDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException{
+    public void quitDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
@@ -220,11 +220,9 @@ public class Atendimento extends Thread {
         c = new Campo(OK, "OK".getBytes());
         reply.addCampo(c);
         responde(reply, add, port);
-        
-        
-        
-        
+
     }
+
     @SuppressWarnings("empty-statement")
     public void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
         PDU pacote = new PDU(data);
@@ -257,7 +255,6 @@ public class Atendimento extends Thread {
         }
 
         us.addPontuacao(3);
-       
 
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
 
@@ -272,7 +269,6 @@ public class Atendimento extends Thread {
             c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
             resposta.addCampo(c);
         }
-        
 
         responde(resposta, add, port);
 
@@ -349,25 +345,33 @@ public class Atendimento extends Thread {
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c, da, h, f;
-        int tam = desafios.size();
-        System.out.println("SIZE: " + tam);
+        int tam = desafios.size(); 
         int t = 0;
-        for (Desafio d : desafios) {
-            t++;
-            reply = new PDU(s, (byte) 0);
-            c = new Campo(DESAFIO, d.getNome().getBytes());
-            reply.addCampo(c);
-            da = new Campo(DATA, d.getDataByte().getBytes());
-            System.out.println("dataaaa " + new String(da.getValor()));
-            reply.addCampo(da);
-            h = new Campo(HORA, d.getTempo().getBytes());
-            reply.addCampo(h);
-            if (t < tam) {
-                f = new Campo(CONTINUA, "0".getBytes());
-                reply.addCampo(f);
+        if (tam > 0) {
+            for (Desafio d : desafios) {
+                t++;
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(DESAFIO, d.getNome().getBytes());
+                reply.addCampo(c);
+                da = new Campo(DATA, d.getStringDataFromByte().getBytes());
+                reply.addCampo(da);
+                h = new Campo(HORA, d.getStringHoraFromByte().getBytes());
+                reply.addCampo(h);
+                
+                if (t < tam) {
+                    f = new Campo(CONTINUA, "0".getBytes());
+                    reply.addCampo(f);
+                }
+                responde(reply, add, port);
             }
+        }
+        else{
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(ERRO, "Zero desafios".getBytes());
+            reply.addCampo(c);
             responde(reply, add, port);
         }
+
     }
 
     private void criaDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException, SocketException {
@@ -400,7 +404,10 @@ public class Atendimento extends Thread {
             byte[] minuto = PDU.intToByteArray(tempo.getMinute());
             byte[] segundo = PDU.intToByteArray(tempo.getSecond());
 
+            //System.out.println("A: " + PDU.byteArrayToInt(ano));
             Desafio d = new Desafio(nome, ano, dia, mes, hora, minuto, segundo);
+            d.setDataProperty();
+            d.setHoraProperty();
             criaPerguntas(d);
             Utilizador u = bd.getUserByIP(add);
             d.addUser(u, tl);
@@ -408,7 +415,7 @@ public class Atendimento extends Thread {
             reply = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, d.getNome().getBytes());
             reply.addCampo(c);
-            dat = new Campo(DATA, d.getDataByte().getBytes());
+            dat = new Campo(DATA, d.getStringDataFromByte().getBytes());
             reply.addCampo(dat);
             responde(reply, add, port);
             boolean f = true;

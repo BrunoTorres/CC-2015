@@ -33,6 +33,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
@@ -94,7 +96,10 @@ public class Menu_Controller implements Initializable {
                 // criarDesafio(name);
                 MusicClient.menuMakeChallenge(name);
             } catch (IOException ex) {
-                Logger.getLogger(Menu_Controller.class.getName()).log(Level.SEVERE, null, ex);
+                Alert al = new Alert(AlertType.ERROR);
+                al.setTitle("ERRO");
+                al.setContentText("IO ERROR MAKE CHALLENGE");
+                al.showAndWait();
             }
         }
     }
@@ -121,8 +126,20 @@ public class Menu_Controller implements Initializable {
     }
 
     @FXML
-    private void logoutAction(ActionEvent event) {
-
+    private void logoutAction(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Login.fxml"));
+        Parent root = loader.load();
+        Login_Controller log_c = loader.getController();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        
+        stage.setScene(scene);
+        stage.show();
+        stage.setResizable(false);
+        stage.setTitle("Login");
+        log_c.setAnterior(this.atual);
+        log_c.setAtual(stage);
+        this.atual.close();
     }
 
     

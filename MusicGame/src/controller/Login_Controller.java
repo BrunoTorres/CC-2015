@@ -11,8 +11,6 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
@@ -31,8 +29,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import musicgame.Campo;
 import musicgame.MusicClient;
-import static musicgame.MusicClient.sendPDU;
-import musicgame.PDU;
 import musicgame.UserInexistenteException;
 import musicgame.Utilizador;
 
@@ -104,7 +100,6 @@ public class Login_Controller extends Application implements Initializable {
         Parent root = loader.load();
 
         Scene scene = new Scene(root);
-
         primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setResizable(false);
@@ -152,7 +147,7 @@ public class Login_Controller extends Application implements Initializable {
             Parent root = loader.load();
             Menu_Controller menu = loader.getController();
             menu.setAnterior(this.atual);
-            menu.setAtual(atual);
+            
             menu.setUser(u);
             
             Stage newStage = new Stage();
@@ -162,9 +157,11 @@ public class Login_Controller extends Application implements Initializable {
             newStage.show();
             newStage.setResizable(false);
             
+            menu.setAtual(newStage);
+            
             //MusicClient.menuMakeChallenge("Desafio1");
             
-            //this.atual.hide();
+            this.button_auth.getScene().getWindow().hide();
 
         } catch (SocketTimeoutException | UserInexistenteException ex) {
             String msg = ex.getMessage();
@@ -196,7 +193,6 @@ public class Login_Controller extends Application implements Initializable {
 
     public void setAnterior(Stage anterior) {
         this.anterior = anterior;
-        this.anterior.close();
     }
 
 }

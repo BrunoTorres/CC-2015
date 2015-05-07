@@ -9,20 +9,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import musicgame.Desafio;
 import musicgame.MusicClient;
 import musicgame.Utilizador;
@@ -30,17 +27,20 @@ import musicgame.Utilizador;
 public class ListarDesafiosController implements Initializable {
 
     @FXML
+    private TableView<Desafio> tableDesafios;
+
+    @FXML
     private TableColumn<Desafio, String> tcHora;
 
     @FXML
     private TableColumn<Desafio, String> tcDesafio;
-    
+
     @FXML
     private TableColumn<Desafio, String> tcData;
 
     @FXML
     private Button buttonEntrar;
-    
+
     private Utilizador user;
     private Stage atual;
     private Stage anterior;
@@ -67,9 +67,15 @@ public class ListarDesafiosController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         try {
             ArrayList<Desafio> desafios = MusicClient.menuListChallenge();
-            tcDesafio.setCellValueFactory(new PropertyValueFactory<>("nome"));
-            //tcData.setCellValueFactory(new PropertyValueFactory<>("getData"));
-            //tcHora.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocalDate().toLocalTime().toString()));
+            tableDesafios.setItems(FXCollections.observableArrayList(desafios));
+            System.err.println("SIZE DES: " + desafios.size());
+            //tcDesafio.setText("COISO");
+            if (desafios.size() > 0) {
+                System.out.println("Data:" + desafios.get(0).getDataProperty().get());
+                tcDesafio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNome()));
+                tcData.setCellValueFactory(cellData -> cellData.getValue().getDataProperty());
+                tcHora.setCellValueFactory(cellData -> cellData.getValue().getHoraProperty());
+            }
         } catch (IOException ex) {
             Alert al = new Alert(AlertType.ERROR);
             al.setTitle("ERRO");
@@ -77,10 +83,10 @@ public class ListarDesafiosController implements Initializable {
             al.showAndWait();
         }
     }
-    
+
     @FXML
-    public void buttonEntrarAction(){
-        
+    public void buttonEntrarAction() {
+
     }
 
 }

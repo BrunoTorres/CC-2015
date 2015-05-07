@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
@@ -32,6 +34,9 @@ public class Desafio implements Serializable {
     private byte[] hora;
     private byte[] minuto;
     private byte[] segundo;
+    
+    private SimpleStringProperty dataString;
+    private SimpleStringProperty horaString;
 
     public Desafio(String nome, byte[] ano, byte[] dia, byte[] mes, byte[] hora, byte[] minuto, byte[] segundo) {
         this.nome = nome;
@@ -45,6 +50,12 @@ public class Desafio implements Serializable {
         this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
         this.usersEnd = new HashMap<>();
+        
+        this.dataString = new SimpleStringProperty();
+        this.horaString = new SimpleStringProperty();
+        
+        //this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
+        //this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
     }
 
     public Desafio() {
@@ -64,14 +75,30 @@ public class Desafio implements Serializable {
         return this.usersEnd;
     }
     
+    public StringProperty getDataProperty(){
+        return this.dataString;
+    }
+    
+    public void setDataProperty(){
+        this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
+        System.out.println("DataString: " + this.dataString.get());
+    }
+    
+    public StringProperty getHoraProperty(){
+        return this.horaString;
+    }    
+    
+    public void setHoraProperty(){
+        this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
+    }    
     
     
     public void addUserEnd(Utilizador u){
         this.usersEnd.put(u.getAlcunha(), u);
     }
     
-    public LocalDateTime getLocalDate(){
-        int anos,ano2,mes,dia,hora,min,seg;
+    public final LocalDateTime getLocalDate(){
+        int anos,ano2, m,d,h,ms,s;
         System.out.println("local");
         anos=this.ano[1];
         System.out.println("anoo "+ anos);
@@ -79,15 +106,17 @@ public class Desafio implements Serializable {
         ano2*=10;
         anos+=ano2+2000;
         //System.out.println("anooooo "+  PDU.byteArrayToInt(this.ano));
-        mes=PDU.byteArrayToInt(this.mes);
-        dia=PDU.byteArrayToInt(this.dia);
-        hora=PDU.byteArrayToInt(this.hora);
-        min=PDU.byteArrayToInt(this.minuto);
-        seg=PDU.byteArrayToInt(this.segundo);
+        m=PDU.byteArrayToInt(this.mes);
+        d=PDU.byteArrayToInt(this.dia);
+        h=PDU.byteArrayToInt(this.hora);
+        ms=PDU.byteArrayToInt(this.minuto);
+        s=PDU.byteArrayToInt(this.segundo);
         
-        LocalDateTime d = LocalDateTime.of(anos, mes, dia, hora, min, seg);
-        System.out.println("************************************* * "  +d.toString());
-        return d;
+        //System.out.println("A: " + anos + " M: " + m + " H: " + h + " MS: " + ms + " S: " + s);
+        
+        LocalDateTime da = LocalDateTime.of(anos, m, d, h, ms, s);
+        System.out.println("************************************* * "  +da.toString());
+        return da;
         
     }
     public void removeUtilizador(String alc){
@@ -194,13 +223,22 @@ public class Desafio implements Serializable {
         sb.append(this.hora).append(this.minuto).append(this.segundo);
         return sb.toString();
     }
-
-    public String getDataByte() {
+    public String getStringDataFromByte() {
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.ano[0]).append(this.ano[1]);
         sb.append(this.mes[0]).append(this.mes[1]);
         sb.append(this.dia[0]).append(this.dia[1]);
+        System.out.println(sb.toString());
+        return sb.toString();
+    }
+    
+    public String getStringHoraFromByte() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.hora[0]).append(this.hora[1]);
+        sb.append(this.minuto[0]).append(this.minuto[1]);
+        sb.append(this.segundo[0]).append(this.segundo[1]);
         System.out.println(sb.toString());
         return sb.toString();
     }

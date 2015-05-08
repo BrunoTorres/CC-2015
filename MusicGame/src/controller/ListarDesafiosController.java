@@ -18,7 +18,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import musicgame.Desafio;
 import musicgame.MusicClient;
@@ -70,12 +69,12 @@ public class ListarDesafiosController implements Initializable {
             tableDesafios.setItems(FXCollections.observableArrayList(desafios));
             System.err.println("SIZE DES: " + desafios.size());
             //tcDesafio.setText("COISO");
-            if (desafios.size() > 0) {
-                System.out.println("Data:" + desafios.get(0).getDataProperty().get());
-                tcDesafio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNome()));
-                tcData.setCellValueFactory(cellData -> cellData.getValue().getDataProperty());
-                tcHora.setCellValueFactory(cellData -> cellData.getValue().getHoraProperty());
-            }
+            //if (desafios.size() > 0) {
+            //  System.out.println("Data:" + desafios.get(0).getDataProperty().get());
+            tcDesafio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNome()));
+            tcData.setCellValueFactory(cellData -> cellData.getValue().getDataProperty());
+            tcHora.setCellValueFactory(cellData -> cellData.getValue().getHoraProperty());
+            //}
         } catch (IOException ex) {
             Alert al = new Alert(AlertType.ERROR);
             al.setTitle("ERRO");
@@ -85,8 +84,17 @@ public class ListarDesafiosController implements Initializable {
     }
 
     @FXML
-    public void buttonEntrarAction() {
-
+    public void buttonEntrarAction() throws IOException {
+        if (tableDesafios.getSelectionModel().getSelectedItems().size() == 0) {
+            Desafio d = tableDesafios.getSelectionModel().getSelectedItem();
+            MusicClient.acceptChallenge(d.getNome());
+        }
+        else{
+            Alert al = new Alert(AlertType.INFORMATION);
+            al.setTitle("Nenhum desafio selecionado");
+            al.setContentText("Selecione um desafio");
+            al.showAndWait();
+        }
     }
 
 }

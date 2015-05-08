@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.application.Application;
@@ -29,6 +30,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import musicgame.Campo;
 import musicgame.MusicClient;
+import musicgame.PDU;
 import musicgame.UserInexistenteException;
 import musicgame.Utilizador;
 
@@ -37,7 +39,10 @@ import musicgame.Utilizador;
  * @author JoaoMano
  */
 public class Login_Controller extends Application implements Initializable {
-
+    
+    @FXML
+    private AnchorPane loginPanel;
+    
     @FXML
     private AnchorPane formPanel;
 
@@ -72,7 +77,7 @@ public class Login_Controller extends Application implements Initializable {
     private Button buttonRegistar;
 
     @FXML
-    private TextField tfNickname;
+    private TextField tfName;
 
     @FXML
     private Button buttonCancel;
@@ -110,13 +115,13 @@ public class Login_Controller extends Application implements Initializable {
     }
 
     @FXML
-    void registarAction(ActionEvent event) {
+    private void registarAction(ActionEvent event) {
         formPanel.setVisible(false);
         nickPanel.setVisible(true);
     }
 
     @FXML
-    void cancelarButtonAction(ActionEvent event) {
+    private void cancelarButtonAction(ActionEvent event) {
         nickPanel.setVisible(false);
         formPanel.setVisible(true);
 
@@ -124,15 +129,46 @@ public class Login_Controller extends Application implements Initializable {
     }
 
     @FXML
-    void registarButtonAction(ActionEvent event) {
-
+    private void registarButtonAction(ActionEvent event) throws UnknownHostException, IOException {
+        try {
+            if (!tf_login.getText().isEmpty() && !tfName.getText().isEmpty() && !pf_pass.getText().isEmpty()) {
+                boolean success;
+                success = MusicClient.menuRegista(tfName.getText(), tf_login.getText(), pf_pass.getText());
+                
+                if (success) {
+                    Alert al = new Alert(Alert.AlertType.INFORMATION);
+                    al.setTitle("Registo");
+                    al.setContentText("Registo efetuado com sucesso! Pode fazer login.");
+                    al.showAndWait();
+                    nickPanel.setVisible(false);
+                    formPanel.setVisible(true);
+                    tf_login.requestFocus();
+                } else {
+                    Alert al = new Alert(Alert.AlertType.ERROR);
+                    al.setTitle("Registo");
+                    al.setContentText("Registo não efetuado! Tente novamente.");
+                    al.showAndWait();
+                }
+            }
+            else{
+                Alert al = new Alert(Alert.AlertType.ERROR);
+                al.setTitle("Registo");
+                al.setContentText("Preencha todos os campos.");
+                al.showAndWait();
+            }
+        } catch (SocketTimeoutException ex) {
+            Alert al = new Alert(Alert.AlertType.ERROR);
+            al.setTitle("Timeout");
+            al.setContentText("Tempo de pedido excedido");
+            al.showAndWait();
+        }
     }
 
     @FXML
     private void limparButtonAction() {
         tf_login.setText("");
         pf_pass.setText("");
-        tfNickname.setText("");
+        tfName.setText("");
     }
 
     @FXML
@@ -141,26 +177,27 @@ public class Login_Controller extends Application implements Initializable {
             ArrayList<Campo> campos = new ArrayList<>();
             int score;
             InetAddress addr = InetAddress.getLocalHost();
+            System.out.println("PASS:");
+            PDU.printBytes(pf_pass.getText().getBytes());
             Utilizador u = MusicClient.menuLogin(new Utilizador(null, tf_login.getText(), pf_pass.getText().getBytes(), addr, 55000));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Menu.fxml"));
             Parent root = loader.load();
             Menu_Controller menu = loader.getController();
             menu.setAnterior(this.atual);
-            
+
             menu.setUser(u);
-            
+
             Stage newStage = new Stage();
             Scene scene = new Scene(root);
 
             newStage.setScene(scene);
             newStage.show();
             newStage.setResizable(false);
-            
+
             menu.setAtual(newStage);
-            
+
             //MusicClient.menuMakeChallenge("Desafio1");
-            
             this.button_auth.getScene().getWindow().hide();
 
         } catch (SocketTimeoutException | UserInexistenteException ex) {

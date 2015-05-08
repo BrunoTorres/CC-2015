@@ -124,12 +124,11 @@ public class MusicClient {
         Campo alcunha = new Campo(ALCUNHA, al.getBytes());
         campos.add(alcunha);
         Campo password = new Campo(PASSWORD, pass.getBytes());
-        campos.add(alcunha);
+        campos.add(password);
         sendPDU(REGISTER, campos);
         PDU pacote = receivePDU();
         System.out.println(pacote.getCampo(0).getId() != 255);
         return pacote.getCampo(0).getId() != 255;
-
     }
 
     public static Utilizador menuLogin(Utilizador u) throws IOException, SocketTimeoutException, UserInexistenteException {
@@ -268,8 +267,6 @@ public class MusicClient {
         int numCampos = pacote.getNumCampos();
         Desafio d = null;
         String nome;
-
-        PDU.printBytes(pacote.getBytes());
 
         if (pacote.getCampo(0).getId() != MusicClient.ERRO) {
 
@@ -466,7 +463,7 @@ public class MusicClient {
 
         PDU pacote = receivePDU();
         byte[] b = pacote.getCampo(2).getValor();
-        PDU.printBytes(b);
+        //PDU.printBytes(b);
         num = PDU.byteArrayToInt(b);
         blocos.put(num, pacote.getCampo(3).getValor());
 

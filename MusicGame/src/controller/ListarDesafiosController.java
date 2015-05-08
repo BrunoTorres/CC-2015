@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import musicgame.Desafio;
 import musicgame.MusicClient;
 import musicgame.Utilizador;
@@ -49,6 +50,9 @@ public class ListarDesafiosController implements Initializable {
 
     public void setAnterior(Stage ant) {
         this.anterior = ant;
+        this.atual.setOnCloseRequest((WindowEvent event) -> {
+            anterior.show();
+        });
     }
 
     public void setAtual(Stage at) {
@@ -67,7 +71,6 @@ public class ListarDesafiosController implements Initializable {
         try {
             ArrayList<Desafio> desafios = MusicClient.menuListChallenge();
             tableDesafios.setItems(FXCollections.observableArrayList(desafios));
-            System.err.println("SIZE DES: " + desafios.size());
             //tcDesafio.setText("COISO");
             //if (desafios.size() > 0) {
             //  System.out.println("Data:" + desafios.get(0).getDataProperty().get());

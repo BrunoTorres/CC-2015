@@ -2,6 +2,7 @@ package musicgame;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -181,6 +182,7 @@ public class Atendimento extends Thread {
                 break;
             case 13:
                 System.out.println("List ranking");
+                listaRanking(data, add, port);
                 break;
             case 14:
                 p = new PDU(data);
@@ -345,7 +347,7 @@ public class Atendimento extends Thread {
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c, da, h, f;
-        int tam = desafios.size(); 
+        int tam = desafios.size();
         int t = 0;
         if (tam > 0) {
             for (Desafio d : desafios) {
@@ -353,19 +355,18 @@ public class Atendimento extends Thread {
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(DESAFIO, d.getNome().getBytes());
                 reply.addCampo(c);
-                da = new Campo(DATA, d.getStringDataFromByte().getBytes());
+                da = new Campo(DATA, d.getData());
                 reply.addCampo(da);
-                h = new Campo(HORA, d.getStringHoraFromByte().getBytes());
+                h = new Campo(HORA, d.getTempo());
                 reply.addCampo(h);
-                
+
                 if (t < tam) {
                     f = new Campo(CONTINUA, "0".getBytes());
                     reply.addCampo(f);
                 }
                 responde(reply, add, port);
             }
-        }
-        else{
+        } else {
             reply = new PDU(s, (byte) 0);
             c = new Campo(ERRO, "Zero desafios".getBytes());
             reply.addCampo(c);
@@ -374,17 +375,48 @@ public class Atendimento extends Thread {
 
     }
 
+    private void listaRanking(byte[] data, InetAddress add, int port) throws IOException, UserInexistenteException {
+        byte[] tl = {data[2], data[3]};
+        int s = PDU.byteArrayToInt(tl);
+        TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
+        PDU reply;
+        Campo c;
+        int tam = this.bd.getRanking().size();
+        int t = 0;
+
+        for (String a : this.bd.getRanking().keySet()) {
+            Utilizador u = this.bd.getUser(a).clone();
+            u.initPontuacao();
+            u.addPontuacao(this.bd.getRanking(a));
+            utili.add(u);
+        }
+
+        t = 0;
+        for (Utilizador u : utili) {
+            t++;
+
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
+            reply.addCampo(c);
+            c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
+            reply.addCampo(c);
+            if (t < tam) {
+                c = new Campo(CONTINUA, "0".getBytes());
+                reply.addCampo(c);
+            }
+            responde(reply, add, port);
+        }
+    }
+
     private void criaDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException, SocketException {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
-        Campo c, dat;
+        Campo c, dat, hor;
         String nome = new String(pacote.getCampo(0).getValor());
 
         boolean e = bd.existeDesafio(nome);
-
-        System.out.println("cria desafio " + e);
 
         if (e) {
             reply = new PDU(s, (byte) 0);
@@ -393,19 +425,33 @@ public class Atendimento extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(1);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(30);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
-            byte[] ano = {(byte) pri, (byte) sec};
+            BigInteger anoAux = BigInteger.valueOf(tempo.getYear());
+            byte[] anoBytes = anoAux.toByteArray();
+            byte[] anoF;
+            if(anoBytes.length < 3)
+                anoF = new byte[] { 0x00, anoBytes[0], anoBytes[1] };
+            else
+                anoF = anoBytes;
+            /*
             byte[] mes = PDU.intToByteArray(tempo.getMonthValue());
             byte[] dia = PDU.intToByteArray(tempo.getDayOfMonth());
             byte[] hora = PDU.intToByteArray(tempo.getHour());
             byte[] minuto = PDU.intToByteArray(tempo.getMinute());
-            byte[] segundo = PDU.intToByteArray(tempo.getSecond());
+            byte[] segundo = PDU.intToByteArray(tempo.getSecond());*/
+            
+            byte mes = (byte) tempo.getMonthValue();
+            byte dia = (byte) tempo.getDayOfMonth();
+            byte hora = (byte) tempo.getHour();
+            byte minuto = (byte) tempo.getMinute();
+            byte segundo = (byte) tempo.getSecond();
 
             //System.out.println("A: " + PDU.byteArrayToInt(ano));
-            Desafio d = new Desafio(nome, ano, dia, mes, hora, minuto, segundo);
+            Desafio d = new Desafio(nome, anoF, dia, mes, hora, minuto, segundo);
+           
             d.setDataProperty();
             d.setHoraProperty();
             criaPerguntas(d);
@@ -415,8 +461,10 @@ public class Atendimento extends Thread {
             reply = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, d.getNome().getBytes());
             reply.addCampo(c);
-            dat = new Campo(DATA, d.getStringDataFromByte().getBytes());
+            dat = new Campo(DATA, d.getData());
             reply.addCampo(dat);
+            hor = new Campo(HORA, d.getTempo());
+            reply.addCampo(hor);
             responde(reply, add, port);
             boolean f = true;
             //System.out.println("cecec"+tempo.toString());
@@ -548,8 +596,6 @@ public class Atendimento extends Thread {
             byte b[] = blocos.get(bloco);
 
             //byte b[] = this.bd.partes.get(bloco);
-            System.out.println("b.size  " + b.length);
-            System.out.println("numeroooo bloocooooo " + bloco);
 
             PDU music = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, nome.getBytes());

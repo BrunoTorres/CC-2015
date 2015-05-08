@@ -39,10 +39,10 @@ import musicgame.Utilizador;
  * @author JoaoMano
  */
 public class Login_Controller extends Application implements Initializable {
-    
+
     @FXML
     private AnchorPane loginPanel;
-    
+
     @FXML
     private AnchorPane formPanel;
 
@@ -134,7 +134,7 @@ public class Login_Controller extends Application implements Initializable {
             if (!tf_login.getText().isEmpty() && !tfName.getText().isEmpty() && !pf_pass.getText().isEmpty()) {
                 boolean success;
                 success = MusicClient.menuRegista(tfName.getText(), tf_login.getText(), pf_pass.getText());
-                
+
                 if (success) {
                     Alert al = new Alert(Alert.AlertType.INFORMATION);
                     al.setTitle("Registo");
@@ -149,8 +149,7 @@ public class Login_Controller extends Application implements Initializable {
                     al.setContentText("Registo não efetuado! Tente novamente.");
                     al.showAndWait();
                 }
-            }
-            else{
+            } else {
                 Alert al = new Alert(Alert.AlertType.ERROR);
                 al.setTitle("Registo");
                 al.setContentText("Preencha todos os campos.");
@@ -177,16 +176,11 @@ public class Login_Controller extends Application implements Initializable {
             ArrayList<Campo> campos = new ArrayList<>();
             int score;
             InetAddress addr = InetAddress.getLocalHost();
-            System.out.println("PASS:");
-            PDU.printBytes(pf_pass.getText().getBytes());
             Utilizador u = MusicClient.menuLogin(new Utilizador(null, tf_login.getText(), pf_pass.getText().getBytes(), addr, 55000));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Menu.fxml"));
             Parent root = loader.load();
             Menu_Controller menu = loader.getController();
-            menu.setAnterior(this.atual);
-
-            menu.setUser(u);
 
             Stage newStage = new Stage();
             Scene scene = new Scene(root);
@@ -196,6 +190,9 @@ public class Login_Controller extends Application implements Initializable {
             newStage.setResizable(false);
 
             menu.setAtual(newStage);
+            menu.setAnterior(this.atual);
+
+            menu.setUser(u);
 
             //MusicClient.menuMakeChallenge("Desafio1");
             this.button_auth.getScene().getWindow().hide();

@@ -6,6 +6,9 @@
 package controller;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,6 +28,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import musicgame.Utilizador;
 
 
 
@@ -53,6 +57,12 @@ public class JogarController extends Application implements Initializable{
 
     @FXML
     private Label labelTimer;
+    
+    @FXML
+    private Label labelTimerJogo;
+    
+    @FXML
+    private Label labelNomeDesafio;
 
     @FXML
     private RadioButton resposta3;
@@ -62,23 +72,40 @@ public class JogarController extends Application implements Initializable{
     private int timerJogo;
     private Timeline tlineJogo;
     
+    private Stage atual;
+    private Stage anterior;
+    private Utilizador u;
+    
+    private LocalDateTime data;
+    
+    public JogarController(LocalDateTime data, Utilizador u){
+        this.data = data;
+        this.u = u;
+        LocalDateTime n = LocalDateTime.now();
+        if(this.data.isAfter(n)){
+            this.timerJogo = (int) n.until(this.data, ChronoUnit.SECONDS);
+            this.labelTimerJogo.setText(String.valueOf(this.timerJogo));
+        }
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         //labelTimer = new Label();
-        labelTimer.setText("20");
+        /*labelTimer.setText("20");
         timerPergunta = Integer.parseInt(labelTimer.getText());
-        timeLine = new Timeline();
+        timeLine = new Timeline();*/
 
-        timeLine.setCycleCount(Timeline.INDEFINITE);
-        timeLine.getKeyFrames().add(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            timerPergunta--;
-            labelTimer.setText(String.valueOf(timerPergunta));
-            if(timerPergunta <= 15){
-                labelTimer.setTextFill(Color.RED);
+        tlineJogo.setCycleCount(Timeline.INDEFINITE);
+        tlineJogo.getKeyFrames().add(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            timerJogo--;
+            labelTimerJogo.setText(String.valueOf(timerJogo));
+            if(timerJogo <= 15){
+                labelTimerJogo.setTextFill(Color.RED);
             }
-            if (timerPergunta <= 0) {
-                timeLine.stop();
+            if (timerJogo <= 0) {
+                tlineJogo.stop();
+                
             }
         }));
         timeLine.playFromStart();
@@ -91,7 +118,7 @@ public class JogarController extends Application implements Initializable{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Jogar.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
         Parent root = loader.load();
         
         Scene scene = new Scene(root);

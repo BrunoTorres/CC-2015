@@ -142,7 +142,7 @@ public class Utilizador implements Serializable {
             return false;
         } else {
             Utilizador c = (Utilizador) o;
-            return this.getUserName().equals(c.getUserName());
+            return this.getAlcunha().equals(c.getAlcunha());
         }
     }
 

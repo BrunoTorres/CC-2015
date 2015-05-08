@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -190,7 +191,7 @@ public class MusicClient {
         sendPDU(DELETE_CHALLENGE, null);
         boolean flag;
         PDU pacote = receivePDU();
-        Desafio d;
+        Desafio d = null;
         if (pacote.getCampo(0).getId() == 255) {
             throw new ChallengeException("Data");
         } else {
@@ -204,7 +205,7 @@ public class MusicClient {
             byte[] hora = new byte[]{b[0], b[1]};
             byte[] min = new byte[]{b[2], b[3]};
             byte[] seg = new byte[]{b[4], b[5]};
-            d = new Desafio(nome, ano, dia, mes, hora, min, seg);
+           // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
 
         }
         return d;
@@ -250,13 +251,30 @@ public class MusicClient {
 
     }
 
+    private static Utilizador getNextUserRanking(PDU pacote) {
+        Utilizador u = null;
+        String nome = new String(pacote.getCampo(0).getValor());
+        int score = PDU.byteArrayToInt(pacote.getCampo(1).getValor());
+        return new Utilizador(nome, score);
+    }
+
     //SERVIDOR EM FALTA
-    public static Map<String, Integer> menuListRankings() throws IOException {
-        TreeMap<String, Integer> lista = new TreeMap<>();
+    public static List<Utilizador> menuListRankings() throws IOException {
+        ArrayList<Utilizador> lista = new ArrayList<>();
         sendPDU(LIST_RANKING, null);
-        PDU p = receivePDU();
-        for (int i = 1; i < p.getNumCampos(); i += 2) {
-            lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i + 1).getValor()));
+        PDU pacote = receivePDU();
+        Utilizador u;
+        u = getNextUserRanking(pacote);
+        if (u != null) {
+            lista.add(u);
+        }
+
+        while (pacote.getNumCampos() == 3) {
+            pacote = receivePDU();
+            u = getNextUserRanking(pacote);
+            if (u != null) {
+                lista.add(u);
+            }
         }
 
         return lista;
@@ -264,38 +282,44 @@ public class MusicClient {
     }
 
     private static Desafio getNextDesafio(PDU pacote) {
-        int numCampos = pacote.getNumCampos();
+        //int numCampos = pacote.getNumCampos();
         Desafio d = null;
         String nome;
 
         if (pacote.getCampo(0).getId() != MusicClient.ERRO) {
 
             nome = new String(pacote.getCampo(0).getValor());
-            byte[] b = pacote.getCampo(1).getValor();
-            PDU.printBytes(b);
-            byte[] ano = new byte[]{b[0], b[1]};
-            byte[] mes = new byte[]{b[2], b[3]};
-            byte[] dia = new byte[]{b[4], b[5]};
 
-            int anoAux = 2000 + Integer.parseInt(new String(ano));
-            int aux = anoAux % 100;
-            int pri = aux / 10;
-            int sec = aux % 10;
-            ano = new byte[]{(byte) pri, (byte) sec};
-            int mes2 = Integer.parseInt(new String(mes));
-            int dia2 = Integer.parseInt(new String(dia));
+            byte[] b = pacote.getCampo(1).getValor();
+
+            byte[] ano = {b[0], b[1], b[2]};
+            byte mes = b[3];
+            byte dia = b[4];
+            /*byte[] mes = new byte[]{b[2], b[3]};
+             byte[] dia = new byte[]{b[4], b[5]};
+
+             int anoAux = 2000 + Integer.parseInt(new String(ano));
+             int aux = anoAux % 100;
+             int pri = aux / 10;
+             int sec = aux % 10;
+             ano = new byte[]{(byte) pri, (byte) sec};
+             int mes2 = Integer.parseInt(new String(mes));
+             int dia2 = Integer.parseInt(new String(dia));*/
 
             b = pacote.getCampo(2).getValor();
-            byte[] hora = new byte[]{b[0], b[1]};
-            byte[] min = new byte[]{b[2], b[3]};
-            byte[] seg = new byte[]{b[4], b[5]};
+            byte hora = b[0];
+            byte min = b[1];
+            byte seg = b[2];
+            /*byte[] hora = new byte[]{b[0], b[1]};
+             byte[] min = new byte[]{b[2], b[3]};
+             byte[] seg = new byte[]{b[4], b[5]};
 
-            int hora2 = Integer.parseInt(new String(hora));
-            int min2 = Integer.parseInt(new String(min));
-            int seg2 = Integer.parseInt(new String(seg));
+             int hora2 = Integer.parseInt(new String(hora));
+             int min2 = Integer.parseInt(new String(min));
+             int seg2 = Integer.parseInt(new String(seg));*/
 
-            //d = new Desafio(nome, ano, dia, mes, hora, min, seg);
-            d = new Desafio(nome, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));
+            d = new Desafio(nome, ano, dia, mes, hora, min, seg);
+            //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
             d.setDataProperty();
             d.setHoraProperty();
         }
@@ -310,63 +334,91 @@ public class MusicClient {
         ArrayList<Desafio> desafios = new ArrayList<>();
 
         d = getNextDesafio(pacote);
-        if(d != null)
+        if (d != null) {
             desafios.add(d);
-        
-        while(pacote.getNumCampos() == 4){
+        }
+
+        while (pacote.getNumCampos() == 4) {
             pacote = receivePDU();
             d = getNextDesafio(pacote);
-            if(d != null)
+            if (d != null) {
                 desafios.add(d);
+            }
         }
-        
+
         return desafios;
     }
 
-    public static void acceptChallenge(String nome) throws IOException, SocketTimeoutException {
+    public static boolean acceptChallenge(String nome) throws IOException, SocketTimeoutException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo m = new Campo(DESAFIO, nome.getBytes());
         campos.add(m);
         sendPDU(ACCEPT_CHALLENGE, campos);
         PDU pacote = receivePDU();
         System.out.println(" idiiii " + pacote.getCampo(0).getValor()[0]);
-        if (pacote.getCampo(0).getValor()[0] == 0) {
-            try {
-                System.out.println("vamos jogar");
-                jogar();
 
-            } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
-                Logger.getLogger(MusicClient.class
-                        .getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        return pacote.getCampo(0).getValor()[0] == 0; /*try {
+         System.out.println("vamos jogar");
+         jogar();
+         } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
+         Logger.getLogger(MusicClient.class
+         .getName()).log(Level.SEVERE, null, ex);
+         }*/
 
     }
 
-    public static void menuMakeChallenge(String nome) throws IOException, SocketTimeoutException {
+    public static Desafio menuMakeChallenge(String nome) throws IOException, SocketTimeoutException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo m = new Campo(7, nome.getBytes());
         campos.add(m);
         sendPDU(MAKE_CHALLENGE, campos);
         PDU pacote = receivePDU();
 
-        System.out.println("Chegou");
-        nome = new String(pacote.getCampo(0).getValor());
-        System.out.println("Desafio: " + nome);
-        System.out.println("Data: " + new String(pacote.getCampo(1).getValor()));
+        Desafio d = null;
 
-        try {
-            //// IFACE CHAMA O JOGAR
-            jogar();
+        if (pacote.getCampo(0).getId() != ERRO) {
+            String name = new String(pacote.getCampo(0).getValor());
 
-        } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
-            Logger.getLogger(MusicClient.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            byte[] b = pacote.getCampo(1).getValor();
+
+            byte[] ano = {b[0], b[1], b[2]};
+            byte mes = b[3];
+            byte dia = b[4];
+            /*byte[] mes = new byte[]{b[2], b[3]};
+             byte[] dia = new byte[]{b[4], b[5]};
+
+             int anoAux = 2000 + Integer.parseInt(new String(ano));
+             int aux = anoAux % 100;
+             int pri = aux / 10;
+             int sec = aux % 10;
+             ano = new byte[]{(byte) pri, (byte) sec};
+             int mes2 = Integer.parseInt(new String(mes));
+             int dia2 = Integer.parseInt(new String(dia));*/
+            System.err.println("DataC: " + new String(b));
+
+            b = pacote.getCampo(2).getValor();
+            byte hora = b[0];
+            byte min = b[1];
+            byte seg = b[2];
+            /*byte[] hora = new byte[]{b[0], b[1]};
+             byte[] min = new byte[]{b[2], b[3]};
+             byte[] seg = new byte[]{b[4], b[5]};
+
+             int hora2 = Integer.parseInt(new String(hora));
+             int min2 = Integer.parseInt(new String(min));
+             int seg2 = Integer.parseInt(new String(seg));*/
+            System.err.println("HoraC: " + new String(b));
+
+            d = new Desafio(name, ano, dia, mes, hora, min, seg);
+            //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
+            d.setDataProperty();
+            d.setHoraProperty();
         }
 
+        return d;
     }
 
-    private static void jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    private static Pergunta jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
         byte[] b, res, data;
         PDU pacote;
         int num = 0;
@@ -376,11 +428,11 @@ public class MusicClient {
         ArrayList<String> respostas = new ArrayList<>();
         TreeMap<Integer, byte[]> blocosImagem;
         TreeMap<Integer, byte[]> blocosMusica;
+        Pergunta p = null;
         try {
             // 1ª pacote -> estrutura da pergunta
             pacote = receivePDU();
             nome = new String(pacote.getCampo(0).getValor());
-            System.out.println("Desafio: " + nome);
             int id = pacote.getCampo(1).getId();
             // se == 255 -> Não existem jogadores suficientes -> Exception
             // se não -> jogar
@@ -391,12 +443,6 @@ public class MusicClient {
             respostas.add(new String(pacote.getCampo(4).getValor()));
             respostas.add(new String(pacote.getCampo(6).getValor()));
             respostas.add(new String(pacote.getCampo(8).getValor()));
-            System.out.println("Nome: " + nome);
-            System.out.println(pergunta);
-
-            for (String s : respostas) {
-                System.out.println(s);
-            }
 
             // 2ª parte -> receber pacotes de uma imagem
             blocosImagem = (TreeMap) recebeBlocos();
@@ -407,6 +453,8 @@ public class MusicClient {
             blocosMusica = (TreeMap) recebeBlocos();
             checkBlocos(blocosMusica, nome, nQuestao, 18);
             String fMusic = constroiFicheiroAudio(blocosMusica);
+
+            p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
             //  }
             //  else{
             //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
@@ -414,6 +462,8 @@ public class MusicClient {
         } catch (SocketTimeoutException e) {
             sendPDU(QUIT, null);
         }
+
+        return p;
     }
 
     private static Map<Integer, byte[]> recebeBlocos() throws IOException, SocketTimeoutException {

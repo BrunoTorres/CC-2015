@@ -8,6 +8,7 @@ package musicgame;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,20 +30,20 @@ public class Desafio implements Serializable {
     private HashMap<String, Utilizador> usersEnd;
     
     private byte[] ano;
-    private byte[] dia;
-    private byte[] mes;
-    private byte[] hora;
-    private byte[] minuto;
-    private byte[] segundo;
+    private byte dia;
+    private byte mes;
+    private byte hora;
+    private byte minuto;
+    private byte segundo;
     
     private SimpleStringProperty dataString;
     private SimpleStringProperty horaString;
 
-    public Desafio(String nome, byte[] ano, byte[] dia, byte[] mes, byte[] hora, byte[] minuto, byte[] segundo) {
+    public Desafio(String nome, byte[] ano, byte mes, byte dia, byte hora, byte minuto, byte segundo) {
         this.nome = nome;
         this.ano = ano;
-        this.dia = dia;
         this.mes = mes;
+        this.dia = dia;
         this.hora = hora;
         this.minuto = minuto;
         this.segundo = segundo;
@@ -81,7 +82,6 @@ public class Desafio implements Serializable {
     
     public void setDataProperty(){
         this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
-        System.out.println("DataString: " + this.dataString.get());
     }
     
     public StringProperty getHoraProperty(){
@@ -98,24 +98,10 @@ public class Desafio implements Serializable {
     }
     
     public final LocalDateTime getLocalDate(){
-        int anos,ano2, m,d,h,ms,s;
-        System.out.println("local");
-        anos=this.ano[1];
-        System.out.println("anoo "+ anos);
-        ano2=this.ano[0];
-        ano2*=10;
-        anos+=ano2+2000;
-        //System.out.println("anooooo "+  PDU.byteArrayToInt(this.ano));
-        m=PDU.byteArrayToInt(this.mes);
-        d=PDU.byteArrayToInt(this.dia);
-        h=PDU.byteArrayToInt(this.hora);
-        ms=PDU.byteArrayToInt(this.minuto);
-        s=PDU.byteArrayToInt(this.segundo);
+        int anos;
+        anos = new BigInteger(this.ano).intValue();
         
-        //System.out.println("A: " + anos + " M: " + m + " H: " + h + " MS: " + ms + " S: " + s);
-        
-        LocalDateTime da = LocalDateTime.of(anos, m, d, h, ms, s);
-        System.out.println("************************************* * "  +da.toString());
+        LocalDateTime da = LocalDateTime.of(anos, this.mes, this.dia, this.hora, this.minuto, this.segundo);
         return da;
         
     }
@@ -171,64 +157,60 @@ public class Desafio implements Serializable {
         this.ano = ano;
     }
 
-    public byte[] getDia() {
+    public byte getDia() {
         return dia;
     }
 
-    public void setDia(byte[] dia) {
+    public void setDia(byte dia) {
         this.dia = dia;
     }
 
-    public byte[] getMes() {
+    public byte getMes() {
         return mes;
     }
 
-    public void setMes(byte[] mes) {
+    public void setMes(byte mes) {
         this.mes = mes;
     }
 
-    public byte[] getHora() {
+    public byte getHora() {
         return hora;
     }
 
-    public void setHora(byte[] hora) {
+    public void setHora(byte hora) {
         this.hora = hora;
     }
 
-    public byte[] getMinuto() {
+    public byte getMinuto() {
         return minuto;
     }
 
-    public void setMinuto(byte[] minuto) {
+    public void setMinuto(byte minuto) {
         this.minuto = minuto;
     }
 
-    public byte[] getSegundo() {
+    public byte getSegundo() {
         return segundo;
     }
 
-    public void setSegundo(byte[] segundo) {
+    public void setSegundo(byte segundo) {
         this.segundo = segundo;
     }
 
     
-    public String getData() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.ano).append(this.mes).append(this.dia);
-        return sb.toString();
+    public byte[] getData() {
+        return new byte[] { this.ano[0], this.ano[1], this.ano[2], this.mes, this.dia };
     }
 
-    public String getTempo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.hora).append(this.minuto).append(this.segundo);
-        return sb.toString();
+    public byte[] getTempo() {
+        return new byte[] {this.hora, this.minuto, this.segundo };
     }
     public String getStringDataFromByte() {
-
+        int horaAux, minAux, segAux;
         StringBuilder sb = new StringBuilder();
-        sb.append(this.ano[0]).append(this.ano[1]);
-        sb.append(this.mes[0]).append(this.mes[1]);
-        sb.append(this.dia[0]).append(this.dia[1]);
+        sb.append(new BigInteger(this.ano).intValue());
+        sb.append(this.mes);
+        sb.append(this.dia);
         System.out.println(sb.toString());
         return sb.toString();
     }
@@ -236,9 +218,9 @@ public class Desafio implements Serializable {
     public String getStringHoraFromByte() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(this.hora[0]).append(this.hora[1]);
-        sb.append(this.minuto[0]).append(this.minuto[1]);
-        sb.append(this.segundo[0]).append(this.segundo[1]);
+        sb.append(this.hora);
+        sb.append(this.minuto);
+        sb.append(this.segundo);
         System.out.println(sb.toString());
         return sb.toString();
     }

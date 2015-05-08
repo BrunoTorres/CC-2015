@@ -1,0 +1,7 @@
+DATA - 5 bytes
+	| 3 - ano
+	| 1 - mes
+	| 1 dia
+
+HORA - 3 bytes
+	| 1 para cada um dos campos

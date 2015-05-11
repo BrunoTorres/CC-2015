@@ -198,7 +198,7 @@ public class MusicClient {
             byte[] hora = new byte[]{b[0], b[1]};
             byte[] min = new byte[]{b[2], b[3]};
             byte[] seg = new byte[]{b[4], b[5]};
-           // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
+            // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
 
         }
         return d;
@@ -240,7 +240,7 @@ public class MusicClient {
         campos.add(c);
         sendPDU(NEXT_QUESTION, campos);
 
-        jogar();
+        jogar(false);
 
     }
 
@@ -411,58 +411,62 @@ public class MusicClient {
         return d;
     }
 
-    public static Pergunta jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
-        System.out.println("JOGAR");
-        byte[] b, res, data;
-        PDU pacote;
-        int num = 0;
-        int nQuestao;
-        int tam;
-        String nome, pergunta;
-        ArrayList<String> respostas = new ArrayList<>();
-        TreeMap<Integer, byte[]> blocosImagem;
-        TreeMap<Integer, byte[]> blocosMusica;
-        Pergunta p = null;
-        try {
-            
-            System.out.println("VOU RECEBER ");
-            // 1ª pacote -> estrutura da pergunta
-            System.out.println("IP: " + InetAddress.getByName("localhost"));
-            pacote = receivePDU();
-            
-            System.err.println("Recebi pergunta");
-            nome = new String(pacote.getCampo(0).getValor());
-            int id = pacote.getCampo(1).getId();
+    public static Pergunta jogar(boolean quit) throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+        if (!quit) {
+            System.out.println("JOGAR");
+            byte[] b, res, data;
+            PDU pacote;
+            int num = 0;
+            int nQuestao;
+            int tam;
+            String nome, pergunta;
+            ArrayList<String> respostas = new ArrayList<>();
+            TreeMap<Integer, byte[]> blocosImagem;
+            TreeMap<Integer, byte[]> blocosMusica;
+            Pergunta p = null;
+            try {
+
+                System.out.println("VOU RECEBER ");
+                // 1ª pacote -> estrutura da pergunta
+                System.out.println("IP: " + InetAddress.getByName("localhost"));
+                pacote = receivePDU();
+
+                System.err.println("Recebi pergunta");
+                nome = new String(pacote.getCampo(0).getValor());
+                int id = pacote.getCampo(1).getId();
             // se == 255 -> Não existem jogadores suficientes -> Exception
-            // se não -> jogar
+                // se não -> jogar
 
-            //if (id != 255) {
-            nQuestao = pacote.getCampo(1).getValor()[0];
-            pergunta = new String(pacote.getCampo(2).getValor());
-            respostas.add(new String(pacote.getCampo(4).getValor()));
-            respostas.add(new String(pacote.getCampo(6).getValor()));
-            respostas.add(new String(pacote.getCampo(8).getValor()));
+                //if (id != 255) {
+                nQuestao = pacote.getCampo(1).getValor()[0];
+                pergunta = new String(pacote.getCampo(2).getValor());
+                respostas.add(new String(pacote.getCampo(4).getValor()));
+                respostas.add(new String(pacote.getCampo(6).getValor()));
+                respostas.add(new String(pacote.getCampo(8).getValor()));
 
-            // 2ª parte -> receber pacotes de uma imagem
-            blocosImagem = (TreeMap) recebeBlocos();
-            checkBlocos(blocosImagem, nome, nQuestao, 16);
-            String fImage = constroiFicheiroImagem(blocosImagem);
+                // 2ª parte -> receber pacotes de uma imagem
+                blocosImagem = (TreeMap) recebeBlocos();
+                checkBlocos(blocosImagem, nome, nQuestao, 16);
+                String fImage = constroiFicheiroImagem(blocosImagem);
 
-            // 3º parte -> receber pacotes de uma musica
-            blocosMusica = (TreeMap) recebeBlocos();
-            checkBlocos(blocosMusica, nome, nQuestao, 18);
-            String fMusic = constroiFicheiroAudio(blocosMusica);
+                // 3º parte -> receber pacotes de uma musica
+                blocosMusica = (TreeMap) recebeBlocos();
+                checkBlocos(blocosMusica, nome, nQuestao, 18);
+                String fMusic = constroiFicheiroAudio(blocosMusica);
 
-            p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
+                p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
             //  }
-            //  else{
-            //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
-            // }
-        } catch (SocketTimeoutException e) {
-            sendPDU(QUIT, null);
-        }
+                //  else{
+                //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
+                // }
+            } catch (SocketTimeoutException e) {
+                sendPDU(QUIT, null);
+            }
 
-        return p;
+            return p;
+        } else {
+            return null;
+        }
     }
 
     private static Map<Integer, byte[]> recebeBlocos() throws IOException, SocketTimeoutException {

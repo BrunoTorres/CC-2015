@@ -17,10 +17,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -50,8 +47,6 @@ public class JogarController implements Initializable {
     @FXML
     private Label labelNumPergunta;
 
-    @FXML
-    private Button butOK;
 
     @FXML
     private ImageView imagePergunta;
@@ -101,7 +96,10 @@ public class JogarController implements Initializable {
     private int nQuestion = 1;
     private MediaPlayer mp;
 
+    private boolean quit;
+
     public JogarController() {
+        this.quit = false;
     }
 
     public JogarController(Desafio d, Utilizador u) {
@@ -129,9 +127,12 @@ public class JogarController implements Initializable {
     public void setAnterior(Stage ant) {
         this.anterior = ant;
         this.atual.setOnCloseRequest((WindowEvent event) -> {
-            mp.dispose();
+            if(mp!=null){
+                mp.dispose();
+            }
+            quit=true;
             anterior.show();
-            
+
         });
     }
 
@@ -142,30 +143,13 @@ public class JogarController implements Initializable {
     public void setUser(Utilizador u) {
         this.user = u;
     }
-    
+
     @FXML
     private void butQuitAction(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Menu.fxml"));
-            Parent root = loader.load();
-            Menu_Controller menu_c = loader.getController();
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            
-            stage.setScene(scene);
-            stage.show();
-            stage.setResizable(false);
-            stage.setTitle("Menu");
-            
-            menu_c.setAtual(stage);
-            menu_c.setAnterior(this.atual);
-            this.atual.close();
-        } catch (IOException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.quit = true;
+        this.anterior.show();
+        this.atual.close();
     }
-    
-     
 
     public void setDesafio(Desafio d) {
         this.d = d;
@@ -191,27 +175,29 @@ public class JogarController implements Initializable {
                 this.panelPergunta.setVisible(true);
                 jogar();
             }
-          
+
         }));
         tlineJogo.playFromStart();
     }
 
     private void apresentaPergunta(Pergunta pg) {
-        this.labelPergunta.setText(pg.getPergunta());
-        this.resposta1.setText(pg.getRespostaIndice(0));
-        this.resposta2.setText(pg.getRespostaIndice(1));
-        this.resposta3.setText(pg.getRespostaIndice(2));
-        this.imagePergunta.setImage(new Image("file:".concat(pg.getImagem())));
-        this.labelNumPergunta.setText(String.valueOf(this.nQuestion));
-        this.nQuestion++;        
-        Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
-        mp = new MediaPlayer(m);
-        mp.play();        
+        if (pg != null) {
+            this.labelPergunta.setText(pg.getPergunta());
+            this.resposta1.setText(pg.getRespostaIndice(0));
+            this.resposta2.setText(pg.getRespostaIndice(1));
+            this.resposta3.setText(pg.getRespostaIndice(2));
+            this.imagePergunta.setImage(new Image("file:".concat(pg.getImagem())));
+            this.labelNumPergunta.setText(String.valueOf(this.nQuestion));
+            this.nQuestion++;
+            Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
+            mp = new MediaPlayer(m);
+            mp.play();
+        }
     }
 
     private void jogar() {
         try {
-            this.p = MusicClient.jogar();
+            this.p = MusicClient.jogar(quit);
             apresentaPergunta(this.p);
         } catch (SocketTimeoutException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);

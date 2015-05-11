@@ -93,7 +93,7 @@ public class Login_Controller extends Application implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //habitat = new SGH();
+        
 
     }
 
@@ -118,6 +118,7 @@ public class Login_Controller extends Application implements Initializable {
         formPanel.setVisible(false);
         nickPanel.setVisible(true);
     }
+    
 
     @FXML
     private void cancelarButtonAction(ActionEvent event) {

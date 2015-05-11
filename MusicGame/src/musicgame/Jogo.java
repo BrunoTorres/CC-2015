@@ -92,8 +92,6 @@ public class Jogo extends Thread {
              } else */
             // for (Utilizador u : this.desafio.getUsers().values()) {
             u.initPontuacao();
-
-            System.out.println("alcoo " + u.getAlcunha());
             label = this.desafio.getLabelByUser(u);
             int s = PDU.byteArrayToInt(label);
             resposta = new PDU(s, (byte) 0);
@@ -114,15 +112,12 @@ public class Jogo extends Thread {
                 c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
                 resposta.addCampo(c);
             }
-            System.err.println("ENVIAR PERGUNTA a ip:"+u.getIp()+"com porta"+u.getPort());
             responde(resposta, u.getIp(), u.getPort());
 
             ////////////////// END REPLY //////////////////
             sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-            System.err.println("ENVIEI IMAGEM");
 
             sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-            System.err.println("ENVIEI MUSICA");
                 // }
 
         } catch (IOException ex) {
@@ -133,7 +128,6 @@ public class Jogo extends Thread {
 
     public void sendImage(String nome, int s, int numQuestao, InetAddress add, int port) throws IOException {
         Campo c;
-        //System.out.println("IMAGEM");
         int i;
         byte[] dateSend, m = this.desafio.getImagemQuestao(this.bd.getPathImage(), numQuestao - 1);
 
@@ -143,7 +137,6 @@ public class Jogo extends Thread {
         PDU image;
 
         byte[] p;
-        // System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
 
             image = new PDU(s, (byte) 0);
@@ -180,7 +173,6 @@ public class Jogo extends Thread {
 
     public void sendMusic(String nome, int s, int numQuestao, InetAddress add, int port) throws IOException {
         Campo c;
-        // System.out.println("MUSICA");
         int i;
         byte[] m = this.desafio.getMusicaQuestao(this.bd.getPathMusic(), numQuestao - 1);
 
@@ -189,7 +181,6 @@ public class Jogo extends Thread {
 
         PDU music;
         byte[] p;
-        // System.out.println("NPACK: " + (nPackets + 1));
         for (i = 0; i < nPackets; i++) {
             if (i != 1) {
                 music = new PDU(s, (byte) 0);
@@ -246,6 +237,5 @@ public class Jogo extends Thread {
             System.out.println("Responde");
         }
     }
-    //numQuestao++;
 
 }

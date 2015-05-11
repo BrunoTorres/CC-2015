@@ -56,7 +56,7 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <Button fx:id="butQuit1" layoutX="499.0" layoutY="344.0" maxWidth="69.0" minWidth="69.0" mnemonicParsing="false" prefWidth="69.0" text="Desistir" AnchorPane.bottomAnchor="18.0" AnchorPane.rightAnchor="18.0" />
+            <Button fx:id="butQuit1" layoutX="499.0" layoutY="344.0" maxWidth="69.0" minWidth="69.0" mnemonicParsing="false" onAction="#butQuitAction" prefWidth="69.0" text="Desistir" AnchorPane.bottomAnchor="18.0" AnchorPane.rightAnchor="18.0" />
             <Button fx:id="butOK1" layoutX="412.0" layoutY="344.0" maxHeight="25.0" maxWidth="69.0" minHeight="25.0" minWidth="69.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text="Confirmar" AnchorPane.bottomAnchor="18.0" AnchorPane.rightAnchor="105.0" />
             <Label fx:id="labelTimerJogo" layoutX="422.0" layoutY="63.0" text="60">
                <font>

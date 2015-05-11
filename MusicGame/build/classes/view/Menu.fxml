@@ -16,8 +16,8 @@
    <children>
       <Pane layoutX="19.0" layoutY="144.0" prefHeight="253.0" prefWidth="760.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button fx:id="buttonCriar" layoutX="68.0" layoutY="28.0" mnemonicParsing="false" onAction="#criarDesafioAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_projetos" stylesheets="@Habitat_Interface_CSS.css" text="   Criar Desafio " />
-            <Button fx:id="buttonListar" layoutX="258.0" layoutY="28.0" mnemonicParsing="false" onAction="#listarDesafiosAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_voluntarios" stylesheets="@Habitat_Interface_CSS.css" text="Lista de Desafios">
+            <Button fx:id="buttonCriar" layoutX="68.0" layoutY="55.0" mnemonicParsing="false" onAction="#criarDesafioAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_projetos" stylesheets="@Habitat_Interface_CSS.css" text="   Criar Desafio " />
+            <Button fx:id="buttonListar" layoutX="258.0" layoutY="55.0" mnemonicParsing="false" onAction="#listarDesafiosAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_voluntarios" stylesheets="@Habitat_Interface_CSS.css" text="Lista de Desafios">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -26,7 +26,7 @@
             <Button fx:id="buttonSair" layoutX="258.0" layoutY="150.0" mnemonicParsing="false" onAction="#logoutAction" prefHeight="75.0" prefWidth="175.0" styleClass="button_menu_logout" stylesheets="@Habitat_Interface_CSS.css" text=" Terminar Sessão" />
          </children>
       </Pane>
-      <Separator layoutX="6.0" layoutY="107.0" prefHeight="0.0" prefWidth="794.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Separator layoutY="159.0" prefHeight="0.0" prefWidth="794.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
       <ToolBar layoutY="412.0" prefHeight="26.0" prefWidth="801.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <items>
             <Label text="Sessão Iniciada:" />
@@ -42,11 +42,11 @@
       </ToolBar>
       <Pane layoutX="56.0" prefHeight="105.0" prefWidth="598.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Label alignment="CENTER" layoutX="164.0" layoutY="30.0" text="Music Game" textAlignment="JUSTIFY" textFill="#0e4088">
-               <font>
-                  <Font name="System Bold" size="30.0" />
-               </font>
-            </Label>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="150.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@MusicGameLogo.png" />
+               </image>
+            </ImageView>
          </children>
       </Pane>
    </children>

@@ -17,7 +17,10 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -96,6 +99,7 @@ public class JogarController implements Initializable {
     private Desafio d;
     private Pergunta p;
     private int nQuestion = 1;
+    private MediaPlayer mp;
 
     public JogarController() {
     }
@@ -125,7 +129,9 @@ public class JogarController implements Initializable {
     public void setAnterior(Stage ant) {
         this.anterior = ant;
         this.atual.setOnCloseRequest((WindowEvent event) -> {
+            mp.dispose();
             anterior.show();
+            
         });
     }
 
@@ -136,9 +142,34 @@ public class JogarController implements Initializable {
     public void setUser(Utilizador u) {
         this.user = u;
     }
+    
+    @FXML
+    private void butQuitAction(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Menu.fxml"));
+            Parent root = loader.load();
+            Menu_Controller menu_c = loader.getController();
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            
+            stage.setScene(scene);
+            stage.show();
+            stage.setResizable(false);
+            stage.setTitle("Menu");
+            
+            menu_c.setAtual(stage);
+            menu_c.setAnterior(this.atual);
+            this.atual.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+     
 
     public void setDesafio(Desafio d) {
         this.d = d;
+        this.labelNomeDesafio.setText(d.getNome());
         this.data = this.d.getLocalDate();
         LocalDateTime n = LocalDateTime.now();
         tlineJogo = new Timeline();
@@ -160,6 +191,7 @@ public class JogarController implements Initializable {
                 this.panelPergunta.setVisible(true);
                 jogar();
             }
+          
         }));
         tlineJogo.playFromStart();
     }
@@ -171,9 +203,9 @@ public class JogarController implements Initializable {
         this.resposta3.setText(pg.getRespostaIndice(2));
         this.imagePergunta.setImage(new Image("file:".concat(pg.getImagem())));
         this.labelNumPergunta.setText(String.valueOf(this.nQuestion));
-        this.nQuestion++;
+        this.nQuestion++;        
         Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
-        MediaPlayer mp = new MediaPlayer(m);
+        mp = new MediaPlayer(m);
         mp.play();        
     }
 

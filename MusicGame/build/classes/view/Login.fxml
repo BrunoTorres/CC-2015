@@ -20,11 +20,11 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="255.0" prefHeight="150.0" prefWidth="227.0">
+      <AnchorPane fx:id="loginPanel" layoutX="255.0" prefHeight="150.0" prefWidth="227.0">
          <children>
             <AnchorPane fx:id="nickPanel" layoutX="9.0" layoutY="85.0" prefHeight="99.0" prefWidth="208.0" visible="false">
                <children>
-                  <TextField fx:id="tfNickname" alignment="CENTER" layoutX="30.0" layoutY="17.0" promptText="Nome" />
+                  <TextField fx:id="tfName" alignment="CENTER" layoutX="30.0" layoutY="17.0" promptText="Nome" />
                   <Button fx:id="buttonCancel" layoutX="109.0" layoutY="57.0" minWidth="70.0" mnemonicParsing="false" onAction="#cancelarButtonAction" styleClass="button_login_limpar" stylesheets="@Habitat_Interface_CSS.css" text="Cancelar" />
                   <Button fx:id="buttonRegistar" layoutX="22.0" layoutY="57.0" minWidth="70.0" mnemonicParsing="false" onAction="#registarButtonAction" styleClass="button_login_login" stylesheets="@Habitat_Interface_CSS.css" text="Registar" />
                   <ImageView fitHeight="16.0" fitWidth="16.0" layoutX="9.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">

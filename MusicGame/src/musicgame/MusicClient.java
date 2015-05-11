@@ -1,6 +1,5 @@
 package musicgame;
 
-import controller.Login_Controller;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,12 +18,6 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -452,13 +445,11 @@ public class MusicClient {
 
             // 2ª parte -> receber pacotes de uma imagem
             blocosImagem = (TreeMap) recebeBlocos();
-            System.err.println("Recebi imagem");
             checkBlocos(blocosImagem, nome, nQuestao, 16);
             String fImage = constroiFicheiroImagem(blocosImagem);
 
             // 3º parte -> receber pacotes de uma musica
             blocosMusica = (TreeMap) recebeBlocos();
-            System.err.println("Recebi musica");
             checkBlocos(blocosMusica, nome, nQuestao, 18);
             String fMusic = constroiFicheiroAudio(blocosMusica);
 

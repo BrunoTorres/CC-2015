@@ -53,14 +53,13 @@ public class Atendimento extends Thread {
     byte[] receiveData;
     byte[] sendData;
 
-    public Atendimento(DatagramPacket so, BD b) {
+    public Atendimento(DatagramPacket so, BD b) throws UserInexistenteException {
         this.receivePacket = so;
         this.sendSocket = null;
         this.sendPacket = null;
         this.bd = b;
         this.receiveData = new byte[1024];
         this.sendData = new byte[1024];
-
     }
 
     @Override
@@ -78,6 +77,8 @@ public class Atendimento extends Thread {
             /*for (byte b : data) {
              System.out.print(b + "|");
              }*/
+
+            
             analisaPacote(data, IPAddress, port);
         } catch (IOException | UserInexistenteException e) {
             System.out.println(e.toString());
@@ -149,8 +150,9 @@ public class Atendimento extends Thread {
                 reply.addCampo(c);
                 PDU p = new PDU(data);
                 Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
-                d.addUser(bd.getUserByIP(add), tl);
+                d.addUser(this.bd.getUserByIP(add), tl);
                 responde(reply, add, port);
+                this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 Jogo j;
                 boolean f = true;
                 // for (int i = 1; i <= 10 && f; i++) {
@@ -425,24 +427,25 @@ public class Atendimento extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(30);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(7);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
             BigInteger anoAux = BigInteger.valueOf(tempo.getYear());
             byte[] anoBytes = anoAux.toByteArray();
             byte[] anoF;
-            if(anoBytes.length < 3)
-                anoF = new byte[] { 0x00, anoBytes[0], anoBytes[1] };
-            else
+            if (anoBytes.length < 3) {
+                anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
+            } else {
                 anoF = anoBytes;
+            }
             /*
-            byte[] mes = PDU.intToByteArray(tempo.getMonthValue());
-            byte[] dia = PDU.intToByteArray(tempo.getDayOfMonth());
-            byte[] hora = PDU.intToByteArray(tempo.getHour());
-            byte[] minuto = PDU.intToByteArray(tempo.getMinute());
-            byte[] segundo = PDU.intToByteArray(tempo.getSecond());*/
-            
+             byte[] mes = PDU.intToByteArray(tempo.getMonthValue());
+             byte[] dia = PDU.intToByteArray(tempo.getDayOfMonth());
+             byte[] hora = PDU.intToByteArray(tempo.getHour());
+             byte[] minuto = PDU.intToByteArray(tempo.getMinute());
+             byte[] segundo = PDU.intToByteArray(tempo.getSecond());*/
+
             byte mes = (byte) tempo.getMonthValue();
             byte dia = (byte) tempo.getDayOfMonth();
             byte hora = (byte) tempo.getHour();
@@ -451,7 +454,7 @@ public class Atendimento extends Thread {
 
             //System.out.println("A: " + PDU.byteArrayToInt(ano));
             Desafio d = new Desafio(nome, anoF, dia, mes, hora, minuto, segundo);
-           
+
             d.setDataProperty();
             d.setHoraProperty();
             criaPerguntas(d);
@@ -466,6 +469,7 @@ public class Atendimento extends Thread {
             hor = new Campo(HORA, d.getTempo());
             reply.addCampo(hor);
             responde(reply, add, port);
+            this.bd.updateUser(u.getAlcunha(), add, port);
             boolean f = true;
             //System.out.println("cecec"+tempo.toString());
             Jogo j;
@@ -596,7 +600,6 @@ public class Atendimento extends Thread {
             byte b[] = blocos.get(bloco);
 
             //byte b[] = this.bd.partes.get(bloco);
-
             PDU music = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, nome.getBytes());
             System.out.println("nome do desafio " + nome);

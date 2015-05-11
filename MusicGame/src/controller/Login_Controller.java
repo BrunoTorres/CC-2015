@@ -30,7 +30,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import musicgame.Campo;
 import musicgame.MusicClient;
-import musicgame.PDU;
 import musicgame.UserInexistenteException;
 import musicgame.Utilizador;
 

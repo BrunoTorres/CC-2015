@@ -19,28 +19,28 @@ import java.util.logging.Logger;
  */
 public class Jogo extends Thread {
 
-    private static final int OK                  = 0;
-    private static final int FIM                 = 250;
-    private static final int ERRO                = 255;
-    private static final int CONTINUA            = 254;
-    private static final int NOME                = 1;
-    private static final int ALCUNHA             = 2;
-    private static final int PASSWORD            = 3;
-    private static final int DATA                = 4;
-    private static final int HORA                = 5;
-    private static final int ESCOLHA             = 6;
-    private static final int DESAFIO             = 7;
-    private static final int NQUESTAO            = 10;
-    private static final int QUESTAO             = 11;
-    private static final int NRESPOSTA           = 12;
-    private static final int RESPOSTA            = 13;
-    private static final int CERTA               = 14;
-    private static final int PONTOS              = 15;
-    private static final int IMAGEM              = 16;
-    private static final int BLOCO               = 17;
-    private static final int AUDIO               = 18;
-    private static final int SCORE               = 20;
-    private static final int TIME                = 21;
+    private static final int OK = 0;
+    private static final int FIM = 250;
+    private static final int ERRO = 255;
+    private static final int CONTINUA = 254;
+    private static final int NOME = 1;
+    private static final int ALCUNHA = 2;
+    private static final int PASSWORD = 3;
+    private static final int DATA = 4;
+    private static final int HORA = 5;
+    private static final int ESCOLHA = 6;
+    private static final int DESAFIO = 7;
+    private static final int NQUESTAO = 10;
+    private static final int QUESTAO = 11;
+    private static final int NRESPOSTA = 12;
+    private static final int RESPOSTA = 13;
+    private static final int CERTA = 14;
+    private static final int PONTOS = 15;
+    private static final int IMAGEM = 16;
+    private static final int BLOCO = 17;
+    private static final int AUDIO = 18;
+    private static final int SCORE = 20;
+    private static final int TIME = 21;
 
     private DatagramPacket sendPacket;
     private DatagramSocket sendSocket;
@@ -74,10 +74,10 @@ public class Jogo extends Thread {
                 while (this.data.isAfter(agora)) {
                     agora = LocalDateTime.now();
 
-                /// vai ter aqui cenas para recber pacote de delete//
+                    /// vai ter aqui cenas para recber pacote de delete//
                 }
             }
-
+            System.out.println("IP USER: " + u.getIp());
             /* if (this.desafio.getUsers().size() < 2) {
              Utilizador u = new Utilizador();
              for (Utilizador ut : this.desafio.getUsers().values()) {
@@ -89,40 +89,42 @@ public class Jogo extends Thread {
              reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
              reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
              responde(reply, u.getIp(), u.getPort());
-             } else */            {
-                // for (Utilizador u : this.desafio.getUsers().values()) {
-                u.initPontuacao();
+             } else */
+            // for (Utilizador u : this.desafio.getUsers().values()) {
+            u.initPontuacao();
 
-                System.out.println("alcoo " + u.getAlcunha());
-                label = this.desafio.getLabelByUser(u);
-                int s = PDU.byteArrayToInt(label);
-                resposta = new PDU(s, (byte) 0);
-                c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
+            System.out.println("alcoo " + u.getAlcunha());
+            label = this.desafio.getLabelByUser(u);
+            int s = PDU.byteArrayToInt(label);
+            resposta = new PDU(s, (byte) 0);
+            c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
+            resposta.addCampo(c);
+            byte[] q = {(byte) numQuestao};
+
+            c = new Campo(NQUESTAO, q);
+            resposta.addCampo(c);
+            c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
+            resposta.addCampo(c);
+            int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
+            int i;
+            for (i = 1; i <= 3; i++) {
+                q = new byte[]{(byte) i};
+                c = new Campo(12, q);
                 resposta.addCampo(c);
-                byte[] q = {(byte) numQuestao};
-
-                c = new Campo(NQUESTAO, q);
+                c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
                 resposta.addCampo(c);
-                c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
-                resposta.addCampo(c);
-                int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
-                int i;
-                for (i = 1; i <= 3; i++) {
-                    q = new byte[]{(byte) i};
-                    c = new Campo(12, q);
-                    resposta.addCampo(c);
-                    c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
-                    resposta.addCampo(c);
-                }
-                responde(resposta, u.getIp(), u.getPort());
-
-                ////////////////// END REPLY //////////////////
-                sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-
-                sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-
-                // }
             }
+            System.err.println("ENVIAR PERGUNTA a ip:"+u.getIp()+"com porta"+u.getPort());
+            responde(resposta, u.getIp(), u.getPort());
+
+            ////////////////// END REPLY //////////////////
+            sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+            System.err.println("ENVIEI IMAGEM");
+
+            sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+            System.err.println("ENVIEI MUSICA");
+                // }
+
         } catch (IOException ex) {
             Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -206,14 +208,14 @@ public class Jogo extends Thread {
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
 
                 responde(music, add, port);
-               // System.out.println(i + 1);
+                // System.out.println(i + 1);
 
             } else {
                 p = new byte[49152];
                 for (int j = 0; j < 49152; j++) {
                     p[j] = m[i * 49152 + j];
                 }
-               // this.bd.partes.put(i+1, p);
+                // this.bd.partes.put(i+1, p);
 
             }
         }

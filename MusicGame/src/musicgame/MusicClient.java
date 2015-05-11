@@ -418,7 +418,8 @@ public class MusicClient {
         return d;
     }
 
-    private static Pergunta jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    public static Pergunta jogar() throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+        System.out.println("JOGAR");
         byte[] b, res, data;
         PDU pacote;
         int num = 0;
@@ -430,8 +431,13 @@ public class MusicClient {
         TreeMap<Integer, byte[]> blocosMusica;
         Pergunta p = null;
         try {
+            
+            System.out.println("VOU RECEBER ");
             // 1ª pacote -> estrutura da pergunta
+            System.out.println("IP: " + InetAddress.getByName("localhost"));
             pacote = receivePDU();
+            
+            System.err.println("Recebi pergunta");
             nome = new String(pacote.getCampo(0).getValor());
             int id = pacote.getCampo(1).getId();
             // se == 255 -> Não existem jogadores suficientes -> Exception
@@ -446,11 +452,13 @@ public class MusicClient {
 
             // 2ª parte -> receber pacotes de uma imagem
             blocosImagem = (TreeMap) recebeBlocos();
+            System.err.println("Recebi imagem");
             checkBlocos(blocosImagem, nome, nQuestao, 16);
             String fImage = constroiFicheiroImagem(blocosImagem);
 
             // 3º parte -> receber pacotes de uma musica
             blocosMusica = (TreeMap) recebeBlocos();
+            System.err.println("Recebi musica");
             checkBlocos(blocosMusica, nome, nQuestao, 18);
             String fMusic = constroiFicheiroAudio(blocosMusica);
 
@@ -481,7 +489,6 @@ public class MusicClient {
             b = pacote.getCampo(2).getValor();
 
             num = PDU.byteArrayToInt(b);
-            System.out.println("##################### " + num);
             blocos.put(num, pacote.getCampo(3).getValor());
             pacote = receivePDU();
             numero = pacote.getCampo(4).getId();

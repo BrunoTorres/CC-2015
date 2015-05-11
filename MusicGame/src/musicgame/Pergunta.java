@@ -8,13 +8,12 @@ package musicgame;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.TreeMap;
 
 /**
  *
  * @author patricia
  */
-class Pergunta implements Serializable {
+public class Pergunta implements Serializable {
     private String musica;
     private String imagem;
     private String pergunta;

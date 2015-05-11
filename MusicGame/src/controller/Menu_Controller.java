@@ -51,8 +51,8 @@ public class Menu_Controller implements Initializable {
     public void setAnterior(Stage ant) {
         this.anterior = ant;
         /*this.atual.setOnCloseRequest((WindowEvent event) -> {
-            anterior.show();
-        });*/
+         anterior.show();
+         });*/
     }
 
     public void setAtual(Stage at) {
@@ -69,7 +69,7 @@ public class Menu_Controller implements Initializable {
     }
 
     @FXML
-    private void criarDesafioAction(ActionEvent event) {
+    private void criarDesafioAction(ActionEvent event) throws IOException {
         TextInputDialog desafio = new TextInputDialog();
         desafio.setTitle("Criar novo desafio");
         desafio.setHeaderText(null);
@@ -78,7 +78,7 @@ public class Menu_Controller implements Initializable {
 
         Optional<String> res = desafio.showAndWait();
         if (res.isPresent()) {
-            try {
+            //try {
                 name = res.get();
 
                 Desafio d = MusicClient.menuMakeChallenge(name);
@@ -88,6 +88,24 @@ public class Menu_Controller implements Initializable {
                     al.setContentText("Nome: " + d.getNome() + "\nData: " + d.getLocalDate().toLocalDate().toString() + "\nHora: " + d.getLocalDate().toLocalTime().toString());
                     al.setHeaderText("Desafio criado");
                     al.showAndWait();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+                    //FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Login.fxml"));
+                    Parent root = loader.load();
+                    JogarController jogarC = loader.getController();
+                    //Login_Controller loginC = loader.getController();
+                    Scene scene = new Scene(root);
+                    Stage stage = new Stage();
+
+                    stage.setScene(scene);
+                    stage.show();
+                    this.atual.hide();
+                    // stage.setResizable(false);
+                    stage.setTitle("MusicGame");
+                    jogarC.setAtual(stage);
+                    jogarC.setAnterior(this.atual);
+                    jogarC.setDesafio(d);
+                    //loginC.setAtual(stage);
+                    //loginC.setAnterior(this.atual);
                 } else {
                     Alert al = new Alert(AlertType.ERROR);
                     al.setTitle("ERRO");
@@ -95,12 +113,12 @@ public class Menu_Controller implements Initializable {
                     al.setContentText("Desafio já existente");
                     al.showAndWait();
                 }
-            } catch (IOException ex) {
+            /*} catch (IOException ex) {
                 Alert al = new Alert(AlertType.ERROR);
                 al.setTitle("ERRO");
                 al.setContentText("IO ERROR MAKE CHALLENGE");
                 al.showAndWait();
-            }
+            }*/
         }
     }
 
@@ -136,7 +154,7 @@ public class Menu_Controller implements Initializable {
         stage.setTitle("Ranking de jogadores");
         listarR.setAtual(stage);
         listarR.setAnterior(this.atual);
-        
+
     }
 
     @FXML
@@ -151,7 +169,7 @@ public class Menu_Controller implements Initializable {
         stage.show();
         stage.setResizable(false);
         stage.setTitle("Login");
-        
+
         log_c.setAtual(stage);
         log_c.setAnterior(this.atual);
         this.atual.close();

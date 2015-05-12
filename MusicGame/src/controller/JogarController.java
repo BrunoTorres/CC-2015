@@ -6,6 +6,7 @@
 package controller;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -192,17 +193,37 @@ public class JogarController implements Initializable {
                     r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerJogo);
                 }
             }
+            this.mp.stop();
+            this.mp.dispose();
             Alert al = new Alert(Alert.AlertType.INFORMATION);
             al.setTitle("Resultado da Pergunta");
             al.setContentText("     PONTOS CONSEGUIDOS:   " + r.getPontos());
             al.showAndWait();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
-            Parent root = loader.load();
+            try {
+                Pergunta seguinte = MusicClient.proximaPergunta(d.getNome(), nQuestion);
+                apresentaPergunta(seguinte);
+            } catch (SocketException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SocketTimeoutException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedAudioFileException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (LineUnavailableException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InsuficientPlayersException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            /*FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+             Parent root = loader.load();
+             JogarController jogarC = loader.getController();
+             Scene scene = new Scene(root);
+             Stage stage = new Stage();
 
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.show();            
+             stage.setScene(scene);
+             stage.show();
+             this.atual.hide();
+             stage.setTitle("MusicGame");
+             */
             this.atual.close();
 
         } catch (IOException ex) {

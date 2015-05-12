@@ -78,7 +78,6 @@ public class Menu_Controller implements Initializable {
 
         Optional<String> res = desafio.showAndWait();
         if (res.isPresent()) {
-            //try {
                 name = res.get();
 
                 Desafio d = MusicClient.menuMakeChallenge(name);
@@ -89,23 +88,18 @@ public class Menu_Controller implements Initializable {
                     al.setHeaderText("Desafio criado");
                     al.showAndWait();
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
-                    //FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Login.fxml"));
                     Parent root = loader.load();
                     JogarController jogarC = loader.getController();
-                    //Login_Controller loginC = loader.getController();
                     Scene scene = new Scene(root);
                     Stage stage = new Stage();
 
                     stage.setScene(scene);
                     stage.show();
                     this.atual.hide();
-                    // stage.setResizable(false);
                     stage.setTitle("MusicGame");
                     jogarC.setAtual(stage);
                     jogarC.setAnterior(this.atual);
                     jogarC.setDesafio(d);
-                    //loginC.setAtual(stage);
-                    //loginC.setAnterior(this.atual);
                 } else {
                     Alert al = new Alert(AlertType.ERROR);
                     al.setTitle("ERRO");
@@ -113,12 +107,6 @@ public class Menu_Controller implements Initializable {
                     al.setContentText("Desafio já existente");
                     al.showAndWait();
                 }
-            /*} catch (IOException ex) {
-                Alert al = new Alert(AlertType.ERROR);
-                al.setTitle("ERRO");
-                al.setContentText("IO ERROR MAKE CHALLENGE");
-                al.showAndWait();
-            }*/
         }
     }
 

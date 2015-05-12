@@ -221,9 +221,7 @@ public class MusicClient {
         PDU pacote = receivePDU();
 
         int resposta = pacote.getCampo(2).getValor()[0];
-        System.out.println("RESPOSTA " + resposta);
         int pontos = pacote.getCampo(3).getValor()[0];
-        System.out.println("PONTOS " + pontos);
 
         boolean flag = pacote.getCampo(4).getId() != 250;
 
@@ -232,7 +230,7 @@ public class MusicClient {
         return r;
     }
 
-    public static void proximaPergunta(String nomeDesafio, int nQuestao) throws IOException, SocketException, SocketTimeoutException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    public static Pergunta proximaPergunta(String nomeDesafio, int nQuestao) throws IOException, SocketException, SocketTimeoutException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(NOME, nomeDesafio.getBytes());
         campos.add(c);
@@ -240,7 +238,8 @@ public class MusicClient {
         campos.add(c);
         sendPDU(NEXT_QUESTION, campos);
 
-        jogar(false);
+        Pergunta p = jogar(false);
+        return p;
 
     }
 

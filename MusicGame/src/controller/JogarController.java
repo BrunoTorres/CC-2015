@@ -18,7 +18,11 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -39,6 +43,7 @@ import musicgame.Desafio;
 import musicgame.InsuficientPlayersException;
 import musicgame.MusicClient;
 import musicgame.Pergunta;
+import musicgame.Resposta;
 import musicgame.Utilizador;
 
 public class JogarController implements Initializable {
@@ -174,25 +179,37 @@ public class JogarController implements Initializable {
         this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-      @FXML
+    @FXML
     private void butOkAction(ActionEvent event) {
+        Resposta r = null;
         try {
-            if(this.resposta1.isSelected()){
-            MusicClient.answer(this.d.getNome(), 1, nQuestion, 60-timerJogo);
-        }
-            else{
-                if(this.resposta2.isSelected()){
-                    MusicClient.answer(this.d.getNome(), 2, nQuestion, 60-timerJogo);
+            if (this.resposta1.isSelected()) {
+                r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerJogo);
+            } else {
+                if (this.resposta2.isSelected()) {
+                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerJogo);
+                } else {
+                    r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerJogo);
                 }
-                else MusicClient.answer(this.d.getNome(), 3, nQuestion, 60-timerJogo);
             }
-            
+            Alert al = new Alert(Alert.AlertType.INFORMATION);
+            al.setTitle("Resultado da Pergunta");
+            al.setContentText("     PONTOS CONSEGUIDOS:   " + r.getPontos());
+            al.showAndWait();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();            
+            this.atual.close();
+
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    
     public void setDesafio(Desafio d) {
 
         this.panelJogo.setVisible(false);
@@ -243,7 +260,7 @@ public class JogarController implements Initializable {
             this.mp.play();
             this.timerPergunta = 60;
             tlineJogo = new Timeline();
-            this.labelTimer.setText(String.valueOf(this.timerPergunta));       
+            this.labelTimer.setText(String.valueOf(this.timerPergunta));
             tlineJogo.setCycleCount(Timeline.INDEFINITE);
             tlineJogo.getKeyFrames().add(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
                 timerPergunta--;

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -46,7 +47,6 @@ public class JogarController implements Initializable {
 
     @FXML
     private Label labelNumPergunta;
-
 
     @FXML
     private ImageView imagePergunta;
@@ -81,6 +81,9 @@ public class JogarController implements Initializable {
     @FXML
     private AnchorPane panelPergunta;
 
+    @FXML
+    private AnchorPane panelRespostas;
+
     private int timerPergunta;
     private Timeline timeLine;
     private int timerJogo;
@@ -94,7 +97,7 @@ public class JogarController implements Initializable {
     private Desafio d;
     private Pergunta p;
     private int nQuestion = 1;
-    private MediaPlayer mp;
+    private MediaPlayer mp = null;
 
     private boolean quit;
 
@@ -127,10 +130,11 @@ public class JogarController implements Initializable {
     public void setAnterior(Stage ant) {
         this.anterior = ant;
         this.atual.setOnCloseRequest((WindowEvent event) -> {
-            if(mp!=null){
-                mp.dispose();
+            if (this.mp != null) {
+                System.out.println("VOU FAZER PAUSE!");
+                this.mp.stop();
             }
-            quit=true;
+            quit = true;
             anterior.show();
 
         });
@@ -145,13 +149,37 @@ public class JogarController implements Initializable {
     }
 
     @FXML
+    private void resp1Action(ActionEvent event) {
+        this.resposta2.setSelected(false);
+        this.resposta3.setSelected(false);
+    }
+
+    @FXML
+    private void resp2Action(ActionEvent event) {
+        this.resposta1.setSelected(false);
+        this.resposta3.setSelected(false);
+    }
+
+    @FXML
+    private void resp3Action(ActionEvent event) {
+        this.resposta1.setSelected(false);
+        this.resposta2.setSelected(false);
+    }
+
+    @FXML
     private void butQuitAction(ActionEvent event) {
         this.quit = true;
         this.anterior.show();
-        this.atual.close();
+        this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     public void setDesafio(Desafio d) {
+
+        this.panelJogo.setVisible(false);
+        this.panelPergunta.setVisible(false);
+        this.panelRespostas.setVisible(false);
+        this.panelWait.setVisible(true);
+
         this.d = d;
         this.labelNomeDesafio.setText(d.getNome());
         this.data = this.d.getLocalDate();
@@ -173,6 +201,7 @@ public class JogarController implements Initializable {
                 this.panelWait.setVisible(false);
                 this.panelJogo.setVisible(true);
                 this.panelPergunta.setVisible(true);
+                this.panelRespostas.setVisible(true);
                 jogar();
             }
 
@@ -190,8 +219,8 @@ public class JogarController implements Initializable {
             this.labelNumPergunta.setText(String.valueOf(this.nQuestion));
             this.nQuestion++;
             Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
-            mp = new MediaPlayer(m);
-            mp.play();
+            this.mp = new MediaPlayer(m);
+            this.mp.play();
         }
     }
 

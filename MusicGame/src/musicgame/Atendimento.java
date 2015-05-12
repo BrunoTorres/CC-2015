@@ -180,6 +180,7 @@ public class Atendimento extends Thread {
                 break;
             case 12:
                 System.out.println("Retransmit");
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                 retransmit(data, add, port);
                 break;
             case 13:
@@ -582,8 +583,9 @@ public class Atendimento extends Thread {
             Campo c;
             String nome = new String(pacote.getCampo(0).getValor()); //nome
             Desafio d = this.bd.getDesafio(nome);
-            int nQ = pacote.getCampo(1).getValor()[0];               //n questao
+            int nQ = pacote.getCampo(1).getValor()[1]-1;               //n questao
             Pergunta p = d.getPergunta(nQ);
+            System.out.println("numero de questao: "+ nQ);
             int tipo = pacote.getCampo(2).getValor()[0];             //imagem ou audio
             String ca;
             if (tipo == IMAGEM) {

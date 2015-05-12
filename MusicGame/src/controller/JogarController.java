@@ -183,14 +183,15 @@ public class JogarController implements Initializable {
     @FXML
     private void butOkAction(ActionEvent event) {
         Resposta r = null;
+        System.out.println("Num questao: "+nQuestion);
         try {
             if (this.resposta1.isSelected()) {
-                r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerJogo);
+                r = MusicClient.answer(this.d.getNome(), 0, nQuestion, 60 - timerJogo);
             } else {
                 if (this.resposta2.isSelected()) {
-                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerJogo);
+                    r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerJogo);
                 } else {
-                    r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerJogo);
+                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerJogo);
                 }
             }
             this.mp.stop();

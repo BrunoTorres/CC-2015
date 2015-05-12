@@ -476,7 +476,7 @@ public class MusicClient {
 
         while (numero == 254) {
             b = pacote.getCampo(2).getValor();
-
+            
             num = PDU.byteArrayToInt(b);
             blocos.put(num, pacote.getCampo(3).getValor());
             pacote = receivePDU();
@@ -517,6 +517,7 @@ public class MusicClient {
     }
 
     private static void checkBlocos(TreeMap<Integer, byte[]> blocos, String nome, int nQuestao, int tipo) {
+        System.out.println("numero de questao: "+nQuestao);
         int i;
         try {
             for (i = 1; i < blocos.lastKey(); i++) {

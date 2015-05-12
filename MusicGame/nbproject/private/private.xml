@@ -5,10 +5,12 @@
         <group>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/BD.java</file>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/controller/JogarController.java</file>
+            <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/Resposta.java</file>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/controller/Menu_Controller.java</file>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/MusicClient.java</file>
-            <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/controller/Login_Controller.java</file>
+            <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/Atendimento.java</file>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/MusicServer.java</file>
+            <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/controller/Login_Controller.java</file>
             <file>file:/C:/Users/patricia/Desktop/CC-2015/MusicGame/src/musicgame/Jogo.java</file>
         </group>
     </open-files>

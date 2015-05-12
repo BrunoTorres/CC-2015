@@ -32,6 +32,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import javafx.util.converter.LocalDateTimeStringConverter;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import musicgame.Desafio;
@@ -131,8 +132,8 @@ public class JogarController implements Initializable {
         this.anterior = ant;
         this.atual.setOnCloseRequest((WindowEvent event) -> {
             if (this.mp != null) {
-                System.out.println("VOU FAZER PAUSE!");
                 this.mp.stop();
+                this.mp.dispose();
             }
             quit = true;
             anterior.show();
@@ -221,6 +222,26 @@ public class JogarController implements Initializable {
             Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
             this.mp = new MediaPlayer(m);
             this.mp.play();
+
+            this.data = this.d.getLocalDate().plusSeconds(60);
+            LocalDateTime n = LocalDateTime.now();
+            tlineJogo = new Timeline();
+            if (this.data.isAfter(n)) {
+                this.timerJogo = (int) n.until(this.data, ChronoUnit.SECONDS);
+                this.labelTimer.setText(String.valueOf(this.timerJogo));
+            }            
+            tlineJogo.setCycleCount(Timeline.INDEFINITE);
+            tlineJogo.getKeyFrames().add(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+                timerJogo--;
+                labelTimer.setText(String.valueOf(timerJogo));
+                if (timerJogo <= 15) {
+                    labelTimer.setTextFill(Color.RED);
+                }
+                if (timerJogo <= 0) {
+                    tlineJogo.stop();
+                }
+            }));
+
         }
     }
 

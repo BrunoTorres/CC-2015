@@ -488,19 +488,14 @@ public class Atendimento extends Thread {
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c, dat;
-
         int id = pacote.getCampo(0).getId();
-        System.out.println("ID = " + id);
-
         int escolha = PDU.byteArrayToInt(pacote.getCampo(0).getValor());
         String nomeDesafio = new String(pacote.getCampo(1).getValor());
         int nQuestao = PDU.byteArrayToInt(pacote.getCampo(2).getValor());
         int tempoResposta = PDU.byteArrayToInt(pacote.getCampo(3).getValor());
         int pontuacao, certa;
         Utilizador user = bd.getUserByIP(add);
-
         Desafio d = bd.getDesafio(nomeDesafio);
-
         int respostaCerta = d.getPergunta(nQuestao - 1).getRespostaCerta();
         if (respostaCerta == escolha) {
             user.addTempoResposta(tempoResposta);

@@ -174,6 +174,25 @@ public class JogarController implements Initializable {
         this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
+      @FXML
+    private void butOkAction(ActionEvent event) {
+        try {
+            if(this.resposta1.isSelected()){
+            MusicClient.answer(this.d.getNome(), 1, nQuestion, 60-timerJogo);
+        }
+            else{
+                if(this.resposta2.isSelected()){
+                    MusicClient.answer(this.d.getNome(), 2, nQuestion, 60-timerJogo);
+                }
+                else MusicClient.answer(this.d.getNome(), 3, nQuestion, 60-timerJogo);
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    
     public void setDesafio(Desafio d) {
 
         this.panelJogo.setVisible(false);
@@ -223,8 +242,6 @@ public class JogarController implements Initializable {
             this.mp = new MediaPlayer(m);
             this.mp.play();
             this.timerPergunta = 60;
-            //this.data = this.d.getLocalDate().plusSeconds(60);
-            //LocalDateTime n = LocalDateTime.now();
             tlineJogo = new Timeline();
             this.labelTimer.setText(String.valueOf(this.timerPergunta));       
             tlineJogo.setCycleCount(Timeline.INDEFINITE);

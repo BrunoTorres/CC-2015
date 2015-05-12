@@ -413,7 +413,6 @@ public class MusicClient {
 
     public static Pergunta jogar(boolean quit) throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
         if (!quit) {
-            System.out.println("JOGAR");
             byte[] b, res, data;
             PDU pacote;
             int num = 0;
@@ -425,12 +424,8 @@ public class MusicClient {
             TreeMap<Integer, byte[]> blocosMusica;
             Pergunta p = null;
             try {
-
-                System.out.println("VOU RECEBER ");
                 // 1ª pacote -> estrutura da pergunta
-                System.out.println("IP: " + InetAddress.getByName("localhost"));
                 pacote = receivePDU();
-
                 System.err.println("Recebi pergunta");
                 nome = new String(pacote.getCampo(0).getValor());
                 int id = pacote.getCampo(1).getId();

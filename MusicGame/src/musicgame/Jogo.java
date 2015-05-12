@@ -77,7 +77,7 @@ public class Jogo extends Thread {
                     /// vai ter aqui cenas para recber pacote de delete//
                 }
             }
-            System.out.println("IP USER: " + u.getIp());
+            
             /* if (this.desafio.getUsers().size() < 2) {
              Utilizador u = new Utilizador();
              for (Utilizador ut : this.desafio.getUsers().values()) {

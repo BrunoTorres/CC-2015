@@ -222,25 +222,23 @@ public class JogarController implements Initializable {
             Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
             this.mp = new MediaPlayer(m);
             this.mp.play();
-
-            this.data = this.d.getLocalDate().plusSeconds(60);
-            LocalDateTime n = LocalDateTime.now();
+            this.timerPergunta = 60;
+            //this.data = this.d.getLocalDate().plusSeconds(60);
+            //LocalDateTime n = LocalDateTime.now();
             tlineJogo = new Timeline();
-            if (this.data.isAfter(n)) {
-                this.timerJogo = (int) n.until(this.data, ChronoUnit.SECONDS);
-                this.labelTimer.setText(String.valueOf(this.timerJogo));
-            }            
+            this.labelTimer.setText(String.valueOf(this.timerPergunta));       
             tlineJogo.setCycleCount(Timeline.INDEFINITE);
             tlineJogo.getKeyFrames().add(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-                timerJogo--;
-                labelTimer.setText(String.valueOf(timerJogo));
-                if (timerJogo <= 15) {
+                timerPergunta--;
+                labelTimer.setText(String.valueOf(timerPergunta));
+                if (timerPergunta <= 15) {
                     labelTimer.setTextFill(Color.RED);
                 }
-                if (timerJogo <= 0) {
+                if (timerPergunta <= 0) {
                     tlineJogo.stop();
                 }
             }));
+            tlineJogo.playFromStart();
 
         }
     }

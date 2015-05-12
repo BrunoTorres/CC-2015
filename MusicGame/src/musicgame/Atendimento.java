@@ -187,9 +187,11 @@ public class Atendimento extends Thread {
                 listaRanking(data, add, port);
                 break;
             case 14:
+                System.out.println("Procxima pergunta");
                 p = new PDU(data);
                 d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 int nQuestao = p.getCampo(1).getValor()[0];
+                this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 j = new Jogo(bd.getUserByIP(add), d.getLocalDate(), d, this.bd, nQuestao, false);
                 j.start();
 

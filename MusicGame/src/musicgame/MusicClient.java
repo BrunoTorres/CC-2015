@@ -238,7 +238,8 @@ public class MusicClient {
         campos.add(c);
         sendPDU(NEXT_QUESTION, campos);
 
-        Pergunta p = jogar(false);
+        Pergunta p = null;
+        p = jogar(false);
         return p;
 
     }
@@ -399,7 +400,6 @@ public class MusicClient {
              int hora2 = Integer.parseInt(new String(hora));
              int min2 = Integer.parseInt(new String(min));
              int seg2 = Integer.parseInt(new String(seg));*/
-            System.err.println("HoraC: " + new String(b));
 
             d = new Desafio(name, ano, dia, mes, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
@@ -419,8 +419,8 @@ public class MusicClient {
             int tam;
             String nome, pergunta;
             ArrayList<String> respostas = new ArrayList<>();
-            TreeMap<Integer, byte[]> blocosImagem;
-            TreeMap<Integer, byte[]> blocosMusica;
+            TreeMap<Integer, byte[]> blocosImagem = new TreeMap<>();
+            TreeMap<Integer, byte[]> blocosMusica = new TreeMap<>();
             Pergunta p = null;
             try {
                 // 1ª pacote -> estrutura da pergunta
@@ -449,7 +449,7 @@ public class MusicClient {
                 String fMusic = constroiFicheiroAudio(blocosMusica);
 
                 p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
-            //  }
+                //  }
                 //  else{
                 //      throw new InsuficientPlayersException(new String(pacote.getCampo(2).getValor()));
                 // }

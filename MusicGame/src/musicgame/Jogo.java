@@ -115,8 +115,11 @@ public class Jogo extends Thread {
             responde(resposta, u.getIp(), u.getPort());
 
             ////////////////// END REPLY //////////////////
+            System.out.println("vai enviar imagem");
             sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
 
+            
+            System.out.println("vai enviar musica");
             sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
                 // }
 

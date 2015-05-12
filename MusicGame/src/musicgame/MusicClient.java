@@ -159,7 +159,9 @@ public class MusicClient {
         Campo c = new Campo(DESAFIO, nomeDesafio.getBytes());
         campos.add(c);
         sendPDU(QUIT, campos);
-        PDU p = receivePDU();
+        System.out.println("Vai receber o ok do desistir");
+        PDU p = receivePDU();        
+        System.out.println("Recebeu o ok do desistir");
 
     }
 
@@ -330,8 +332,9 @@ public class MusicClient {
         if (d != null) {
             desafios.add(d);
         }
-
+        System.out.println("vai receber os pacotes dos desafio");
         while (pacote.getNumCampos() == 4) {
+            System.out.println("recebeu pacote");
             pacote = receivePDU();
             d = getNextDesafio(pacote);
             if (d != null) {

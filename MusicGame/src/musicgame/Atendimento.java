@@ -78,7 +78,6 @@ public class Atendimento extends Thread {
              System.out.print(b + "|");
              }*/
 
-            
             analisaPacote(data, IPAddress, port);
         } catch (IOException | UserInexistenteException e) {
             System.out.println(e.toString());
@@ -130,6 +129,7 @@ public class Atendimento extends Thread {
                 fimDesafio(data, add, port);
                 break;
             case 7:
+                System.out.println("Vai listar os desafios");
                 listaDesafios(data, add, port);
                 break;
             case 8:
@@ -218,11 +218,11 @@ public class Atendimento extends Thread {
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
         Campo c, dat;
-
+        System.out.println("coisasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         Utilizador user = bd.getUserByIP(add);
-
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         d.remUtilizadoresEnd(user.getAlcunha());
+        d.remUtilizadores(user.getAlcunha());
         reply = new PDU(s, (byte) 0);
         c = new Campo(OK, "OK".getBytes());
         reply.addCampo(c);
@@ -348,6 +348,7 @@ public class Atendimento extends Thread {
 
     private void listaDesafios(byte[] data, InetAddress add, int port) throws IOException {
         ArrayList<Desafio> desafios = bd.getDesafios();
+        ArrayList<Desafio> desafiosAenviar = new ArrayList<>();
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
@@ -356,6 +357,13 @@ public class Atendimento extends Thread {
         int t = 0;
         if (tam > 0) {
             for (Desafio d : desafios) {
+                if (d.getStatus() == false) {
+                    desafiosAenviar.add(d);
+                }
+            }
+            tam = desafiosAenviar.size();
+
+            for (Desafio d : desafiosAenviar) {
                 t++;
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(DESAFIO, d.getNome().getBytes());
@@ -370,6 +378,7 @@ public class Atendimento extends Thread {
                     reply.addCampo(f);
                 }
                 responde(reply, add, port);
+
             }
         } else {
             reply = new PDU(s, (byte) 0);
@@ -499,7 +508,10 @@ public class Atendimento extends Thread {
         int pontuacao, certa;
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(nomeDesafio);
-        int respostaCerta = d.getPergunta(nQuestao - 1).getRespostaCerta();
+        System.out.println("Numero de questao na validação da resposta: " + (nQuestao - 2));
+        int respostaCerta = d.getPergunta(nQuestao - 2).getRespostaCerta();
+        System.out.println("A resposta que ele escolheu é a: " + escolha);
+        System.out.println("resposta certa é a numero: " + respostaCerta + " À pergunta: " + d.getPergunta(nQuestao - 2).getPergunta());
         if (respostaCerta == escolha) {
             user.addTempoResposta(tempoResposta);
             user.addPontuacao(2);
@@ -583,9 +595,9 @@ public class Atendimento extends Thread {
             Campo c;
             String nome = new String(pacote.getCampo(0).getValor()); //nome
             Desafio d = this.bd.getDesafio(nome);
-            int nQ = pacote.getCampo(1).getValor()[1]-1;               //n questao
+            int nQ = pacote.getCampo(1).getValor()[1] - 1;               //n questao
             Pergunta p = d.getPergunta(nQ);
-            System.out.println("numero de questao: "+ nQ);
+            System.out.println("numero de questao: " + nQ);
             int tipo = pacote.getCampo(2).getValor()[0];             //imagem ou audio
             String ca;
             if (tipo == IMAGEM) {

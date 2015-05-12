@@ -17,12 +17,8 @@ import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,7 +33,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import javafx.util.converter.LocalDateTimeStringConverter;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import musicgame.Desafio;
@@ -175,57 +170,65 @@ public class JogarController implements Initializable {
 
     @FXML
     private void butQuitAction(ActionEvent event) {
-        this.quit = true;
-        this.anterior.show();
-        this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
+        try {
+            this.quit = true;
+            MusicClient.menuQuit(this.d.getNome());
+            this.anterior.show();
+            this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
+        } catch (IOException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     private void butOkAction(ActionEvent event) {
         Resposta r = null;
-        System.out.println("Num questao: "+nQuestion);
         try {
             if (this.resposta1.isSelected()) {
-                r = MusicClient.answer(this.d.getNome(), 0, nQuestion, 60 - timerJogo);
+                r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerPergunta);
             } else {
                 if (this.resposta2.isSelected()) {
-                    r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerJogo);
+                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerPergunta);
                 } else {
-                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerJogo);
+                    r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerPergunta);
                 }
             }
+            this.tlineJogo.stop();
             this.mp.stop();
             this.mp.dispose();
             Alert al = new Alert(Alert.AlertType.INFORMATION);
             al.setTitle("Resultado da Pergunta");
             al.setContentText("     PONTOS CONSEGUIDOS:   " + r.getPontos());
             al.showAndWait();
-            try {
-                Pergunta seguinte = MusicClient.proximaPergunta(d.getNome(), nQuestion);
-                apresentaPergunta(seguinte);
-            } catch (SocketException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SocketTimeoutException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UnsupportedAudioFileException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InsuficientPlayersException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            if (nQuestion >= 11) {
+                MusicClient.menuEnd(this.d.getNome());
+            } else {
+                try {
+                    Pergunta seguinte = MusicClient.proximaPergunta(d.getNome(), nQuestion);
+                    apresentaPergunta(seguinte);
+                } catch (SocketException ex) {
+                    Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SocketTimeoutException ex) {
+                    Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedAudioFileException ex) {
+                    Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (LineUnavailableException ex) {
+                    Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InsuficientPlayersException ex) {
+                    Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+                 Parent root = loader.load();
+                 JogarController jogarC = loader.getController();
+                 Scene scene = new Scene(root);
+                 Stage stage = new Stage();
+
+                 stage.setScene(scene);
+                 stage.show();
+                 this.atual.hide();
+                 stage.setTitle("MusicGame");
+                 */
             }
-            /*FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
-             Parent root = loader.load();
-             JogarController jogarC = loader.getController();
-             Scene scene = new Scene(root);
-             Stage stage = new Stage();
-
-             stage.setScene(scene);
-             stage.show();
-             this.atual.hide();
-             stage.setTitle("MusicGame");
-             */
-
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -271,15 +274,19 @@ public class JogarController implements Initializable {
         if (pg != null) {
             this.labelPergunta.setText(pg.getPergunta());
             this.resposta1.setText(pg.getRespostaIndice(0));
+            this.resposta1.setSelected(false);
             this.resposta2.setText(pg.getRespostaIndice(1));
+            this.resposta2.setSelected(false);
             this.resposta3.setText(pg.getRespostaIndice(2));
+            this.resposta3.setSelected(false);
             this.imagePergunta.setImage(new Image("file:".concat(pg.getImagem())));
             this.labelNumPergunta.setText(String.valueOf(this.nQuestion));
             this.nQuestion++;
             Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
             this.mp = new MediaPlayer(m);
-            this.mp.play();
+            this.mp.play();            
             this.timerPergunta = 60;
+            labelTimer.setTextFill(Color.BLACK);
             tlineJogo = new Timeline();
             this.labelTimer.setText(String.valueOf(this.timerPergunta));
             tlineJogo.setCycleCount(Timeline.INDEFINITE);
@@ -291,6 +298,7 @@ public class JogarController implements Initializable {
                 }
                 if (timerPergunta <= 0) {
                     tlineJogo.stop();
+                    
                 }
             }));
             tlineJogo.playFromStart();

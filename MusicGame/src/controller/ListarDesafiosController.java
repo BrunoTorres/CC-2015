@@ -12,7 +12,10 @@ import java.util.ResourceBundle;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -88,11 +91,23 @@ public class ListarDesafiosController implements Initializable {
 
     @FXML
     public void buttonEntrarAction() throws IOException {
-        if (tableDesafios.getSelectionModel().getSelectedItems().size() == 0) {
+        if (tableDesafios.getSelectionModel().getSelectedItems().size() != 0) {
             Desafio d = tableDesafios.getSelectionModel().getSelectedItem();
             MusicClient.acceptChallenge(d.getNome());
-        }
-        else{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+            Parent root = loader.load();
+            JogarController jogarC = loader.getController();
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+
+            stage.setScene(scene);
+            stage.show();
+            this.atual.hide();
+            stage.setTitle("MusicGame");
+            jogarC.setAtual(stage);
+            jogarC.setAnterior(this.atual);
+            jogarC.setDesafio(d);
+        } else {
             Alert al = new Alert(AlertType.INFORMATION);
             al.setTitle("Nenhum desafio selecionado");
             al.setContentText("Selecione um desafio");

@@ -73,7 +73,7 @@ public class MusicClient {
 
     public static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
         clientSocket = new DatagramSocket();
-        IPAddress = InetAddress.getByName("192.168.1.67");
+        IPAddress = InetAddress.getByName("192.168.1.79");
         System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;

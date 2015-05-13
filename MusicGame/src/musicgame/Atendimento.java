@@ -122,6 +122,7 @@ public class Atendimento extends Thread {
                 responde(reply, add, port);
                 break;
             case 5:
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                 quitDesafio(data, add, port);
                 break;
             case 6:
@@ -131,12 +132,14 @@ public class Atendimento extends Thread {
                 break;
             case 7:
                 System.out.println("Vai listar os desafios");
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                 listaDesafios(data, add, port);
                 break;
             case 8:
                 System.out.println("Make challenge");
                  {
                     try {
+                        this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                         criaDesafio(data, add, port);
                     } catch (UserInexistenteException ex) {
                         Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
@@ -176,6 +179,7 @@ public class Atendimento extends Thread {
                 System.out.println("Delete challenge");
                 break;
             case 11:
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                 respostas(data, add, port);
 
                 break;
@@ -186,6 +190,7 @@ public class Atendimento extends Thread {
                 break;
             case 13:
                 System.out.println("List ranking");
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                 listaRanking(data, add, port);
                 break;
             case 14:

@@ -41,6 +41,7 @@ public class Jogo extends Thread {
     private static final int AUDIO = 18;
     private static final int SCORE = 20;
     private static final int TIME = 21;
+    private static final int BLOCOS = 21;
 
     private DatagramPacket sendPacket;
     private DatagramSocket sendSocket;
@@ -141,12 +142,12 @@ public class Jogo extends Thread {
 
         int nPackets = m.length / 49152;
         int lastPackBytes = m.length % 49152;
-
+        c = new Campo(BLOCOS,PDU.intToByteArray(nPackets));
         PDU image;
 
         byte[] p;
         for (i = 0; i < nPackets; i++) {
-            System.out.println("Enviou pacote numero: "+i);
+            System.out.println("Enviou pacote numero: " + i);
 
             image = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, desafio.getNome().getBytes());

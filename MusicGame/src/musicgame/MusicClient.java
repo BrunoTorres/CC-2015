@@ -443,13 +443,13 @@ public class MusicClient {
                 respostas.add(new String(pacote.getCampo(8).getValor()));
 
                 // 2ª parte -> receber pacotes de uma imagem
-                blocosImagem = (TreeMap) recebeBlocos();
+                blocosImagem = (TreeMap) recebeBlocos(IMAGEM);
                 System.err.println("Recebi imagem");
                 checkBlocos(blocosImagem, nome, nQuestao, 16);
                 String fImage = constroiFicheiroImagem(blocosImagem);
 
                 // 3º parte -> receber pacotes de uma musica
-                blocosMusica = (TreeMap) recebeBlocos();
+                blocosMusica = (TreeMap) recebeBlocos(AUDIO);
                 System.err.println("Recebi musica");
                 checkBlocos(blocosMusica, nome, nQuestao, 18);
                 String fMusic = constroiFicheiroAudio(blocosMusica);
@@ -469,7 +469,7 @@ public class MusicClient {
         }
     }
 
-    private static Map<Integer, byte[]> recebeBlocos() throws IOException, SocketTimeoutException {
+    private static Map<Integer, byte[]> recebeBlocos(int tipo) throws IOException {
         byte[] b;
         PDU pacote;
         int num;
@@ -486,7 +486,12 @@ public class MusicClient {
             
             num = PDU.byteArrayToInt(b);
             blocos.put(num, pacote.getCampo(3).getValor());
+            try{
             pacote = receivePDU();
+            }
+            catch(SocketTimeoutException ex){
+                askBlockRetransmit(blocos, num, new String(pacote.getCampo(0).getValor()), PDU.byteArrayToInt(pacote.getCampo(1).getValor()), tipo);
+            }
             System.out.println("Recebi dentro WHILE: " + i);
             i++;
             numero = pacote.getCampo(4).getId();

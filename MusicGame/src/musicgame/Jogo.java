@@ -146,6 +146,7 @@ public class Jogo extends Thread {
 
         byte[] p;
         for (i = 0; i < nPackets; i++) {
+            System.out.println("Enviou pacote numero: "+i);
 
             image = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, desafio.getNome().getBytes());

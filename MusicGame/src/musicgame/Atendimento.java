@@ -65,7 +65,6 @@ public class Atendimento extends Thread {
     @Override
     public void run() {
         try {
-            //imgTeste();
             InetAddress IPAddress = receivePacket.getAddress();
             int port = receivePacket.getPort();
             int tam = receivePacket.getLength();
@@ -84,13 +83,6 @@ public class Atendimento extends Thread {
         }
     }
 
-    /*private void imgTeste() throws IOException{
-     File f = new File("C:\\Users\\John\\Pictures\\2.jpg");
-     byte[] img = Files.readAllBytes(f.toPath());
-     FileOutputStream fos = new FileOutputStream("C:\\Users\\John\\Pictures\\testeeee.jpg");
-     fos.write(img);
-     fos.close();
-     }*/
     private void analisaPacote(byte[] data, InetAddress add, int port) throws IOException, UserInexistenteException {
         PDU reply;
         int s;
@@ -462,22 +454,12 @@ public class Atendimento extends Thread {
             } else {
                 anoF = anoBytes;
             }
-            /*
-             byte[] mes = PDU.intToByteArray(tempo.getMonthValue());
-             byte[] dia = PDU.intToByteArray(tempo.getDayOfMonth());
-             byte[] hora = PDU.intToByteArray(tempo.getHour());
-             byte[] minuto = PDU.intToByteArray(tempo.getMinute());
-             byte[] segundo = PDU.intToByteArray(tempo.getSecond());*/
-
             byte mes = (byte) tempo.getMonthValue();
             byte dia = (byte) tempo.getDayOfMonth();
             byte hora = (byte) tempo.getHour();
             byte minuto = (byte) tempo.getMinute();
             byte segundo = (byte) tempo.getSecond();
-
-            //System.out.println("A: " + PDU.byteArrayToInt(ano));
             Desafio d = new Desafio(nome, anoF, mes, dia, hora, minuto, segundo);
-
             d.setDataProperty();
             d.setHoraProperty();
             criaPerguntas(d);
@@ -493,15 +475,9 @@ public class Atendimento extends Thread {
             reply.addCampo(hor);
             responde(reply, add, port);
             this.bd.updateUser(u.getAlcunha(), add, port);
-            boolean f = true;
-            //System.out.println("cecec"+tempo.toString());
             Jogo j;
-            //for (int i = 1; i <= 10 && f; i++) {
-            j = new Jogo(u, tempo, d, this.bd, 1, true);
+            j = new Jogo(this.bd.getUserByIP(add), tempo, d, this.bd, 1, true);
             j.start();
-                //f = respostas();
-
-            // }
         }
     }
 

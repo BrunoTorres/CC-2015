@@ -72,6 +72,9 @@ public class JogarController implements Initializable {
     private Label labelNomeDesafio;
 
     @FXML
+    private Button butOk;
+
+    @FXML
     private RadioButton resposta3;
 
     @FXML
@@ -186,12 +189,12 @@ public class JogarController implements Initializable {
         try {
             if (this.resposta1.isSelected()) {
                 r = MusicClient.answer(this.d.getNome(), 1, nQuestion, 60 - timerPergunta);
+            } else if (this.resposta2.isSelected()) {
+                r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerPergunta);
+            } else if (this.resposta3.isSelected()) {
+                r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerPergunta);
             } else {
-                if (this.resposta2.isSelected()) {
-                    r = MusicClient.answer(this.d.getNome(), 2, nQuestion, 60 - timerPergunta);
-                } else {
-                    r = MusicClient.answer(this.d.getNome(), 3, nQuestion, 60 - timerPergunta);
-                }
+                r = MusicClient.answer(this.d.getNome(), 0, nQuestion, 60);
             }
             this.tlineJogo.stop();
             this.mp.stop();
@@ -230,17 +233,16 @@ public class JogarController implements Initializable {
                  */
             }
         } catch (IOException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JogarController.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void setDesafio(Desafio d) {
-
         this.panelJogo.setVisible(false);
         this.panelPergunta.setVisible(false);
         this.panelRespostas.setVisible(false);
         this.panelWait.setVisible(true);
-
         this.d = d;
         this.labelNomeDesafio.setText(d.getNome());
         this.data = this.d.getLocalDate();
@@ -272,6 +274,7 @@ public class JogarController implements Initializable {
 
     private void apresentaPergunta(Pergunta pg) {
         if (pg != null) {
+            this.butOk.setDisable(false);
             this.labelPergunta.setText(pg.getPergunta());
             this.resposta1.setText(pg.getRespostaIndice(0));
             this.resposta1.setSelected(false);
@@ -284,7 +287,7 @@ public class JogarController implements Initializable {
             this.nQuestion++;
             Media m = new Media("file:///".concat(pg.getMusica()).replace("\\", "%5C"));
             this.mp = new MediaPlayer(m);
-            this.mp.play();            
+            this.mp.play();
             this.timerPergunta = 60;
             labelTimer.setTextFill(Color.BLACK);
             tlineJogo = new Timeline();
@@ -298,7 +301,8 @@ public class JogarController implements Initializable {
                 }
                 if (timerPergunta <= 0) {
                     tlineJogo.stop();
-                    
+                    this.butOk.setDisable(true);
+                    butOkAction(new ActionEvent(butOk, atual));
                 }
             }));
             tlineJogo.playFromStart();
@@ -310,12 +314,16 @@ public class JogarController implements Initializable {
         try {
             this.p = MusicClient.jogar(quit);
             apresentaPergunta(this.p);
+
         } catch (SocketTimeoutException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JogarController.class
+                    .getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JogarController.class
+                    .getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JogarController.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
 
     }

@@ -404,7 +404,7 @@ public class MusicClient {
              int min2 = Integer.parseInt(new String(min));
              int seg2 = Integer.parseInt(new String(seg));*/
 
-            d = new Desafio(name, ano, dia, mes, hora, min, seg);
+            d = new Desafio(name, ano, mes, dia, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
             d.setDataProperty();
             d.setHoraProperty();

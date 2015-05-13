@@ -465,7 +465,7 @@ public class Atendimento extends Thread {
             byte segundo = (byte) tempo.getSecond();
 
             //System.out.println("A: " + PDU.byteArrayToInt(ano));
-            Desafio d = new Desafio(nome, anoF, dia, mes, hora, minuto, segundo);
+            Desafio d = new Desafio(nome, anoF, mes, dia, hora, minuto, segundo);
 
             d.setDataProperty();
             d.setHoraProperty();
@@ -519,9 +519,14 @@ public class Atendimento extends Thread {
             certa = 1;
 
         } else {
-            user.subPontuacao(1);
-            pontuacao = -1;
-            certa = 0;
+            if (escolha == 0) {
+                pontuacao = 0;
+                certa = 0;
+            } else {
+                user.subPontuacao(1);
+                pontuacao = -1;
+                certa = 0;
+            }
         }
         reply = new PDU(s, (byte) 0);
         c = new Campo(DESAFIO, d.getNome().getBytes());

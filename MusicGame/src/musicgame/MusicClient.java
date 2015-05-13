@@ -73,7 +73,8 @@ public class MusicClient {
 
     public static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
         clientSocket = new DatagramSocket();
-        IPAddress = InetAddress.getByName("localhost");
+        IPAddress = InetAddress.getByName("192.168.1.67");
+        System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
         label++;
@@ -443,11 +444,13 @@ public class MusicClient {
 
                 // 2ª parte -> receber pacotes de uma imagem
                 blocosImagem = (TreeMap) recebeBlocos();
+                System.err.println("Recebi imagem");
                 checkBlocos(blocosImagem, nome, nQuestao, 16);
                 String fImage = constroiFicheiroImagem(blocosImagem);
 
                 // 3º parte -> receber pacotes de uma musica
                 blocosMusica = (TreeMap) recebeBlocos();
+                System.err.println("Recebi musica");
                 checkBlocos(blocosMusica, nome, nQuestao, 18);
                 String fMusic = constroiFicheiroAudio(blocosMusica);
 
@@ -474,6 +477,7 @@ public class MusicClient {
         // 2º pacote -> primeiro pacote de com uma imagem
 
         pacote = receivePDU();
+        System.out.println("Recebi 1º");
         int i = 1;
         int numero = pacote.getCampo(4).getId();
 
@@ -483,6 +487,8 @@ public class MusicClient {
             num = PDU.byteArrayToInt(b);
             blocos.put(num, pacote.getCampo(3).getValor());
             pacote = receivePDU();
+            System.out.println("Recebi dentro WHILE: " + i);
+            i++;
             numero = pacote.getCampo(4).getId();
         }
         b = pacote.getCampo(2).getValor();
@@ -508,24 +514,24 @@ public class MusicClient {
         campos.add(c);
         c = new Campo(BLOCO, PDU.intToByteArray(n));
         campos.add(c);
+        System.out.println("ASK RET- nQ: " + nQuestao + " - nBloco: " + n);
         sendPDU(RETRANSMIT, campos);
 
         PDU pacote = receivePDU();
         byte[] b = pacote.getCampo(2).getValor();
         //PDU.printBytes(b);
         num = PDU.byteArrayToInt(b);
+        System.out.println("RECEBI RET: nBloco: " + num);
         blocos.put(num, pacote.getCampo(3).getValor());
 
         System.out.println("b.size " + pacote.getCampo(3).getValor().length);
     }
 
     private static void checkBlocos(TreeMap<Integer, byte[]> blocos, String nome, int nQuestao, int tipo) {
-        System.out.println("numero de questao: "+nQuestao);
         int i;
         try {
             for (i = 1; i < blocos.lastKey(); i++) {
                 if (!blocos.containsKey(i)) {
-                    //  System.out.println("NO BLOCK: " + i);
                     askBlockRetransmit(blocos, i, nome, nQuestao, tipo);
 
                 }

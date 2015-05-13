@@ -49,6 +49,7 @@ class BD implements Serializable {
             this.ranking.put(u.getAlcunha(),this.ranking.get(u.getAlcunha())+u.getPontuacao());
         else
             this.ranking.put(u.getAlcunha(),u.getPontuacao());
+        System.out.println("PONTUACAO FOI ATUALIZADA: "+this.ranking.get(u.getAlcunha()));
         
     }
 

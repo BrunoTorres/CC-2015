@@ -91,6 +91,16 @@ public class Utilizador implements Serializable {
         return ip;
     }
 
+    public int getScore() {
+        return score;
+    }
+
+    public int getTempoRespostaTotal() {
+        return tempoRespostaTotal;
+    }
+    
+    
+
     public int getPort() {
         return port;
     }

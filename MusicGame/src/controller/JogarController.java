@@ -11,7 +11,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
@@ -196,15 +198,31 @@ public class JogarController implements Initializable {
             } else {
                 r = MusicClient.answer(this.d.getNome(), 0, nQuestion, 60);
             }
+            if (this.timerPergunta > 0) {
+                this.mp.stop();
+            }
             this.tlineJogo.stop();
-            this.mp.stop();
-            this.mp.dispose();
             Alert al = new Alert(Alert.AlertType.INFORMATION);
             al.setTitle("Resultado da Pergunta");
             al.setContentText("     PONTOS CONSEGUIDOS:   " + r.getPontos());
             al.showAndWait();
             if (nQuestion >= 11) {
-                MusicClient.menuEnd(this.d.getNome());
+                System.out.println("Chegou ao ultimo vai fazer o end");
+                TreeMap<String, Integer> results = (TreeMap) MusicClient.menuEnd(this.d.getNome());
+                Alert alres = new Alert(Alert.AlertType.INFORMATION);
+                int pos = 1;
+                alres.setTitle("Desafio " + this.d.getNome());
+                alres.setHeaderText("Resultados");
+                StringBuilder sb = new StringBuilder();
+                for (String s : results.keySet()) {
+                    sb.append(pos).append(": ").append(s).append(" | ").append(results.get(s)).append(" pontos\n");
+                    pos++;
+                }
+                alres.setContentText(sb.toString());
+                alres.showAndWait();
+                this.anterior.show();
+                this.atual.close();
+
             } else {
                 try {
                     Pergunta seguinte = MusicClient.proximaPergunta(d.getNome(), nQuestion);
@@ -220,17 +238,6 @@ public class JogarController implements Initializable {
                 } catch (InsuficientPlayersException ex) {
                     Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
-                 Parent root = loader.load();
-                 JogarController jogarC = loader.getController();
-                 Scene scene = new Scene(root);
-                 Stage stage = new Stage();
-
-                 stage.setScene(scene);
-                 stage.show();
-                 this.atual.hide();
-                 stage.setTitle("MusicGame");
-                 */
             }
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class

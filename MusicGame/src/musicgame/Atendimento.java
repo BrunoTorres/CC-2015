@@ -126,6 +126,7 @@ public class Atendimento extends Thread {
                 break;
             case 6:
                 System.out.println("End");
+                this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 fimDesafio(data, add, port);
                 break;
             case 7:
@@ -242,7 +243,7 @@ public class Atendimento extends Thread {
 
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         d.addUserEnd(user);
-
+        Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         while (d.getTamanhoUtilizadoresEnd() < d.getTamanhoUsers());
         int maior = 0;
         Utilizador us = new Utilizador();
@@ -260,16 +261,14 @@ public class Atendimento extends Thread {
                 }
             }
         }
-
         us.addPontuacao(3);
-
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
-
         for (Utilizador u : d.getUserEnd().values()) {
+            System.out.println("Pontuacao antes: "+this.bd.getUser(u.getAlcunha()));
             utili.add(u);
             bd.actRanking(u);
         }
-
+        resposta.addCampo(des);
         for (Utilizador u : utili) {
             c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
             resposta.addCampo(c);
@@ -363,22 +362,29 @@ public class Atendimento extends Thread {
             }
             tam = desafiosAenviar.size();
 
-            for (Desafio d : desafiosAenviar) {
-                t++;
-                reply = new PDU(s, (byte) 0);
-                c = new Campo(DESAFIO, d.getNome().getBytes());
-                reply.addCampo(c);
-                da = new Campo(DATA, d.getData());
-                reply.addCampo(da);
-                h = new Campo(HORA, d.getTempo());
-                reply.addCampo(h);
+            if (tam > 0) {
+                for (Desafio d : desafiosAenviar) {
+                    t++;
+                    reply = new PDU(s, (byte) 0);
+                    c = new Campo(DESAFIO, d.getNome().getBytes());
+                    reply.addCampo(c);
+                    da = new Campo(DATA, d.getData());
+                    reply.addCampo(da);
+                    h = new Campo(HORA, d.getTempo());
+                    reply.addCampo(h);
 
-                if (t < tam) {
-                    f = new Campo(CONTINUA, "0".getBytes());
-                    reply.addCampo(f);
+                    if (t < tam) {
+                        f = new Campo(CONTINUA, "0".getBytes());
+                        reply.addCampo(f);
+                    }
+                    responde(reply, add, port);
+
                 }
+            } else {
+                reply = new PDU(s, (byte) 0);
+                c = new Campo(ERRO, "Zero desafios".getBytes());
+                reply.addCampo(c);
                 responde(reply, add, port);
-
             }
         } else {
             reply = new PDU(s, (byte) 0);

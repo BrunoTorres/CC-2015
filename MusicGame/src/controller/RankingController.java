@@ -63,10 +63,12 @@ public class RankingController implements Initializable {
         try {
             ArrayList<Utilizador> ranking = (ArrayList) MusicClient.menuListRankings();
             tableRanking.setItems(FXCollections.observableArrayList(ranking));
+            for(Utilizador u : ranking){
+            }
             
             tcPos.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(String.valueOf(tableRanking.getItems().indexOf(cellData.getValue()) + 1)));
             tcNick.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAlcunha()));
-            tcScore.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getPontuacao())));
+            tcScore.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getScore())));
             //}
         } catch (IOException ex) {
             Alert al = new Alert(Alert.AlertType.ERROR);

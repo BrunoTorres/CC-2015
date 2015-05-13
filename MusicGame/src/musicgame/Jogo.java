@@ -90,12 +90,14 @@ public class Jogo extends Thread {
              reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
              responde(reply, u.getIp(), u.getPort());
              } else */
-            this.desafio=this.bd.getDesafio(this.desafio.getNome());
-            for( Utilizador u : this.desafio.getUsers().values()){
+            this.desafio = this.bd.getDesafio(this.desafio.getNome());
+            for (Utilizador u : this.desafio.getUsers().values()) {
                 System.out.println(u.getAlcunha());
             }
             if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
-                u.initPontuacao();
+                if (numQuestao == 1) {
+                    u.initPontuacao();
+                }
                 label = this.desafio.getLabelByUser(u);
                 int s = PDU.byteArrayToInt(label);
                 resposta = new PDU(s, (byte) 0);

@@ -589,15 +589,18 @@ public class Atendimento extends Thread {
             Desafio d = this.bd.getDesafio(nome);
             int nQ = pacote.getCampo(1).getValor()[1] - 1;               //n questao
             Pergunta p = d.getPergunta(nQ);
-            System.out.println("numero de questao: " + nQ);
+            System.out.println("numero de questao no retransmit: " + nQ);
             int tipo = pacote.getCampo(2).getValor()[0];             //imagem ou audio
             String ca;
             if (tipo == IMAGEM) {
+                System.out.println("Imagem retransmit");
                 ca = this.bd.getPathImage().concat(p.getImagem());
-            } else {
+            } else {                
+                System.out.println("Musica retransmit");
                 ca = this.bd.getPathMusic().concat(p.getMusica());
             }
             int bloco = PDU.byteArrayToInt(pacote.getCampo(3).getValor());      //n bloco
+            System.out.println("numero de bloco a transmitir: "+bloco);
 
             TreeMap<Integer, byte[]> blocos = (TreeMap) this.getBlocos(ca);
             byte b[] = blocos.get(bloco);
@@ -615,7 +618,9 @@ public class Atendimento extends Thread {
             System.out.println("blocooo " + bloco);
             c = new Campo(tipo, b);
             music.addCampo(c);                                      //bloco
+            System.out.println("Respondeu");
             responde(music, add, port);
+            System.out.println("Depois da resposta");
         } catch (IOException ex) {
             Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
         }

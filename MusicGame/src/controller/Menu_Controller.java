@@ -7,9 +7,12 @@ package controller;
 
 ;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +26,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import musicgame.Desafio;
 import musicgame.MusicClient;
+import musicgame.ServerUnreachableException;
 import musicgame.Utilizador;
 
 
@@ -78,6 +82,7 @@ public class Menu_Controller implements Initializable {
 
         Optional<String> res = desafio.showAndWait();
         if (res.isPresent()) {
+            try {
                 name = res.get();
 
                 Desafio d = MusicClient.menuMakeChallenge(name);
@@ -107,6 +112,11 @@ public class Menu_Controller implements Initializable {
                     al.setContentText("Desafio já existente");
                     al.showAndWait();
                 }
+            } catch (SocketTimeoutException ex) {
+                Logger.getLogger(Menu_Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerUnreachableException ex) {
+                Logger.getLogger(Menu_Controller.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

@@ -6,9 +6,12 @@
 package controller;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,6 +23,7 @@ import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import musicgame.MusicClient;
+import musicgame.ServerUnreachableException;
 import musicgame.Utilizador;
 
 public class RankingController implements Initializable {
@@ -75,6 +79,8 @@ public class RankingController implements Initializable {
             al.setTitle("ERRO");
             al.setContentText("ERRO IO");
             al.showAndWait();
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(RankingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

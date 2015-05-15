@@ -6,9 +6,12 @@
 package controller;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -25,6 +28,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import musicgame.Desafio;
 import musicgame.MusicClient;
+import musicgame.ServerUnreachableException;
 import musicgame.Utilizador;
 
 public class ListarDesafiosController implements Initializable {
@@ -86,27 +90,35 @@ public class ListarDesafiosController implements Initializable {
             al.setTitle("ERRO");
             al.setContentText("ERRO IO");
             al.showAndWait();
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(ListarDesafiosController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @FXML
     public void buttonEntrarAction() throws IOException {
         if (tableDesafios.getSelectionModel().getSelectedItems().size() != 0) {
-            Desafio d = tableDesafios.getSelectionModel().getSelectedItem();
-            MusicClient.acceptChallenge(d.getNome());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
-            Parent root = loader.load();
-            JogarController jogarC = loader.getController();
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-
-            stage.setScene(scene);
-            stage.show();
-            this.atual.hide();
-            stage.setTitle("MusicGame");
-            jogarC.setAtual(stage);
-            jogarC.setAnterior(this.atual);
-            jogarC.setDesafio(d);
+            try {
+                Desafio d = tableDesafios.getSelectionModel().getSelectedItem();
+                MusicClient.acceptChallenge(d.getNome());
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Jogar.fxml"));
+                Parent root = loader.load();
+                JogarController jogarC = loader.getController();
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                
+                stage.setScene(scene);
+                stage.show();
+                this.atual.hide();
+                stage.setTitle("MusicGame");
+                jogarC.setAtual(stage);
+                jogarC.setAnterior(this.atual);
+                jogarC.setDesafio(d);
+            } catch (SocketTimeoutException ex) {
+                Logger.getLogger(ListarDesafiosController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerUnreachableException ex) {
+                Logger.getLogger(ListarDesafiosController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             Alert al = new Alert(AlertType.INFORMATION);
             al.setTitle("Nenhum desafio selecionado");

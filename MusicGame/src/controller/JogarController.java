@@ -41,6 +41,7 @@ import musicgame.InsuficientPlayersException;
 import musicgame.MusicClient;
 import musicgame.Pergunta;
 import musicgame.Resposta;
+import musicgame.ServerUnreachableException;
 import musicgame.Utilizador;
 
 public class JogarController implements Initializable {
@@ -176,7 +177,13 @@ public class JogarController implements Initializable {
     private void butQuitAction(ActionEvent event) {
         try {
             this.quit = true;
-            MusicClient.menuQuit(this.d.getNome());
+            try {
+                MusicClient.menuQuit(this.d.getNome());
+            } catch (SocketTimeoutException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerUnreachableException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            }
             this.anterior.show();
             this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
         } catch (IOException ex) {
@@ -241,6 +248,8 @@ public class JogarController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class
                     .getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -330,6 +339,8 @@ public class JogarController implements Initializable {
         } catch (UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
             Logger.getLogger(JogarController.class
                     .getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

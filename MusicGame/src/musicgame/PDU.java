@@ -52,20 +52,17 @@ public class PDU {
         Campo c;
         if (numCampos > 0) {
             for (int i = 8; i < tamLista + 8;) {
-                //System.out.println("i: " + i);
                 int k = 0;
                 int id = bytes[i];
                 byte[] sizeL = new byte[]{bytes[i + 1], bytes[i + 2]};
                 int sizeNew = byteArrayToInt(sizeL);
-
-                //System.out.println("Size: " + sizeL);
                 byte[] valor = new byte[sizeNew];
                 int j;
                 for (j = i + 3; j < sizeNew + i + 3; j++) {
                     valor[k] = bytes[j];
                     k++;
                 }
-                
+
                 c = new Campo(id, valor);
                 this.campos.add(c);
                 i += sizeNew + 3;
@@ -137,8 +134,6 @@ public class PDU {
         this.tamLista += c.getSize()[0] + c.getSize()[1];
     }
 
-    
-    
     public Campo getCampo(int ind) {
         return campos.get(ind);
     }

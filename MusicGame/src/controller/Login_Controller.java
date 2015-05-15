@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
@@ -30,6 +32,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import musicgame.Campo;
 import musicgame.MusicClient;
+import musicgame.ServerUnreachableException;
 import musicgame.UserInexistenteException;
 import musicgame.Utilizador;
 
@@ -160,6 +163,8 @@ public class Login_Controller extends Application implements Initializable {
             al.setTitle("Timeout");
             al.setContentText("Tempo de pedido excedido");
             al.showAndWait();
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(Login_Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -213,6 +218,8 @@ public class Login_Controller extends Application implements Initializable {
                     al.setContentText("Tempo de pedido excedido");
             }
             al.showAndWait();
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(Login_Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

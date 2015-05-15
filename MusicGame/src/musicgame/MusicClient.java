@@ -70,8 +70,16 @@ public class MusicClient {
     private static InetAddress IPAddress;
     private static DatagramSocket clientSocket;
     private static DatagramPacket receivePacket;
+    private static ArrayList<Campo> lastCamposSent;
+    private static int lastIdSent;
+    private static int tentativa;
 
     public static void sendPDU(int id, ArrayList<Campo> campos) throws IOException {
+        if (id != lastIdSent) {
+            tentativa = 0;
+        }
+        lastCamposSent = campos;
+        lastIdSent = id;
         clientSocket = new DatagramSocket();
         IPAddress = InetAddress.getByName("192.168.1.79");
         System.out.println(IPAddress);
@@ -91,9 +99,10 @@ public class MusicClient {
 
     }
 
-    public static PDU receivePDU() throws IOException, SocketTimeoutException {
+    public static PDU receivePDUNoExeception() throws IOException, SocketTimeoutException {
         int tam;
         byte[] data, res;
+        clientSocket.setSoTimeout(5000);
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
         tam = receivePacket.getLength();
@@ -105,14 +114,42 @@ public class MusicClient {
         return pacote;
     }
 
-    public static void menuInit() throws IOException {
-        System.out.println("hello");
-        sendPDU(HELLO, null);
-        PDU pacote = receivePDU();
-        System.out.println("cenas " + pacote.getCampo(0).getId());
+    public static PDU receivePDU() throws IOException, SocketTimeoutException, ServerUnreachableException {
+        int tam;
+        byte[] data, res;
+        clientSocket.setSoTimeout(5000);
+        try {
+            receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            clientSocket.receive(receivePacket);
+            tam = receivePacket.getLength();
+            receivePacket.setLength(receivePacket.getLength());
+            res = receivePacket.getData();
+            data = new byte[tam];
+            System.arraycopy(res, 0, data, 0, tam);
+            PDU pacote = new PDU(data);
+            return pacote;
+        } catch (SocketTimeoutException ste) {
+            tentativa++;
+            if (tentativa <= 5) {
+                sendPDU(lastIdSent, lastCamposSent);
+                return receivePDU();
+            } else {
+                throw new ServerUnreachableException();
+            }
+
+        }
     }
 
-    public static boolean menuRegista(String nome, String al, String pass) throws IOException, SocketTimeoutException {
+    public static void menuInit() throws IOException, ServerUnreachableException {
+        sendPDU(HELLO, null);
+        try {
+            PDU pacote = receivePDU();
+        } catch (SocketTimeoutException ste) {
+
+        }
+    }
+
+    public static boolean menuRegista(String nome, String al, String pass) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo nomeCampo = new Campo(NOME, nome.getBytes());
         campos.add(nomeCampo);
@@ -122,11 +159,10 @@ public class MusicClient {
         campos.add(password);
         sendPDU(REGISTER, campos);
         PDU pacote = receivePDU();
-        System.out.println(pacote.getCampo(0).getId() != 255);
         return pacote.getCampo(0).getId() != 255;
     }
 
-    public static Utilizador menuLogin(Utilizador u) throws IOException, SocketTimeoutException, UserInexistenteException {
+    public static Utilizador menuLogin(Utilizador u) throws IOException, SocketTimeoutException, UserInexistenteException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         int score;
         Campo m = new Campo(ALCUNHA, u.getAlcunha().getBytes());
@@ -150,23 +186,21 @@ public class MusicClient {
 
     }
 
-    public static void menuLogout() throws SocketTimeoutException, IOException {
+    public static void menuLogout() throws SocketTimeoutException, IOException, ServerUnreachableException {
         sendPDU(LOGOUT, null);
         PDU p = receivePDU();
     }
 
-    public static void menuQuit(String nomeDesafio) throws IOException {
+    public static void menuQuit(String nomeDesafio) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(DESAFIO, nomeDesafio.getBytes());
         campos.add(c);
         sendPDU(QUIT, campos);
-        System.out.println("Vai receber o ok do desistir");
-        PDU p = receivePDU();        
-        System.out.println("Recebeu o ok do desistir");
+        PDU p = receivePDU();
 
     }
 
-    public static Map<String, Integer> menuEnd(String nomeDesafio) throws IOException {
+    public static Map<String, Integer> menuEnd(String nomeDesafio) throws IOException, SocketTimeoutException, ServerUnreachableException {
         TreeMap<String, Integer> lista = new TreeMap<>();
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(DESAFIO, nomeDesafio.getBytes());
@@ -183,7 +217,7 @@ public class MusicClient {
     }
 
     /////SERVIDOR EM FALTA
-    public static Desafio menuDelete() throws IOException, ChallengeException {
+    public static Desafio menuDelete() throws IOException, ChallengeException, SocketTimeoutException, ServerUnreachableException {
         sendPDU(DELETE_CHALLENGE, null);
         boolean flag;
         PDU pacote = receivePDU();
@@ -197,7 +231,6 @@ public class MusicClient {
             byte[] mes = new byte[]{b[2], b[3]};
             byte[] dia = new byte[]{b[4], b[5]};
             b = pacote.getCampo(2).getValor();
-            System.out.println("c  " + ano[0]);
             byte[] hora = new byte[]{b[0], b[1]};
             byte[] min = new byte[]{b[2], b[3]};
             byte[] seg = new byte[]{b[4], b[5]};
@@ -207,7 +240,7 @@ public class MusicClient {
         return d;
     }
 
-    public static Resposta answer(String nDesafio, int escolha, int nQuestao, int tempo) throws IOException {
+    public static Resposta answer(String nDesafio, int escolha, int nQuestao, int tempo) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(ESCOLHA, new byte[]{(byte) escolha});
         campos.add(c);
@@ -233,7 +266,7 @@ public class MusicClient {
         return r;
     }
 
-    public static Pergunta proximaPergunta(String nomeDesafio, int nQuestao) throws IOException, SocketException, SocketTimeoutException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    public static Pergunta proximaPergunta(String nomeDesafio, int nQuestao) throws IOException, SocketException, SocketTimeoutException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(NOME, nomeDesafio.getBytes());
         campos.add(c);
@@ -255,7 +288,7 @@ public class MusicClient {
     }
 
     //SERVIDOR EM FALTA
-    public static List<Utilizador> menuListRankings() throws IOException {
+    public static List<Utilizador> menuListRankings() throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Utilizador> lista = new ArrayList<>();
         sendPDU(LIST_RANKING, null);
         PDU pacote = receivePDU();
@@ -322,7 +355,7 @@ public class MusicClient {
         return d;
     }
 
-    public static ArrayList<Desafio> menuListChallenge() throws IOException, SocketTimeoutException {
+    public static ArrayList<Desafio> menuListChallenge() throws IOException, SocketTimeoutException, ServerUnreachableException {
 
         sendPDU(LIST_CHALLENGES, null);
         PDU pacote = receivePDU();
@@ -333,9 +366,7 @@ public class MusicClient {
         if (d != null) {
             desafios.add(d);
         }
-        System.out.println("vai receber os pacotes dos desafio");
         while (pacote.getNumCampos() == 4) {
-            System.out.println("recebeu pacote");
             pacote = receivePDU();
             d = getNextDesafio(pacote);
             if (d != null) {
@@ -346,13 +377,12 @@ public class MusicClient {
         return desafios;
     }
 
-    public static boolean acceptChallenge(String nome) throws IOException, SocketTimeoutException {
+    public static boolean acceptChallenge(String nome) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo m = new Campo(DESAFIO, nome.getBytes());
         campos.add(m);
         sendPDU(ACCEPT_CHALLENGE, campos);
         PDU pacote = receivePDU();
-        System.out.println(" idiiii " + pacote.getCampo(0).getValor()[0]);
 
         return pacote.getCampo(0).getValor()[0] == 0; /*try {
          System.out.println("vamos jogar");
@@ -364,7 +394,7 @@ public class MusicClient {
 
     }
 
-    public static Desafio menuMakeChallenge(String nome) throws IOException, SocketTimeoutException {
+    public static Desafio menuMakeChallenge(String nome) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         Campo m = new Campo(7, nome.getBytes());
         campos.add(m);
@@ -414,7 +444,7 @@ public class MusicClient {
         return d;
     }
 
-    public static Pergunta jogar(boolean quit) throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException {
+    public static Pergunta jogar(boolean quit) throws SocketException, SocketTimeoutException, IOException, UnsupportedAudioFileException, LineUnavailableException, InsuficientPlayersException, ServerUnreachableException {
         if (!quit) {
             byte[] b, res, data;
             PDU pacote;
@@ -423,8 +453,8 @@ public class MusicClient {
             int tam;
             String nome, pergunta;
             ArrayList<String> respostas = new ArrayList<>();
-            TreeMap<Integer, byte[]> blocosImagem = new TreeMap<>();
-            TreeMap<Integer, byte[]> blocosMusica = new TreeMap<>();
+            TreeMap<Integer, PDU> blocosImagem = new TreeMap<>();
+            TreeMap<Integer, PDU> blocosMusica = new TreeMap<>();
             Pergunta p = null;
             try {
                 // 1ª pacote -> estrutura da pergunta
@@ -469,37 +499,27 @@ public class MusicClient {
         }
     }
 
-    private static Map<Integer, byte[]> recebeBlocos(int tipo) throws IOException {
+    private static Map<Integer, PDU> recebeBlocos(int tipo) throws IOException, SocketTimeoutException, ServerUnreachableException {
         byte[] b;
         PDU pacote;
         int num;
-        TreeMap<Integer, byte[]> blocos = new TreeMap<>();
+        TreeMap<Integer, PDU> blocos = new TreeMap<>();
         // 2º pacote -> primeiro pacote de com uma imagem
 
-        pacote = receivePDU();
-        System.out.println("Recebi 1º");
-        int i = 1;
+        pacote = receivePDUNoExeception();
         int numero = pacote.getCampo(4).getId();
 
-        while (numero == 254) {
-            b = pacote.getCampo(2).getValor();
-            
-            num = PDU.byteArrayToInt(b);
-            blocos.put(num, pacote.getCampo(3).getValor());
-            try{
-            pacote = receivePDU();
-            }
-            catch(SocketTimeoutException ex){
-                askBlockRetransmit(blocos, num, new String(pacote.getCampo(0).getValor()), PDU.byteArrayToInt(pacote.getCampo(1).getValor()), tipo);
-            }
-            System.out.println("Recebi dentro WHILE: " + i);
-            i++;
+        while (numero == 254 && pacote.getCampo(3).getId() == tipo) {
+            num = (byte) pacote.getCampo(2).getValor()[0];
+            blocos.put(num, pacote);
+            pacote = receivePDUNoExeception();
             numero = pacote.getCampo(4).getId();
         }
-        b = pacote.getCampo(2).getValor();
-        num = PDU.byteArrayToInt(b);
-
-        blocos.put(num, pacote.getCampo(3).getValor());
+        if (numero == 250) {
+            b = pacote.getCampo(2).getValor();
+            num = (byte) b[0];
+            blocos.put(num, pacote);
+        }
         /*
          for (Integer c : blocos.keySet()) {
          System.out.println(c);
@@ -508,7 +528,7 @@ public class MusicClient {
         return blocos;
     }
 
-    private static void askBlockRetransmit(TreeMap<Integer, byte[]> blocos, int n, String nome, int nQuestao, int tipo) throws SocketTimeoutException, IOException {
+    private static void askBlockRetransmit(TreeMap<Integer, PDU> blocos, int n, String nome, int nQuestao, int tipo) throws SocketTimeoutException, IOException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         int num;
         Campo c = new Campo(DESAFIO, nome.getBytes());
@@ -517,42 +537,37 @@ public class MusicClient {
         campos.add(c);
         c = new Campo(tipo, new byte[]{(byte) tipo});
         campos.add(c);
-        c = new Campo(BLOCO, PDU.intToByteArray(n));
+        c = new Campo(BLOCO, new byte[]{(byte) n});
         campos.add(c);
-        System.out.println("ASK RET- nQ: " + nQuestao + " - nBloco: " + n);
         sendPDU(RETRANSMIT, campos);
-
         PDU pacote = receivePDU();
         byte[] b = pacote.getCampo(2).getValor();
-        //PDU.printBytes(b);
         num = PDU.byteArrayToInt(b);
-        System.out.println("RECEBI RET: nBloco: " + num);
-        blocos.put(num, pacote.getCampo(3).getValor());
-
-        System.out.println("b.size " + pacote.getCampo(3).getValor().length);
+        blocos.put(num, pacote);
     }
 
-    private static void checkBlocos(TreeMap<Integer, byte[]> blocos, String nome, int nQuestao, int tipo) {
+    private static void checkBlocos(TreeMap<Integer, PDU> blocos, String nome, int nQuestao, int tipo) throws ServerUnreachableException {
         int i;
         try {
             for (i = 1; i < blocos.lastKey(); i++) {
                 if (!blocos.containsKey(i)) {
                     askBlockRetransmit(blocos, i, nome, nQuestao, tipo);
-
                 }
             }
+            while (blocos.get(blocos.lastKey()).getCampo(4).getId() == 254) {
+                askBlockRetransmit(blocos, blocos.lastKey() + 1, nome, nQuestao, tipo);
+            }
         } catch (IOException ex) {
-            Logger.getLogger(MusicClient.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            System.out.println("excecao!!!");
         }
 
     }
 
-    private static String constroiFicheiroAudio(Map<Integer, byte[]> blocos) throws UnsupportedAudioFileException, IOException {
+    private static String constroiFicheiroAudio(Map<Integer, PDU> blocos) throws UnsupportedAudioFileException, IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            for (byte[] a : blocos.values()) {
-                os.write(a);
+            for (PDU a : blocos.values()) {
+                os.write(a.getCampo(3).getValor());
 
             }
         } catch (IOException ex) {
@@ -566,11 +581,11 @@ public class MusicClient {
         return f.getAbsolutePath();
     }
 
-    private static String constroiFicheiroImagem(TreeMap<Integer, byte[]> blocosImagem) throws FileNotFoundException, IOException {
+    private static String constroiFicheiroImagem(TreeMap<Integer, PDU> blocosImagem) throws FileNotFoundException, IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            for (byte[] a : blocosImagem.values()) {
-                os.write(a);
+            for (PDU a : blocosImagem.values()) {
+                os.write(a.getCampo(3).getValor());
 
             }
         } catch (IOException ex) {

@@ -186,7 +186,7 @@ public class Atendimento extends Thread {
                 listaRanking(data, add, port);
                 break;
             case 14:
-                System.out.println("Proxima pergunta");
+                System.out.println("Prooxima pergunta");
                 p = new PDU(data);
                 d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 int nQuestao = p.getCampo(1).getValor()[0];
@@ -442,7 +442,7 @@ public class Atendimento extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(7);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(10);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;

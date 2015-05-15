@@ -137,12 +137,21 @@ public class JogarController implements Initializable {
     public void setAnterior(Stage ant) {
         this.anterior = ant;
         this.atual.setOnCloseRequest((WindowEvent event) -> {
-            if (this.mp != null) {
-                this.mp.stop();
-                this.mp.dispose();
+            this.quit = true;
+            try {
+                if (this.mp != null) {
+                    this.mp.stop();
+                    this.mp.dispose();
+                }
+                MusicClient.menuQuit(this.d.getNome());
+                this.anterior.show();
+            } catch (SocketTimeoutException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerUnreachableException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            quit = true;
-            anterior.show();
 
         });
     }
@@ -175,20 +184,8 @@ public class JogarController implements Initializable {
 
     @FXML
     private void butQuitAction(ActionEvent event) {
-        try {
-            this.quit = true;
-            try {
-                MusicClient.menuQuit(this.d.getNome());
-            } catch (SocketTimeoutException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ServerUnreachableException ex) {
-                Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            this.anterior.show();
-            this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
-        } catch (IOException ex) {
-            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
+
     }
 
     @FXML

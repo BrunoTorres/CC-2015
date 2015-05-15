@@ -113,7 +113,14 @@ public class Login_Controller extends Application implements Initializable {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        try {
+            launch(args);
+            MusicClient.menuInit();
+        } catch (IOException ex) {
+            Logger.getLogger(Login_Controller.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(Login_Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML

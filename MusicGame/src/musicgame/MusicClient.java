@@ -80,9 +80,10 @@ public class MusicClient {
         }
         lastCamposSent = campos;
         lastIdSent = id;
+        System.out.println("Atualizou para a opcao: "+id);
         clientSocket = new DatagramSocket();
         IPAddress = InetAddress.getByName("192.168.1.79");
-        System.out.println(IPAddress);
+        //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
         label++;
@@ -129,6 +130,7 @@ public class MusicClient {
             PDU pacote = new PDU(data);
             return pacote;
         } catch (SocketTimeoutException ste) {
+            System.out.println("Tentativa numero: "+tentativa);
             tentativa++;
             if (tentativa <= 5) {
                 sendPDU(lastIdSent, lastCamposSent);

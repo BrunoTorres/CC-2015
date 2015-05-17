@@ -84,7 +84,7 @@ public class Menu_Controller implements Initializable {
         if (res.isPresent()) {
             try {
                 name = res.get();
-
+                System.out.println("Utilizador dono no menu: "+this.user.getAlcunha());
                 Desafio d = MusicClient.menuMakeChallenge(name,this.user.getAlcunha());
                 if (d != null) {
                     Alert al = new Alert(AlertType.INFORMATION);

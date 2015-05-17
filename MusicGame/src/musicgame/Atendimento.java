@@ -610,6 +610,7 @@ public class Atendimento extends Thread {
         PDU pacote = new PDU(data);
         String des = new String(pacote.getCampo(0).getValor());
         
+        
     }
 
 }

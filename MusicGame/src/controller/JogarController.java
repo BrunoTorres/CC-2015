@@ -271,6 +271,8 @@ public class JogarController implements Initializable {
         this.panelPergunta.setVisible(false);
         this.panelRespostas.setVisible(false);
         this.panelWait.setVisible(true);
+        System.out.println("Utilizador atual:"+this.user.getAlcunha());
+        System.out.println("Utilizador dono:"+d.getUser());
         if(this.user.getAlcunha().equals(d.getUser()))
             this.butDel.setVisible(true);
         this.d = d;

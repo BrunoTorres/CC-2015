@@ -89,6 +89,7 @@ public class Login_Controller extends Application implements Initializable {
     
     private Stage atual;
     private Stage anterior;
+    private boolean apagar;
 
     public Login_Controller() {
     }

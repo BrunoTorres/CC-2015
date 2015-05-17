@@ -498,7 +498,7 @@ public class MusicClient {
 
                     p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
                 } else {
-                    throw new InsuficientPlayersException(new String(pacote.getCampo(0).getValor()));
+                    throw new InsuficientPlayersException(new String(pacote.getCampo(1).getValor()));
                 }
             } catch (SocketTimeoutException e) {
                 sendPDU(QUIT, null);

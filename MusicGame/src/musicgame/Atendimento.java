@@ -157,6 +157,8 @@ public class Atendimento extends Thread {
                 break;
             case 10:
                 System.out.println("Delete challenge");
+                this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
+                deleteChallenge(data, add, port);
                 break;
             case 11:
                 this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
@@ -413,7 +415,7 @@ public class Atendimento extends Thread {
         PDU reply;
         Campo c, dat, hor;
         String nome = new String(pacote.getCampo(0).getValor());
-
+        String user = new String(pacote.getCampo(1).getValor());
         boolean e = bd.existeDesafio(nome);
 
         if (e) {
@@ -440,7 +442,7 @@ public class Atendimento extends Thread {
             byte hora = (byte) tempo.getHour();
             byte minuto = (byte) tempo.getMinute();
             byte segundo = (byte) tempo.getSecond();
-            Desafio d = new Desafio(nome, anoF, mes, dia, hora, minuto, segundo);
+            Desafio d = new Desafio(nome, user, anoF, mes, dia, hora, minuto, segundo);
             d.setDataProperty();
             d.setHoraProperty();
             criaPerguntas(d);
@@ -602,6 +604,12 @@ public class Atendimento extends Thread {
             Logger.getLogger(Atendimento.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void deleteChallenge(byte[] data, InetAddress add, int port) {
+        PDU pacote = new PDU(data);
+        String des = new String(pacote.getCampo(0).getValor());
+        
     }
 
 }

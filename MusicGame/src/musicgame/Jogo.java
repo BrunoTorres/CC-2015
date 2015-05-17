@@ -78,55 +78,59 @@ public class Jogo extends Thread {
                     /// vai ter aqui cenas para recber pacote de delete//
                 }
             }
-            this.desafio.setStatus(true);
-            if (this.desafio.getUsers().size() < 2) {
-                Utilizador u = new Utilizador();
-                for (Utilizador ut : this.desafio.getUsers().values()) {
-                    u = ut;
-                }
+            if (this.desafio.getStatus() == false) {
+                this.desafio.setStatus(true);
+                if (this.desafio.getUsers().size() < 2) {
+                    Utilizador us = this.u;
 
-                PDU reply;
-                reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(u)), (byte) 0);
-                reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
-                reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
-                responde(reply, u.getIp(), u.getPort());
+                    PDU reply;
+                    reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(us)), (byte) 0);
+                    reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
+                    reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
+                    responde(reply, us.getIp(), us.getPort());
+                } else {
+                    this.desafio = this.bd.getDesafio(this.desafio.getNome());
+
+                    if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
+                        if (numQuestao == 1) {
+                            u.initPontuacao();
+                        }
+                        label = this.desafio.getLabelByUser(u);
+                        int s = PDU.byteArrayToInt(label);
+                        resposta = new PDU(s, (byte) 0);
+                        c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
+                        resposta.addCampo(c);
+                        byte[] q = {(byte) numQuestao};
+
+                        c = new Campo(NQUESTAO, q);
+                        resposta.addCampo(c);
+                        c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
+                        resposta.addCampo(c);
+                        int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
+                        int i;
+                        for (i = 1; i <= 3; i++) {
+                            q = new byte[]{(byte) i};
+                            c = new Campo(12, q);
+                            resposta.addCampo(c);
+                            c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
+                            resposta.addCampo(c);
+                        }
+                        responde(resposta, u.getIp(), u.getPort());
+                        ////////////////// END REPLY //////////////////
+                        //System.out.println("vai enviar imagem");
+                        sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+
+                        //System.out.println("vai enviar musica");
+                        sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+                    }
+                }
             } else {
-                this.desafio = this.bd.getDesafio(this.desafio.getNome());
-                for (Utilizador u : this.desafio.getUsers().values()) {
-                    System.out.println(u.getAlcunha());
-                }
-                if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
-                    if (numQuestao == 1) {
-                        u.initPontuacao();
-                    }
-                    label = this.desafio.getLabelByUser(u);
-                    int s = PDU.byteArrayToInt(label);
-                    resposta = new PDU(s, (byte) 0);
-                    c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
-                    resposta.addCampo(c);
-                    byte[] q = {(byte) numQuestao};
-
-                    c = new Campo(NQUESTAO, q);
-                    resposta.addCampo(c);
-                    c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
-                    resposta.addCampo(c);
-                    int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
-                    int i;
-                    for (i = 1; i <= 3; i++) {
-                        q = new byte[]{(byte) i};
-                        c = new Campo(12, q);
-                        resposta.addCampo(c);
-                        c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
-                        resposta.addCampo(c);
-                    }
-                    responde(resposta, u.getIp(), u.getPort());
-                    ////////////////// END REPLY //////////////////
-                    //System.out.println("vai enviar imagem");
-                    sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-
-                    //System.out.println("vai enviar musica");
-                    sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-                }
+                Utilizador us = this.u;
+                PDU reply;
+                reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(us)), (byte) 0);
+                reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
+                reply.addCampo(new Campo(255, "Desafio eliminado!".getBytes()));
+                responde(reply, us.getIp(), us.getPort());
             }
         } catch (IOException ex) {
             Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);

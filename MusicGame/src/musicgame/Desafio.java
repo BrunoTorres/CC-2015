@@ -30,6 +30,7 @@ public class Desafio implements Serializable {
     private HashMap<String, Utilizador> usersEnd;
     private boolean status; // false->não foi feito true->já ocorreu
     private int numPlayersDone;
+    private String user;
     
     private byte[] ano;
     private byte dia;
@@ -41,8 +42,9 @@ public class Desafio implements Serializable {
     private SimpleStringProperty dataString;
     private SimpleStringProperty horaString;
 
-    public Desafio(String nome, byte[] ano, byte mes, byte dia, byte hora, byte minuto, byte segundo) {
+    public Desafio(String nome, String user, byte[] ano, byte mes, byte dia, byte hora, byte minuto, byte segundo) {
         this.nome = nome;
+        this.user = user;
         this.numPlayersDone=1;
         this.ano = ano;
         this.mes = mes;
@@ -85,6 +87,13 @@ public class Desafio implements Serializable {
         this.status = status;
     }    
     
+    public String getUser(){
+        return this.user;
+    }
+    
+    public void setUser(String s){
+        this.user = s;
+    }
     
     public int getTamanhoUsers(){
         return this.users.size();

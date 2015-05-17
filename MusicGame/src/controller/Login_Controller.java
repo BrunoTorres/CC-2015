@@ -86,8 +86,7 @@ public class Login_Controller extends Application implements Initializable {
 
     private String cenas;
 
-    //private FuncionarioDAO funcionarioDAO;
-    //private SGH habitat;
+    
     private Stage atual;
     private Stage anterior;
 
@@ -194,6 +193,7 @@ public class Login_Controller extends Application implements Initializable {
 
             Stage newStage = new Stage();
             Scene scene = new Scene(root);
+            
 
             newStage.setScene(scene);
             newStage.show();

@@ -105,6 +105,7 @@ public class Menu_Controller implements Initializable {
                     jogarC.setAtual(stage);
                     jogarC.setAnterior(this.atual);
                     jogarC.setDesafio(d);
+                    jogarC.setUser(this.user);
                 } else {
                     Alert al = new Alert(AlertType.ERROR);
                     al.setTitle("ERRO");

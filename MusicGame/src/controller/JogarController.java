@@ -12,7 +12,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +36,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import musicgame.ChallengeException;
 import musicgame.Desafio;
 import musicgame.InsuficientPlayersException;
 import musicgame.MusicClient;
@@ -76,6 +76,9 @@ public class JogarController implements Initializable {
 
     @FXML
     private Button butOk;
+    
+    @FXML
+    private Button butDel;
 
     @FXML
     private RadioButton resposta3;
@@ -186,7 +189,19 @@ public class JogarController implements Initializable {
     @FXML
     private void butQuitAction(ActionEvent event) {
         this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
-
+    }
+    
+     @FXML
+    private void deleteButtonAction(ActionEvent event) {
+        try {
+            MusicClient.menuDelete(this.d.getNome());
+        } catch (IOException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ChallengeException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerUnreachableException ex) {
+            Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
@@ -256,6 +271,8 @@ public class JogarController implements Initializable {
         this.panelPergunta.setVisible(false);
         this.panelRespostas.setVisible(false);
         this.panelWait.setVisible(true);
+        if(this.user.getAlcunha().equals(d.getUser()))
+            this.butDel.setVisible(true);
         this.d = d;
         this.labelNomeDesafio.setText(d.getNome());
         this.data = this.d.getLocalDate();
@@ -340,9 +357,9 @@ public class JogarController implements Initializable {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InsuficientPlayersException ex) {
             Alert al = new Alert(Alert.AlertType.ERROR);
-            al.setTitle("JOGADORES INSUFICIENTES");
-            al.setHeaderText(null);
-            al.setContentText("Impossível iniciar jogo");
+            al.setTitle("DESAFIO");
+            al.setHeaderText("Impossível iniciar desafio");
+            al.setContentText(ex.getMessage());
             al.showAndWait();
             atual.close();
             anterior.show();

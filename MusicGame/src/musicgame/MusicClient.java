@@ -224,8 +224,10 @@ public class MusicClient {
     }
 
     /////SERVIDOR EM FALTA
-    public static Desafio menuDelete() throws IOException, ChallengeException, SocketTimeoutException, ServerUnreachableException {
-        sendPDU(DELETE_CHALLENGE, null);
+    public static Desafio menuDelete(String desafio) throws IOException, ChallengeException, SocketTimeoutException, ServerUnreachableException {
+        ArrayList<Campo> campos = new ArrayList<>();
+        campos.add(new Campo(DESAFIO, desafio.getBytes()));
+        sendPDU(DELETE_CHALLENGE, campos);
         boolean flag;
         PDU pacote = receivePDU();
         Desafio d = null;
@@ -354,7 +356,7 @@ public class MusicClient {
              int min2 = Integer.parseInt(new String(min));
              int seg2 = Integer.parseInt(new String(seg));*/
 
-            d = new Desafio(nome, ano, mes, dia, hora, min, seg);
+            d = new Desafio(nome, null, ano, mes, dia, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
             d.setDataProperty();
             d.setHoraProperty();
@@ -442,7 +444,7 @@ public class MusicClient {
              int min2 = Integer.parseInt(new String(min));
              int seg2 = Integer.parseInt(new String(seg));*/
 
-            d = new Desafio(name, ano, mes, dia, hora, min, seg);
+            d = new Desafio(name, null, ano, mes, dia, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
             d.setDataProperty();
             d.setHoraProperty();
@@ -494,7 +496,7 @@ public class MusicClient {
 
                     p = new Pergunta(fMusic, fImage, pergunta, respostas, -1);
                 } else {
-                    throw new InsuficientPlayersException();
+                    throw new InsuficientPlayersException(new String(pacote.getCampo(0).getValor()));
                 }
             } catch (SocketTimeoutException e) {
                 sendPDU(QUIT, null);

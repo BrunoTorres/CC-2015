@@ -29,14 +29,15 @@ public class Desafio implements Serializable {
     private HashMap<String, byte[]> labels;
     private HashMap<String, Utilizador> usersEnd;
     private boolean status; // false->não foi feito true->já ocorreu
-    
+    private boolean haveWinner;
+
     private byte[] ano;
     private byte dia;
     private byte mes;
     private byte hora;
     private byte minuto;
     private byte segundo;
-    
+
     private SimpleStringProperty dataString;
     private SimpleStringProperty horaString;
 
@@ -52,76 +53,85 @@ public class Desafio implements Serializable {
         this.labels = new HashMap<>();
         this.questoes = new ArrayList<>();
         this.usersEnd = new HashMap<>();
-        this.status=false;
-        
+        this.status = false;
+        this.haveWinner = false;
+
         this.dataString = new SimpleStringProperty();
         this.horaString = new SimpleStringProperty();
-        
+
         //this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
         //this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
     }
 
     public Desafio() {
     }
-    public void remUtilizadoresEnd(String alcunha){
+
+    public void remUtilizadoresEnd(String alcunha) {
         this.usersEnd.remove(alcunha);
     }
-    
-     public void remUtilizadores(String alcunha){
+
+    public void remUtilizadores(String alcunha) {
         this.users.remove(alcunha);
     }
-    
-    public int getTamanhoUtilizadoresEnd(){
+
+    public int getTamanhoUtilizadoresEnd() {
         return this.usersEnd.size();
-    }       
-        
+    }
+
     public boolean getStatus() {
         return status;
     }
 
     public void setStatus(boolean status) {
         this.status = status;
-    }    
+    }
     
-    
-    public int getTamanhoUsers(){
+    public boolean getHaveWinner() {
+        return this.haveWinner;
+    }
+
+    public void setHaveWinner(boolean status) {
+        this.haveWinner = status;
+    }
+
+    public int getTamanhoUsers() {
         return this.users.size();
     }
-    
-    public Map<String,Utilizador> getUserEnd(){
+
+    public Map<String, Utilizador> getUserEnd() {
         return this.usersEnd;
     }
-    
-    public StringProperty getDataProperty(){
+
+    public StringProperty getDataProperty() {
         return this.dataString;
     }
-    
-    public void setDataProperty(){
+
+    public void setDataProperty() {
         this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
     }
-    
-    public StringProperty getHoraProperty(){
+
+    public StringProperty getHoraProperty() {
         return this.horaString;
-    }    
-    
-    public void setHoraProperty(){
+    }
+
+    public void setHoraProperty() {
         this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
-    }    
-    
-    
-    public void addUserEnd(Utilizador u){
+    }
+
+    public void addUserEnd(Utilizador u) {
         this.usersEnd.put(u.getAlcunha(), u);
     }
-    
-    public final LocalDateTime getLocalDate(){
+
+    public final LocalDateTime getLocalDate() {
         int anos;
         anos = new BigInteger(this.ano).intValue();
-        
+
         LocalDateTime da = LocalDateTime.of(anos, this.mes, this.dia, this.hora, this.minuto, this.segundo);
         return da;
-        
+
     }
-    public void removeUtilizador(String alc){
+
+    public void removeUtilizador(String alc) {
         this.users.remove(alc);
     }
 
@@ -143,7 +153,6 @@ public class Desafio implements Serializable {
         }
         return flag;
     }
-    
 
     public HashMap<String, Utilizador> getUsers() {
         return users;
@@ -213,14 +222,14 @@ public class Desafio implements Serializable {
         this.segundo = segundo;
     }
 
-    
     public byte[] getData() {
-        return new byte[] { this.ano[0], this.ano[1], this.ano[2], this.mes, this.dia };
+        return new byte[]{this.ano[0], this.ano[1], this.ano[2], this.mes, this.dia};
     }
 
     public byte[] getTempo() {
-        return new byte[] {this.hora, this.minuto, this.segundo };
+        return new byte[]{this.hora, this.minuto, this.segundo};
     }
+
     public String getStringDataFromByte() {
         int horaAux, minAux, segAux;
         StringBuilder sb = new StringBuilder();
@@ -230,7 +239,7 @@ public class Desafio implements Serializable {
         System.out.println(sb.toString());
         return sb.toString();
     }
-    
+
     public String getStringHoraFromByte() {
 
         StringBuilder sb = new StringBuilder();
@@ -266,7 +275,7 @@ public class Desafio implements Serializable {
     }
 
     public byte[] getImagemQuestao(String pImage, int i) throws IOException {
-        
+
         //System.out.println("nome imagem = " + this.questoes.get(i).getImagem());
         String img = pImage.concat(this.questoes.get(i).getImagem());
         File f = new File(img);
@@ -278,20 +287,21 @@ public class Desafio implements Serializable {
 
     public byte[] getMusicaQuestao(String pMusica, int i) throws IOException { // retorna array com TODOS os bytes de um ficheiro de som de uma questão
         String m = pMusica.concat(this.questoes.get(i).getMusica());
-        
+
         File f = new File(m);
         byte[] r = Files.readAllBytes(f.toPath());
         //r = Files.readAllBytes(f.toPath());
 
         return r;
     }
-    
+
     @Override
-    public String toString(){
-        StringBuilder sb= new StringBuilder();
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
         sb.append("nome====== ").append(this.nome);
-        for(Pergunta p :this.questoes)
+        for (Pergunta p : this.questoes) {
             p.toString();
+        }
         return sb.toString();
     }
 

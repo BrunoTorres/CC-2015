@@ -224,12 +224,12 @@ public class MusicClient {
     }
 
     /////SERVIDOR EM FALTA
-    public static Desafio menuDelete(String desafio) throws IOException, ChallengeException, SocketTimeoutException, ServerUnreachableException {
+    public static void menuDelete(String desafio) throws IOException, ChallengeException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         campos.add(new Campo(DESAFIO, desafio.getBytes()));
         sendPDU(DELETE_CHALLENGE, campos);
-        boolean flag;
-        PDU pacote = receivePDU();
+        //boolean flag;
+        /*PDU pacote = receivePDU();
         Desafio d = null;
         if (pacote.getCampo(0).getId() == 255) {
             throw new ChallengeException("Data");
@@ -246,7 +246,7 @@ public class MusicClient {
             // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
 
         }
-        return d;
+        return d;*/
     }
 
     public static Resposta answer(String nDesafio, int escolha, int nQuestao, int tempo) throws IOException, SocketTimeoutException, ServerUnreachableException {

@@ -609,7 +609,8 @@ public class Atendimento extends Thread {
     private void deleteChallenge(byte[] data, InetAddress add, int port) {
         PDU pacote = new PDU(data);
         String des = new String(pacote.getCampo(0).getValor());
-        
+        Desafio d = this.bd.getDesafio(des);
+        d.setStatus(true);
         
     }
 

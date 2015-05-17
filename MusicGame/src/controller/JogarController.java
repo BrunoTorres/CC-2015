@@ -195,6 +195,8 @@ public class JogarController implements Initializable {
     private void deleteButtonAction(ActionEvent event) {
         try {
             MusicClient.menuDelete(this.d.getNome());
+            this.atual.close();
+            this.anterior.show();
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ChallengeException ex) {

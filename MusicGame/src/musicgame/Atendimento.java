@@ -261,7 +261,7 @@ public class Atendimento extends Thread {
         us.addPontuacao(3);
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
         for (Utilizador u : d.getUserEnd().values()) {
-            System.out.println("Pontuacao antes: "+this.bd.getUser(u.getAlcunha()));
+            System.out.println("Pontuacao antes: c"+this.bd.getUser(u.getAlcunha()));
             utili.add(u);
             bd.actRanking(u);
         }

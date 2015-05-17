@@ -219,7 +219,7 @@ public class JogarController implements Initializable {
                 alres.setHeaderText("Resultados");
                 StringBuilder sb = new StringBuilder();
                 for (Utilizador u : results) {
-                    sb.append(pos).append(": ").append(u.getAlcunha()).append(" | ").append(u.getPontuacao()).append(" pontos\n");
+                    sb.append(pos).append(": ").append(u.getAlcunha()).append(" | ").append(u.getScore()).append(" pontos\n");
                     pos++;
                 }
                 alres.setContentText(sb.toString());

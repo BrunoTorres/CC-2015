@@ -1,4 +1,4 @@
-    package musicgame;
+package musicgame;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -247,24 +249,23 @@ public class Atendimento extends Thread {
 
         PDU resposta = new PDU(s, (byte) 0);
 
-        for (Utilizador u : d.getUserEnd().values()) {
-            if (u.getPontuacao() > maior) {
-                maior = u.getPontuacao();
-                us = u;
-            } else if (u.getPontuacao() == maior) {
-                if (u.getTempoResposta() < us.getTempoResposta()) {
-                    us = u;
-                    maior = u.getPontuacao();
-                }
-            }
-        }
-        us.addPontuacao(3);
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
         for (Utilizador u : d.getUserEnd().values()) {
-            System.out.println("Pontuacao antes: c"+this.bd.getUser(u.getAlcunha()));
+            System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
             utili.add(u);
-            bd.actRanking(u);
+            
+            if (d.getHaveWinner() == false) {
+                d.setHaveWinner(true);
+                utili.first().addPontuacao(3);
+                
+            }
+            if(u.equals(utili.first()))
+                this.bd.actRanking(utili.first());
+            else
+                this.bd.actRanking(u);
+            
         }
+
         resposta.addCampo(des);
         for (Utilizador u : utili) {
             c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
@@ -277,7 +278,7 @@ public class Atendimento extends Thread {
 
     }
 
-    private void processaLogin(byte[] data, InetAddress add, int port) {
+    private synchronized void processaLogin(byte[] data, InetAddress add, int port) {
 
         PDU pacote = new PDU(data);
 
@@ -592,14 +593,14 @@ public class Atendimento extends Thread {
             String ca;
             if (tipo == IMAGEM) {
                 ca = this.bd.getPathImage().concat(p.getImagem());
-            } else {                
+            } else {
                 ca = this.bd.getPathMusic().concat(p.getMusica());
             }
             int bloco = PDU.byteArrayToInt(pacote.getCampo(3).getValor());      //n bloco
 
             TreeMap<Integer, byte[]> blocos = (TreeMap) this.getBlocos(ca);
             byte b[] = blocos.get(bloco);
-            
+
             //byte b[] = this.bd.partes.get(bloco);
             PDU music = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, nome.getBytes());
@@ -610,10 +611,11 @@ public class Atendimento extends Thread {
             music.addCampo(c);                                          //nBloco
             c = new Campo(tipo, b);
             music.addCampo(c);                                      //bloco
-            if(bloco == blocos.lastKey())
+            if (bloco == blocos.lastKey()) {
                 music.addCampo(new Campo(FIM, new byte[]{0}));
-            else
+            } else {
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
+            }
             responde(music, add, port);
         } catch (IOException ex) {
             Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);

@@ -134,8 +134,11 @@ public class Menu_Controller implements Initializable {
         this.atual.hide();
         // stage.setResizable(false);
         stage.setTitle("Lista de desafios disponíveis");
+        listarC.setUser(this.user);
         listarC.setAtual(stage);
+        
         listarC.setAnterior(this.atual);
+        
     }
 
     @FXML

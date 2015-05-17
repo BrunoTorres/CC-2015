@@ -116,6 +116,7 @@ public class ListarDesafiosController implements Initializable {
                     stage.show();
                     this.atual.hide();
                     stage.setTitle("MusicGame");
+                    jogarC.setUser(this.user);
                     jogarC.setAtual(stage);
                     jogarC.setAnterior(this.anterior);
                     jogarC.setDesafio(d);

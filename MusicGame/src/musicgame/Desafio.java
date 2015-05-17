@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -30,6 +32,7 @@ public class Desafio implements Serializable {
     private HashMap<String, Utilizador> usersEnd;
     private boolean status; // false->não foi feito true->já ocorreu
     private boolean haveWinner;
+    private TreeSet<Utilizador> result;
 
     private byte[] ano;
     private byte dia;
@@ -55,6 +58,8 @@ public class Desafio implements Serializable {
         this.usersEnd = new HashMap<>();
         this.status = false;
         this.haveWinner = false;
+        
+        this.result = new TreeSet<>(new CompareUsersByPoints());
 
         this.dataString = new SimpleStringProperty();
         this.horaString = new SimpleStringProperty();
@@ -64,6 +69,7 @@ public class Desafio implements Serializable {
     }
 
     public Desafio() {
+        this.result = new TreeSet<>(new CompareUsersByPoints());
     }
 
     public void remUtilizadoresEnd(String alcunha) {
@@ -92,6 +98,18 @@ public class Desafio implements Serializable {
 
     public void setHaveWinner(boolean status) {
         this.haveWinner = status;
+    }
+    
+    public void addUserResult(Utilizador u){
+        this.result.add(u);
+    }
+    
+    public Set<Utilizador> getResult(){
+        return this.result;
+    }
+    
+    public void setWinner(){
+        this.result.first().addPontuacao(3);
     }
 
     public int getTamanhoUsers() {

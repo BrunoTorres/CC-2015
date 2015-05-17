@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
@@ -82,8 +84,8 @@ public class MusicClient {
         lastIdSent = id;
         System.out.println("Atualizou para a opcao: "+id);
         clientSocket = new DatagramSocket();
-        //IPAddress = InetAddress.getByName("192.168.1.79");
-        IPAddress = InetAddress.getByName("localhost");
+        IPAddress = InetAddress.getByName("192.168.1.79");
+        //IPAddress = InetAddress.getByName("localhost");
         //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
@@ -203,8 +205,9 @@ public class MusicClient {
 
     }
 
-    public static Map<String, Integer> menuEnd(String nomeDesafio) throws IOException, SocketTimeoutException, ServerUnreachableException {
-        TreeMap<String, Integer> lista = new TreeMap<>();
+    public static Set<Utilizador> menuEnd(String nomeDesafio) throws IOException, SocketTimeoutException, ServerUnreachableException {
+        //TreeMap<String, Integer> lista = new TreeMap<>();
+        TreeSet<Utilizador> users = new TreeSet<>(new CompareUsersByPoints());
         ArrayList<Campo> campos = new ArrayList<>();
         Campo c = new Campo(DESAFIO, nomeDesafio.getBytes());
         campos.add(c);
@@ -212,10 +215,11 @@ public class MusicClient {
 
         PDU p = receivePDU();
         for (int i = 1; i < p.getNumCampos(); i += 2) {
-            lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i + 1).getValor()));
+            users.add(new Utilizador(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i + 1).getValor())));
+            //lista.put(new String(p.getCampo(i).getValor()), PDU.byteArrayToInt(p.getCampo(i + 1).getValor()));
         }
 
-        return lista;
+        return users;
 
     }
 

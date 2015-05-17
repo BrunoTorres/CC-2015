@@ -15,10 +15,10 @@ class CompareUsersByPoints implements Comparator<Utilizador>, Serializable {
     @Override
     public int compare(Utilizador o1, Utilizador o2) {
         if (o1.getPontuacao() > o2.getPontuacao()) {
-            return 1;
+            return -1;
         }
         if (o1.getPontuacao() < o2.getPontuacao()) {
-            return -1;
+            return 1;
         }
         if (o1.getTempoResposta() > o2.getTempoResposta()) {
             return 1;

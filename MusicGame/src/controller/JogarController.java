@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
@@ -211,14 +212,14 @@ public class JogarController implements Initializable {
             al.showAndWait();
             if (nQuestion >= 11) {
                 System.out.println("Chegou ao ultimo vai fazer o end");
-                TreeMap<String, Integer> results = (TreeMap) MusicClient.menuEnd(this.d.getNome());
+                TreeSet<Utilizador> results = (TreeSet) MusicClient.menuEnd(this.d.getNome());
                 Alert alres = new Alert(Alert.AlertType.INFORMATION);
                 int pos = 1;
                 alres.setTitle("Desafio " + this.d.getNome());
                 alres.setHeaderText("Resultados");
                 StringBuilder sb = new StringBuilder();
-                for (String s : results.keySet()) {
-                    sb.append(pos).append(": ").append(s).append(" | ").append(results.get(s)).append(" pontos\n");
+                for (Utilizador u : results) {
+                    sb.append(pos).append(": ").append(u.getAlcunha()).append(" | ").append(u.getPontuacao()).append(" pontos\n");
                     pos++;
                 }
                 alres.setContentText(sb.toString());

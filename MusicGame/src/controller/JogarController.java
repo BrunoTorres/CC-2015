@@ -219,7 +219,7 @@ public class JogarController implements Initializable {
                 alres.setHeaderText("Resultados");
                 StringBuilder sb = new StringBuilder();
                 for (Utilizador u : results) {
-                    sb.append(pos).append(": ").append(u.getAlcunha()).append(" | ").append(u.getScore()).append(" pontos\n");
+                    sb.append(pos).append(": ").append(u.getAlcunha()).append(" | ").append(u.getPontuacao()).append(" pontos\n");
                     pos++;
                 }
                 alres.setContentText(sb.toString());
@@ -327,18 +327,25 @@ public class JogarController implements Initializable {
         try {
             this.p = MusicClient.jogar(quit);
             apresentaPergunta(this.p);
-
         } catch (SocketTimeoutException ex) {
             Logger.getLogger(JogarController.class
                     .getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(JogarController.class
                     .getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
+        } catch (UnsupportedAudioFileException | LineUnavailableException ex) {
             Logger.getLogger(JogarController.class
                     .getName()).log(Level.SEVERE, null, ex);
         } catch (ServerUnreachableException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InsuficientPlayersException ex) {
+            Alert al = new Alert(Alert.AlertType.ERROR);
+            al.setTitle("JOGADORES INSUFICIENTES");
+            al.setHeaderText(null);
+            al.setContentText("Impossível iniciar jogo");
+            al.showAndWait();
+            atual.close();
+            anterior.show();
         }
 
     }

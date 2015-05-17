@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -28,6 +30,7 @@ class BD implements Serializable {
     private ArrayList<Pergunta> perguntas;
     private String pastaMusica;
     private String pastaImagem;
+    private Lock l = new ReentrantLock();
 
     public BD(String pMusica, String pImagem) {
         this.pastaImagem = pImagem;
@@ -37,50 +40,70 @@ class BD implements Serializable {
         this.desafios = new HashMap<>();
         this.ranking = new HashMap<>();
     }
-    public int getRanking(String nome){
+
+    public int getRanking(String nome) {
         return this.ranking.get(nome);
     }
-    public Map<String,Integer> getRanking(){
+
+    public Map<String, Integer> getRanking() {
         return this.ranking;
-        
+
     }
-    public void actRanking(Utilizador u){
-        if(this.ranking.containsKey(u.getAlcunha()))
-            this.ranking.put(u.getAlcunha(),this.ranking.get(u.getAlcunha())+u.getPontuacao());
-        else
-            this.ranking.put(u.getAlcunha(),u.getPontuacao());
-        System.out.println("PONTUACAO FOI ATUALIZADA: "+this.ranking.get(u.getAlcunha()));
-        
+
+    public void actRanking(Utilizador u) {
+        l.lock();
+        try {
+            if (this.ranking.containsKey(u.getAlcunha())) {
+                this.ranking.put(u.getAlcunha(), this.ranking.get(u.getAlcunha()) + u.getPontuacao());
+            } else {
+                this.ranking.put(u.getAlcunha(), u.getPontuacao());
+            }
+            System.out.println("PONTUACAO FOI ATUALIZADA: " + this.ranking.get(u.getAlcunha()));
+        } finally {
+            l.unlock();
+        }
+
     }
 
     public void addUser(Utilizador u) {
-        users.put(u.getAlcunha(), u);
-        ranking.put(u.getAlcunha(), 0);
+        l.lock();
+        try {
+            users.put(u.getAlcunha(), u);
+            ranking.put(u.getAlcunha(), 0);
+        } finally {
+            l.unlock();
+        }
     }
-    
-    public int addPontuacao(String alcunha, int p){
-        int r = p + ranking.get(alcunha);
-        ranking.put(alcunha, r);
+
+    public int addPontuacao(String alcunha, int p) {
+        l.lock();
+        int r;
+        try {
+            r = p + ranking.get(alcunha);
+            ranking.put(alcunha, r);
+        } finally {
+            l.unlock();
+        }
         return r;
     }
 
-    public void addDesafio(Desafio d) {
+    public synchronized void addDesafio(Desafio d) {
         desafios.put(d.getNome(), d);
     }
 
-    public void addPergunta(Pergunta p) {
+    public synchronized void addPergunta(Pergunta p) {
         perguntas.add(p);
     }
 
-    public void removeUser(String alcunha) {
+    public synchronized void removeUser(String alcunha) {
         users.remove(alcunha);
     }
 
-    public void removeDesafio(String nd) {
+    public synchronized void removeDesafio(String nd) {
         desafios.remove(nd);
     }
 
-    public void removePergunta(Pergunta p) {
+    public synchronized void removePergunta(Pergunta p) {
         perguntas.remove(p);
     }
 
@@ -88,7 +111,7 @@ class BD implements Serializable {
         return users.containsKey(alc);
     }
 
-    public void carregaPerguntas(String path) throws IOException {
+    public synchronized void carregaPerguntas(String path) throws IOException {
         File f = new File(path);
         //Pattern init = Pattern.compile("\\w+=\\w+");
         //Pattern rest = Pattern.compile("\\w+=\\w+");
@@ -121,7 +144,6 @@ class BD implements Serializable {
                 l = br.readLine();
 
             }
-          
 
         }
     }
@@ -168,7 +190,7 @@ class BD implements Serializable {
         }
     }
 
-    public void updateUser(String alcunha, InetAddress add, int port) {
+    public synchronized void updateUser(String alcunha, InetAddress add, int port) {
         this.users.get(alcunha).setIp(add);
         this.users.get(alcunha).setPort(port);
     }
@@ -180,8 +202,8 @@ class BD implements Serializable {
         }
         return des;
     }
-    
-    public Desafio getDesafio(String nome){
+
+    public Desafio getDesafio(String nome) {
         return this.desafios.get(nome);
     }
 
@@ -199,7 +221,7 @@ class BD implements Serializable {
     public String getPathImage() {
         return this.pastaImagem;
     }
-    
+
     public String getPathMusic() {
         return this.pastaMusica;
     }

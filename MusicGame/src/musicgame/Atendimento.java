@@ -152,22 +152,8 @@ public class Atendimento extends Thread {
                 responde(reply, add, port);
                 this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 Jogo j;
-                boolean f = true;
-                // for (int i = 1; i <= 10 && f; i++) {
                 j = new Jogo(bd.getUserByIP(add), d.getLocalDate(), d, this.bd, 1, true);
                 j.start();
-
-                //}
-                /*
-                 if (!f) {
-                 d.removeUtilizador(bd.getUserByIP(add).getAlcunha());
-                 reply = new PDU(s, (byte) 0);
-                 c = new Campo(01, "Ok".getBytes());
-                 reply.addCampo(c);
-                 responde(reply, add, port);
-
-                 }
-                 */
                 break;
             case 10:
                 System.out.println("Delete challenge");
@@ -217,8 +203,8 @@ public class Atendimento extends Thread {
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         PDU reply;
-        Campo c, dat;
-        System.out.println("coisasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        Campo c;
+        //System.out.println("coisasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         d.remUtilizadoresEnd(user.getAlcunha());
@@ -231,51 +217,45 @@ public class Atendimento extends Thread {
     }
 
     @SuppressWarnings("empty-statement")
-    public void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
+    public synchronized void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
-        PDU reply;
-        Campo c, dat;
+        Campo c;
 
         Utilizador user = bd.getUserByIP(add);
 
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         d.addUserEnd(user);
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
-        while (d.getTamanhoUtilizadoresEnd() < d.getTamanhoUsers());
-        int maior = 0;
-        Utilizador us = new Utilizador();
-
-        PDU resposta = new PDU(s, (byte) 0);
-
-        TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
-        for (Utilizador u : d.getUserEnd().values()) {
-            System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
-            utili.add(u);
-            
-            if (d.getHaveWinner() == false) {
-                d.setHaveWinner(true);
-                utili.first().addPontuacao(3);
-                
+        if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
+            d.setNumPlayersDone(d.getNumPlayersDone() + 1);
+            //System.out.println("Não faço nada SOU O USER: "+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
+        } else {
+            //System.out.println("Faço alguma coisa porque sou o ultimo sou o use:"+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
+            TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
+            for (Utilizador u : d.getUserEnd().values()) {
+                //System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
+                utili.add(u);
             }
-            if(u.equals(utili.first()))
-                this.bd.actRanking(utili.first());
-            else
-                this.bd.actRanking(u);
-            
+            utili.first().addPontuacao(3);
+            //System.out.println("´Foram adicionados 3 pontos ao jogador"+utili.first().getAlcunha());
+            for (Utilizador uaux : utili) {
+                PDU resposta = new PDU(s, (byte) 0);
+                resposta.addCampo(des);
+              //  System.out.println("Por cada jogador  vou atualizar ranking");
+                this.bd.actRanking(uaux);
+                for (Utilizador u : utili) {
+                //    System.out.println("mandar um jogador");
+                    c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
+                    resposta.addCampo(c);
+                    c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
+                    resposta.addCampo(c);
+                }
+                //System.out.println("responder");
+                responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
+            }
         }
-
-        resposta.addCampo(des);
-        for (Utilizador u : utili) {
-            c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
-            resposta.addCampo(c);
-            c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
-            resposta.addCampo(c);
-        }
-
-        responde(resposta, add, port);
-
     }
 
     private synchronized void processaLogin(byte[] data, InetAddress add, int port) {
@@ -617,8 +597,10 @@ public class Atendimento extends Thread {
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
             }
             responde(music, add, port);
+
         } catch (IOException ex) {
-            Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Atendimento.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 

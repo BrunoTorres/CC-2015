@@ -79,55 +79,54 @@ public class Jogo extends Thread {
                 }
             }
             this.desafio.setStatus(true);
-            /* if (this.desafio.getUsers().size() < 2) {
-             Utilizador u = new Utilizador();
-             for (Utilizador ut : this.desafio.getUsers().values()) {
-             u = ut;
-             }
-
-             PDU reply;
-             reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(u)), (byte) 0);
-             reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
-             reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
-             responde(reply, u.getIp(), u.getPort());
-             } else */
-            this.desafio = this.bd.getDesafio(this.desafio.getNome());
-            for (Utilizador u : this.desafio.getUsers().values()) {
-                System.out.println(u.getAlcunha());
-            }
-            if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
-                if (numQuestao == 1) {
-                    u.initPontuacao();
+            if (this.desafio.getUsers().size() < 2) {
+                Utilizador u = new Utilizador();
+                for (Utilizador ut : this.desafio.getUsers().values()) {
+                    u = ut;
                 }
-                label = this.desafio.getLabelByUser(u);
-                int s = PDU.byteArrayToInt(label);
-                resposta = new PDU(s, (byte) 0);
-                c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
-                resposta.addCampo(c);
-                byte[] q = {(byte) numQuestao};
 
-                c = new Campo(NQUESTAO, q);
-                resposta.addCampo(c);
-                c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
-                resposta.addCampo(c);
-                int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
-                int i;
-                for (i = 1; i <= 3; i++) {
-                    q = new byte[]{(byte) i};
-                    c = new Campo(12, q);
-                    resposta.addCampo(c);
-                    c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
-                    resposta.addCampo(c);
+                PDU reply;
+                reply = new PDU(PDU.byteArrayToInt(this.desafio.getLabelByUser(u)), (byte) 0);
+                reply.addCampo(new Campo(7, this.desafio.getNome().getBytes()));
+                reply.addCampo(new Campo(255, "Número insuficiente de jogadores!".getBytes()));
+                responde(reply, u.getIp(), u.getPort());
+            } else {
+                this.desafio = this.bd.getDesafio(this.desafio.getNome());
+                for (Utilizador u : this.desafio.getUsers().values()) {
+                    System.out.println(u.getAlcunha());
                 }
-                responde(resposta, u.getIp(), u.getPort());
+                if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
+                    if (numQuestao == 1) {
+                        u.initPontuacao();
+                    }
+                    label = this.desafio.getLabelByUser(u);
+                    int s = PDU.byteArrayToInt(label);
+                    resposta = new PDU(s, (byte) 0);
+                    c = new Campo(DESAFIO, this.desafio.getNome().getBytes());
+                    resposta.addCampo(c);
+                    byte[] q = {(byte) numQuestao};
 
-                ////////////////// END REPLY //////////////////
-                System.out.println("vai enviar imagem");
-                sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+                    c = new Campo(NQUESTAO, q);
+                    resposta.addCampo(c);
+                    c = new Campo(QUESTAO, this.desafio.getPergunta(numQuestao - 1).getPergunta().getBytes());
+                    resposta.addCampo(c);
+                    int tam = this.desafio.getNumeroRespostas(numQuestao - 1);
+                    int i;
+                    for (i = 1; i <= 3; i++) {
+                        q = new byte[]{(byte) i};
+                        c = new Campo(12, q);
+                        resposta.addCampo(c);
+                        c = new Campo(13, this.desafio.getResposta(numQuestao - 1, i - 1).getBytes());
+                        resposta.addCampo(c);
+                    }
+                    responde(resposta, u.getIp(), u.getPort());
+                    ////////////////// END REPLY //////////////////
+                    //System.out.println("vai enviar imagem");
+                    sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
 
-                System.out.println("vai enviar musica");
-                sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
-                // }
+                    //System.out.println("vai enviar musica");
+                    sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
@@ -173,7 +172,7 @@ public class Jogo extends Thread {
         image.addCampo(c);
         c = new Campo(NQUESTAO, PDU.intToByteArray(numQuestao));
         image.addCampo(c);
-        image.addCampo(new Campo(BLOCO, new byte[]{(byte) (i+1)}));
+        image.addCampo(new Campo(BLOCO, new byte[]{(byte) (i + 1)}));
         image.addCampo(new Campo(IMAGEM, p));
         image.addCampo(new Campo(FIM, new byte[]{0}));  ////////////////////////////// last block
         //System.out.println(i + 1);
@@ -230,7 +229,7 @@ public class Jogo extends Thread {
 
         //this.bd.partes.put(i+1, p);
         music.addCampo(c);
-        music.addCampo(new Campo(BLOCO, new byte[]{(byte) (i+1)}));
+        music.addCampo(new Campo(BLOCO, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(AUDIO, p));
         music.addCampo(new Campo(FIM, new byte[]{0}));  ////////////////////////////// last block
         //System.out.println(i + 1);

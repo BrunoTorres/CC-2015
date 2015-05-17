@@ -30,7 +30,7 @@ public class Utilizador implements Serializable {
         this.pass = null;
         this.port = 0;
         this.ip = null;
-        this.pontuacao=0;
+        this.pontuacao=score;
         this.score=score;
         this.tempoRespostaTotal=0;
 

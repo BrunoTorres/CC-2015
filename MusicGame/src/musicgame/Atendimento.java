@@ -248,42 +248,26 @@ public class Atendimento extends Thread {
         Utilizador us = new Utilizador();
 
         PDU resposta = new PDU(s, (byte) 0);
-        
+
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
-        
-        if(d.getUserEnd().size() == d.getUsers().size()){
-            for(Utilizador u :d.getUserEnd().values()){
-                d.addUserResult(u);
-            }
-            d.setWinner();
-            for(Utilizador u : d.getResult()){
-                this.bd.actRanking(u);
-            }
-            d.setHaveWinner(true);
-        }
-        else{
-            while(d.getUserEnd().size() != d.getUsers().size() && !d.getHaveWinner());
-        }
-        
-        /*for (Utilizador u : d.getUserEnd().values()) {
+        for (Utilizador u : d.getUserEnd().values()) {
             System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
             utili.add(u);
-
+            
             if (d.getHaveWinner() == false) {
                 d.setHaveWinner(true);
                 utili.first().addPontuacao(3);
-
+                
             }
-            if (u.equals(utili.first())) {
+            if(u.equals(utili.first()))
                 this.bd.actRanking(utili.first());
-            } else {
+            else
                 this.bd.actRanking(u);
-            }
-
-        }*/
+            
+        }
 
         resposta.addCampo(des);
-        for (Utilizador u : d.getResult()) {
+        for (Utilizador u : utili) {
             c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
             resposta.addCampo(c);
             c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));

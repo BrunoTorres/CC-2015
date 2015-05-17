@@ -76,7 +76,7 @@ public class JogarController implements Initializable {
 
     @FXML
     private Button butOk;
-    
+
     @FXML
     private Button butDel;
 
@@ -111,6 +111,7 @@ public class JogarController implements Initializable {
     private MediaPlayer mp = null;
 
     private boolean quit;
+    private boolean apagar;
 
     public JogarController() {
         this.quit = false;
@@ -190,11 +191,12 @@ public class JogarController implements Initializable {
     private void butQuitAction(ActionEvent event) {
         this.atual.fireEvent(new WindowEvent(atual, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
-    
-     @FXML
+
+    @FXML
     private void deleteButtonAction(ActionEvent event) {
         try {
             MusicClient.menuDelete(this.d.getNome());
+            this.apagar = true;
             this.atual.close();
             this.anterior.show();
         } catch (IOException ex) {
@@ -269,14 +271,16 @@ public class JogarController implements Initializable {
     }
 
     public void setDesafio(Desafio d) {
+        this.apagar = false;
         this.panelJogo.setVisible(false);
         this.panelPergunta.setVisible(false);
         this.panelRespostas.setVisible(false);
         this.panelWait.setVisible(true);
-        System.out.println("Utilizador atual:"+this.user.getAlcunha());
-        System.out.println("Utilizador dono:"+d.getUser());
-        if(this.user.getAlcunha().equals(d.getUser()))
+        System.out.println("Utilizador atual:" + this.user.getAlcunha());
+        System.out.println("Utilizador dono:" + d.getUser());
+        if (this.user.getAlcunha().equals(d.getUser())) {
             this.butDel.setVisible(true);
+        }
         this.d = d;
         this.labelNomeDesafio.setText(d.getNome());
         this.data = this.d.getLocalDate();
@@ -360,13 +364,15 @@ public class JogarController implements Initializable {
         } catch (ServerUnreachableException ex) {
             Logger.getLogger(JogarController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InsuficientPlayersException ex) {
-            Alert al = new Alert(Alert.AlertType.ERROR);
-            al.setTitle("DESAFIO");
-            al.setHeaderText("Impossível iniciar desafio");
-            al.setContentText(ex.getMessage());
-            al.showAndWait();
-            atual.close();
-            anterior.show();
+            if (!apagar) {
+                Alert al = new Alert(Alert.AlertType.ERROR);
+                al.setTitle("DESAFIO");
+                al.setHeaderText("Impossível iniciar desafio");
+                al.setContentText(ex.getMessage());
+                al.showAndWait();
+                atual.close();
+                anterior.show();
+            }
         }
 
     }

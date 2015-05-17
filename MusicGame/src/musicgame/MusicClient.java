@@ -403,9 +403,11 @@ public class MusicClient {
 
     }
 
-    public static Desafio menuMakeChallenge(String nome) throws IOException, SocketTimeoutException, ServerUnreachableException {
+    public static Desafio menuMakeChallenge(String nome, String alc) throws IOException, SocketTimeoutException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
-        Campo m = new Campo(7, nome.getBytes());
+        Campo m = new Campo(DESAFIO, nome.getBytes());
+        campos.add(m);
+        m = new Campo(ALCUNHA, alc.getBytes());
         campos.add(m);
         sendPDU(MAKE_CHALLENGE, campos);
         PDU pacote = receivePDU();

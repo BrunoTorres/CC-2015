@@ -85,7 +85,7 @@ public class Menu_Controller implements Initializable {
             try {
                 name = res.get();
 
-                Desafio d = MusicClient.menuMakeChallenge(name);
+                Desafio d = MusicClient.menuMakeChallenge(name,this.user.getAlcunha());
                 if (d != null) {
                     Alert al = new Alert(AlertType.INFORMATION);
                     al.setTitle("Criar desafio");
@@ -101,11 +101,11 @@ public class Menu_Controller implements Initializable {
                     stage.setScene(scene);
                     stage.show();
                     this.atual.hide();
-                    stage.setTitle("MusicGame");
-                    jogarC.setAtual(stage);
-                    jogarC.setAnterior(this.atual);
-                    jogarC.setDesafio(d);
+                    stage.setTitle("MusicGame");                                      
                     jogarC.setUser(this.user);
+                    jogarC.setAtual(stage);
+                    jogarC.setAnterior(this.atual);  
+                    jogarC.setDesafio(d);
                 } else {
                     Alert al = new Alert(AlertType.ERROR);
                     al.setTitle("ERRO");

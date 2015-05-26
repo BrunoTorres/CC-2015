@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author Bruno Pereira
  */
-public class Atendimento extends Thread {
+public class InteracaoCliente extends Thread {
 
     private static final int OK = 0;
     private static final int FIM = 250;
@@ -55,7 +55,7 @@ public class Atendimento extends Thread {
     byte[] receiveData;
     byte[] sendData;
 
-    public Atendimento(DatagramPacket so, BD b) throws UserInexistenteException {
+    public InteracaoCliente(DatagramPacket so, BD b) throws UserInexistenteException {
         this.receivePacket = so;
         this.sendSocket = null;
         this.sendPacket = null;
@@ -136,7 +136,7 @@ public class Atendimento extends Thread {
                         this.bd.updateUser(bd.getUserByIP(add).getAlcunha(), add, port);
                         criaDesafio(data, add, port);
                     } catch (UserInexistenteException ex) {
-                        Logger.getLogger(Atendimento.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 break;
@@ -601,7 +601,7 @@ public class Atendimento extends Thread {
             responde(music, add, port);
 
         } catch (IOException ex) {
-            Logger.getLogger(Atendimento.class
+            Logger.getLogger(InteracaoCliente.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }

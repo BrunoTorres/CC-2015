@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +26,12 @@ import java.util.concurrent.locks.ReentrantLock;
 class BD implements Serializable {
 
     private HashMap<String, Utilizador> users; /// syc
-    private HashMap<String, Integer> ranking;     /// syc
-    private HashMap<String, Desafio> desafios; // syc
+    private HashMap<String, Integer> rankingLocal;     /// syc
+    private HashMap<String, Integer> rankingGlobal;     /// syc
+    private HashMap<String, Desafio> desafiosLocais; // syc
+    private HashMap<String, LocalDateTime> desafiosGlobais; // syc
     private ArrayList<Pergunta> perguntas;
+    private HashMap<InetAddress, Integer> servidores;
     private String pastaMusica;
     private String pastaImagem;
     private Lock l = new ReentrantLock();
@@ -37,28 +41,39 @@ class BD implements Serializable {
         this.perguntas = new ArrayList<>();
         this.pastaMusica = pMusica;
         this.users = new HashMap<>();
-        this.desafios = new HashMap<>();
-        this.ranking = new HashMap<>();
+        this.desafiosLocais = new HashMap<>();
+        this.rankingLocal = new HashMap<>();
+        this.servidores = new HashMap<>();
+        this.desafiosGlobais = new HashMap<>();
+        this.rankingGlobal = new HashMap<>();
+    }
+    
+    public Map<String, LocalDateTime> getDesafiosGlobais(){
+        return this.desafiosGlobais;
+    }
+    
+    public Map<String, Integer> getRankingGlobal(){
+        return this.rankingGlobal;
     }
 
     public int getRanking(String nome) {
-        return this.ranking.get(nome);
+        return this.rankingLocal.get(nome);
     }
 
     public Map<String, Integer> getRanking() {
-        return this.ranking;
+        return this.rankingLocal;
 
     }
 
     public void actRanking(Utilizador u) {
         l.lock();
         try {
-            if (this.ranking.containsKey(u.getAlcunha())) {
-                this.ranking.put(u.getAlcunha(), this.ranking.get(u.getAlcunha()) + u.getPontuacao());
+            if (this.rankingLocal.containsKey(u.getAlcunha())) {
+                this.rankingLocal.put(u.getAlcunha(), this.rankingLocal.get(u.getAlcunha()) + u.getPontuacao());
             } else {
-                this.ranking.put(u.getAlcunha(), u.getPontuacao());
+                this.rankingLocal.put(u.getAlcunha(), u.getPontuacao());
             }
-            System.out.println("PONTUACAO FOI ATUALIZADA: " + this.ranking.get(u.getAlcunha()));
+            System.out.println("PONTUACAO FOI ATUALIZADA: " + this.rankingLocal.get(u.getAlcunha()));
         } finally {
             l.unlock();
         }
@@ -69,7 +84,7 @@ class BD implements Serializable {
         l.lock();
         try {
             users.put(u.getAlcunha(), u);
-            ranking.put(u.getAlcunha(), 0);
+            rankingLocal.put(u.getAlcunha(), 0);
         } finally {
             l.unlock();
         }
@@ -79,8 +94,8 @@ class BD implements Serializable {
         l.lock();
         int r;
         try {
-            r = p + ranking.get(alcunha);
-            ranking.put(alcunha, r);
+            r = p + rankingLocal.get(alcunha);
+            rankingLocal.put(alcunha, r);
         } finally {
             l.unlock();
         }
@@ -88,7 +103,7 @@ class BD implements Serializable {
     }
 
     public synchronized void addDesafio(Desafio d) {
-        desafios.put(d.getNome(), d);
+        desafiosLocais.put(d.getNome(), d);
     }
 
     public synchronized void addPergunta(Pergunta p) {
@@ -100,7 +115,7 @@ class BD implements Serializable {
     }
 
     public synchronized void removeDesafio(String nd) {
-        desafios.remove(nd);
+        desafiosLocais.remove(nd);
     }
 
     public synchronized void removePergunta(Pergunta p) {
@@ -197,18 +212,18 @@ class BD implements Serializable {
 
     public ArrayList<Desafio> getDesafios() {
         ArrayList<Desafio> des = new ArrayList<>();
-        for (Desafio d : desafios.values()) {
+        for (Desafio d : desafiosLocais.values()) {
             des.add(d);
         }
         return des;
     }
 
     public Desafio getDesafio(String nome) {
-        return this.desafios.get(nome);
+        return this.desafiosLocais.get(nome);
     }
 
     public boolean existeDesafio(String nome) {
-        return desafios.containsKey(nome);
+        return desafiosLocais.containsKey(nome);
     }
 
     public Pergunta getPergunta() {
@@ -225,5 +240,18 @@ class BD implements Serializable {
     public String getPathMusic() {
         return this.pastaMusica;
     }
+    
+    public void registaServidor(InetAddress ip, int porta){
+        this.servidores.put(ip, porta);
+    }
 
+    public Map<InetAddress, Integer> getServidores() {
+        return this.servidores;
+    }
+
+    void registaServidores(HashMap<InetAddress, Integer> svs) {
+        for(InetAddress i : svs.keySet()){
+            this.servidores.put(i, svs.get(i));
+        }
+    }
 }

@@ -60,7 +60,7 @@ class BD implements Serializable {
         return this.rankingLocal.get(nome);
     }
 
-    public Map<String, Integer> getRanking() {
+    public Map<String, Integer> getRankingLocal() {
         return this.rankingLocal;
 
     }
@@ -270,6 +270,12 @@ class BD implements Serializable {
     public synchronized void  addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
         for(String s: des.keySet()){
             this.desafiosGlobais.put(s, des.get(s));
+        }
+    }
+
+    public synchronized void addRankingGlobal(HashMap<String, Integer> rank) {
+        for(String s: rank.keySet()){
+            this.rankingGlobal.put(s,rank.get(s));
         }
     }
 }

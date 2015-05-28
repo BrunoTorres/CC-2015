@@ -128,9 +128,11 @@ public class InteracaoServidor extends Thread {
        private void adicionaRanking() throws IOException, ClassNotFoundException { 
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
-        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+        this.in = new ObjectInputStream(s2.getInputStream());
+        HashMap<String, Integer> rank = (HashMap<String, Integer>)  in.readObject();
+        
+        this.bd.addRankingGlobal(rank);
 
-        ///////////////////////////////// ver isto !! o adicionar
 
     }
     
@@ -168,7 +170,7 @@ public class InteracaoServidor extends Thread {
         out.flush();
         out.reset();
         
-        out.writeObject(bd.getRanking());////////////////////////////////////////////
+        out.writeObject(bd.getRankingLocal());////////////////////////////////////////////
         out.flush();
         out.reset();
     }

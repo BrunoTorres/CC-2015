@@ -3,13 +3,12 @@ package musicgame;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,16 +65,16 @@ public class InteracaoServidor extends Thread {
     private void registaServidor(PDU p) throws IOException, ClassNotFoundException { // sv principal regista novo sv, devolve-lhe lista dos que conhece e envia aos que conhece
         // o novo sv
         String ip = new String(p.getCampo(1).getBytes());
-        ObjectOutputStream o;
+        //ObjectOutputStream o;
         BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = bg.intValue();
         Socket serv = new Socket(InetAddress.getByName(ip), porta);
 
         Campo c;
-
-        o = new ObjectOutputStream(serv.getOutputStream());
-        o.writeObject(this.bd.getServidores());
-        o.flush();
+          //                                                    falta info antes de enviar objecto?!
+       // out = new ObjectOutputStream(serv.getOutputStream());
+        out.writeObject(this.bd.getServidores());
+        out.flush();
 
         this.bd.registaServidor(InetAddress.getByName(ip), porta);
 
@@ -91,38 +90,86 @@ public class InteracaoServidor extends Thread {
             bg = BigInteger.valueOf(porta);
             c = new Campo(AtendimentoServidor.PORTA, bg.toByteArray());
             res.addCampo(c);
-            o = new ObjectOutputStream(conhecidos.getOutputStream());
-            o.writeObject(res);
-            o.flush();
+            out = new ObjectOutputStream(conhecidos.getOutputStream());
+            out.writeObject(res);
+            out.flush();
         }
 
 ///////////////////////////////////////TODOS
     }
-
-    private void adicionaSVLocal() throws IOException, ClassNotFoundException { // novo servidor adiciona lista de svs que o principal conhece
+    
+    
+// novo servidor adiciona lista de svs que o principal conhece
+    private void adicionaSVLocal() throws IOException, ClassNotFoundException { 
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
 
         HashMap<InetAddress, Integer> svs = (HashMap<InetAddress, Integer>) in2.readObject();
         this.bd.registaServidores(svs);
-    }
+        
 
-    private void adicionaSVLocal(PDU p) throws UnknownHostException {
+    }
+   
+    
+       private void adicionaDesafios() throws IOException, ClassNotFoundException { 
+        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
+        Socket s2 = ss.accept();
+        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+        this.in=new ObjectInputStream(s2.getInputStream());
+        
+       HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
+       
+       this.bd.addDesafiosGlobais(des);
+   
+
+    }
+       
+       private void adicionaRanking() throws IOException, ClassNotFoundException { 
+        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
+        Socket s2 = ss.accept();
+        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+
+        ///////////////////////////////// ver isto !! o adicionar
+
+    }
+    
+
+    private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
         String ip = new String(p.getCampo(1).getBytes());
         BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = bg.intValue();
         this.bd.getServidores().put(InetAddress.getByName(ip), porta);
+        Socket server = new Socket(ip, porta);
+        out = new ObjectOutputStream(server.getOutputStream());
+        sendDesafios();
+        sendRanking();
+    }
+// envia primeiro info a avisar que vai a seguir um arraylist de desafios
+    private void sendDesafios() throws IOException { 
+        PDU res = new PDU(0, AtendimentoServidor.INFO);
+        Campo c = new Campo(AtendimentoServidor.REGISTADESAFIO,new byte[]{0});
+        res.addCampo(c);
+        out.writeObject(res);
+        out.flush();
+        out.reset();
         
-        sendDesafios(ip, porta);
-        sendRanking(ip, porta);
+        out.writeObject(bd.getDesafiosLocais());
+        out.flush();
+        out.reset();
+        
     }
-
-    private void sendDesafios(String ip, int porta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void sendRanking(String ip, int porta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+// envia primeiro info a avisar que vai a seguir um map com o ranking
+    private void sendRanking() throws IOException {
+        PDU res = new PDU(0, AtendimentoServidor.INFO);
+        Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
+        res.addCampo(c);
+        out.writeObject(res);
+        out.flush();
+        out.reset();
+        
+        out.writeObject(bd.getRanking());////////////////////////////////////////////
+        out.flush();
+        out.reset();
     }
 }

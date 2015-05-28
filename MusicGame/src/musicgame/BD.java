@@ -101,7 +101,19 @@ class BD implements Serializable {
         }
         return r;
     }
-
+    
+    
+    public Map<String,LocalDateTime> getDesafiosLocais(){
+        HashMap<String, LocalDateTime> aux = new HashMap<>();
+        for(String s: this.desafiosLocais.keySet()){
+            Desafio d=this.desafiosLocais.get(s);
+            if(!d.getStatus())
+                aux.put(s,d.getLocalDate());  
+        }
+        return aux;
+    }
+    
+    
     public synchronized void addDesafio(Desafio d) {
         desafiosLocais.put(d.getNome(), d);
     }
@@ -249,9 +261,15 @@ class BD implements Serializable {
         return this.servidores;
     }
 
-    void registaServidores(HashMap<InetAddress, Integer> svs) {
+    public synchronized void registaServidores(HashMap<InetAddress, Integer> svs) {
         for(InetAddress i : svs.keySet()){
             this.servidores.put(i, svs.get(i));
+        }
+    }
+
+    public synchronized void  addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
+        for(String s: des.keySet()){
+            this.desafiosGlobais.put(s, des.get(s));
         }
     }
 }

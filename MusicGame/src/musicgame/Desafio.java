@@ -19,7 +19,6 @@ import javafx.beans.property.StringProperty;
 
 /**
  *
- * @author patricia
  */
 public class Desafio implements Serializable {
 

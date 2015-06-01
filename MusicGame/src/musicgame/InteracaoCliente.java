@@ -176,7 +176,7 @@ public class InteracaoCliente extends Thread {
                 listaRanking(data, add, port);
                 break;
             case 14:
-                System.out.println("Prooxima pergunta");
+                System.out.println("Proxima pergunta");
                 p = new PDU(data);
                 d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 int nQuestao = p.getCampo(1).getValor()[0];
@@ -381,10 +381,10 @@ public class InteracaoCliente extends Thread {
         TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
         PDU reply;
         Campo c;
-        int tam = this.bd.getRanking().size();
+        int tam = this.bd.getRankingLocal().size();
         int t = 0;
 
-        for (String a : this.bd.getRanking().keySet()) {
+        for (String a : this.bd.getRankingLocal().keySet()) {
             Utilizador u = this.bd.getUser(a).clone();
             u.initPontuacao();
             u.addPontuacao(this.bd.getRanking(a));

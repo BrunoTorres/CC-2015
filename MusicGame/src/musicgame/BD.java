@@ -21,7 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
- * @author patricia
  */
 class BD implements Serializable {
 
@@ -30,6 +29,9 @@ class BD implements Serializable {
     private HashMap<String, Integer> rankingGlobal;     /// syc
     private HashMap<String, Desafio> desafiosLocais; // syc
     private HashMap<String, LocalDateTime> desafiosGlobais; // syc
+    
+    private HashMap<String, HashMap<InetAddress,Integer>> listaDesafiosServidores;
+    
     private ArrayList<Pergunta> perguntas;
     private HashMap<InetAddress, Integer> servidores;
     private String pastaMusica;
@@ -46,6 +48,8 @@ class BD implements Serializable {
         this.servidores = new HashMap<>();
         this.desafiosGlobais = new HashMap<>();
         this.rankingGlobal = new HashMap<>();
+        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
+        
     }
     
     public Map<String, LocalDateTime> getDesafiosGlobais(){
@@ -275,7 +279,12 @@ class BD implements Serializable {
 
     public synchronized void addRankingGlobal(HashMap<String, Integer> rank) {
         for(String s: rank.keySet()){
-            this.rankingGlobal.put(s,rank.get(s));
+            if(this.rankingGlobal.containsKey(s)){
+                int r=this.rankingGlobal.get(s)+rank.get(s);
+                this.rankingGlobal.put(s,r);
+            }
+            else
+                this.rankingGlobal.put(s,rank.get(s));
         }
     }
 }

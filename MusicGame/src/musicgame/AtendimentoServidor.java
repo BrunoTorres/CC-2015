@@ -16,13 +16,15 @@ public class AtendimentoServidor extends Thread {
     public static final int IP = 30;
     public static final int PORTA = 31;
     public static final int REGISTASV = 32;
-    public static final int REGISTADESAFIO = 33;
+    public static final int REQUESTDESAFIO = 33;
     public static final int LISTADESAFIOS = 34;
     public static final int ACEITADESAFIO = 35;
     public static final int RESULTADOS = 36;
     public static final int RANKINGLOCAL = 37;
     public static final int REGISTASVSEMRESPOSTA = 38;
     public static final int LISTADESVS = 39;
+    public static final int DESAFIO = 40;
+    
 
     private BD bd;
     private int portaTCP; // EEUUUUUUU

@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 class BD implements Serializable {
-
+    private int port;
     private HashMap<String, Utilizador> users; /// syc
     private HashMap<String, Integer> rankingLocal;     /// syc
     private HashMap<String, Integer> rankingGlobal;     /// syc
@@ -220,6 +220,12 @@ class BD implements Serializable {
             return us;
         }
     }
+    public void setPorta(int porta){
+        this.port=porta;
+    }
+    public int getPorta(){
+        return this.port;
+    }
 
     public synchronized void updateUser(String alcunha, InetAddress add, int port) {
         this.users.get(alcunha).setIp(add);
@@ -272,9 +278,7 @@ class BD implements Serializable {
     }
 
     public synchronized void  addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
-        for(String s: des.keySet()){
-            this.desafiosGlobais.put(s, des.get(s));
-        }
+        
     }
 
     public synchronized void addRankingGlobal(HashMap<String, Integer> rank) {
@@ -286,5 +290,23 @@ class BD implements Serializable {
             else
                 this.rankingGlobal.put(s,rank.get(s));
         }
+    }
+
+    public synchronized void addDesafiosGlobais(HashMap<String, LocalDateTime> des, InetAddress byName, int porta) {
+        HashMap<InetAddress,Integer>aux= new HashMap<>();
+        aux.put(byName, porta);
+        for(String s: des.keySet()){
+            this.listaDesafiosServidores.put(s,aux);
+            this.desafiosGlobais.put(s, des.get(s));
+        }
+        
+    }
+
+    public synchronized HashMap<InetAddress, Integer> getDesafioByIp(String desafio) {
+        return this.listaDesafiosServidores.get(desafio);
+    }
+
+    public synchronized void  addDesafioGlobal(String desafio, LocalDateTime data) {
+        this.desafiosGlobais.put(desafio, data);
     }
 }

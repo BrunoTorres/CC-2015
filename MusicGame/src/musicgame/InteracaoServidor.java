@@ -79,6 +79,9 @@ public class InteracaoServidor extends Thread {
                        LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
                         this.bd.addDesafioGlobal(desafio,data);
                         break;
+                    case AtendimentoServidor.RANKINGLOCAL:
+                        adicionaRanking();
+                        break;
 
                    // case AtendimentoServidor.REGISTADESAFIO:  
                     //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
@@ -231,5 +234,7 @@ public class InteracaoServidor extends Thread {
         out.writeObject(f);
         out.flush();
     }
+
+   
 
 }

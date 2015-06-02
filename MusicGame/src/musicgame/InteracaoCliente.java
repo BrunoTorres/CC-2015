@@ -258,6 +258,7 @@ public class InteracaoCliente extends Thread {
                 resposta.addCampo(des);
                 //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
+                
 
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
                 //*************************************************************************//
@@ -271,6 +272,12 @@ public class InteracaoCliente extends Thread {
                 //System.out.println("responder");
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
             }
+            try {
+                sendRankinLocal();  ///////////////////////////////############################################################################
+            } catch (IOException ex) {
+                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
     }
 
@@ -738,8 +745,11 @@ public class InteracaoCliente extends Thread {
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
                 out.flush();
+                conhecidos.close();
             }
+            
         }
+        
     }
 
     /*   
@@ -768,4 +778,23 @@ public class InteracaoCliente extends Thread {
      }
      }
      */
+
+    private void sendRankinLocal() throws IOException {
+        for (InetAddress i : this.bd.getServidores().keySet()) {
+            int portaSV = this.bd.getServidores().get(i);
+            try (Socket conhecidos = new Socket(i, portaSV)) {
+                PDU res = new PDU(0, AtendimentoServidor.INFO);
+                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
+                res.addCampo(c);
+                
+
+                ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
+                out.writeObject(res);
+                out.flush();
+                out.writeObject(this.bd.getRankingLocal());
+                out.flush();
+                conhecidos.close();
+            }
+        }
+    }
 }

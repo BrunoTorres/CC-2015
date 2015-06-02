@@ -2,15 +2,20 @@ package musicgame;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -92,9 +97,6 @@ public class InteracaoCliente extends Thread {
         byte[] tl = {data[2], data[3]};
         System.out.println("Opcao:" + data[4]);
         switch (data[4]) {
-            case 0:
-                System.out.println("Reply");
-                break;
             case 1:
                 s = PDU.byteArrayToInt(tl);
                 reply = new PDU(s, (byte) 0);
@@ -147,7 +149,18 @@ public class InteracaoCliente extends Thread {
                 c = new Campo(OK, PDU.intToByteArray(0));
                 reply.addCampo(c);
                 PDU p = new PDU(data);
-                Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
+                //Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
+                String desafio = new String(p.getCampo(0).getValor());
+                if (!this.bd.getDesafiosLocais().containsKey(desafio)) {
+                    try {
+                        requestDesafio(desafio);
+
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                Desafio d = bd.getDesafio(desafio);
                 d.addUser(this.bd.getUserByIP(add), tl);
                 responde(reply, add, port);
                 this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
@@ -245,10 +258,27 @@ public class InteracaoCliente extends Thread {
             for (Utilizador uaux : utili) {
                 PDU resposta = new PDU(s, (byte) 0);
                 resposta.addCampo(des);
-              //  System.out.println("Por cada jogador  vou atualizar ranking");
+                //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
+                
+                
+                
+                
+                
+                
+                
+                //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
+                
+                //*************************************************************************//
+                
+                
+                
+                
+                
+                
+                
                 for (Utilizador u : utili) {
-                //    System.out.println("mandar um jogador");
+                    //    System.out.println("mandar um jogador");
                     c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
                     resposta.addCampo(c);
                     c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
@@ -458,6 +488,13 @@ public class InteracaoCliente extends Thread {
             reply.addCampo(hor);
             responde(reply, add, port);
             this.bd.updateUser(u.getAlcunha(), add, port);
+
+            try {
+                sendInfoDesafio(d);
+            } catch (IOException ex) {
+                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             Jogo j;
             j = new Jogo(this.bd.getUserByIP(add), tempo, d, this.bd, 1, true);
             j.start();
@@ -611,7 +648,102 @@ public class InteracaoCliente extends Thread {
         String des = new String(pacote.getCampo(0).getValor());
         Desafio d = this.bd.getDesafio(des);
         d.setStatus(true);
-        
+
     }
+
+    // Faz um pedido para ser enviado um desafio nao existente na base de dados local e recebe as imagens e musicas correspondentes.
+    private void requestDesafio(String desafio) throws IOException, ClassNotFoundException {
+        PDU res = new PDU(0, AtendimentoServidor.INFO);
+        Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio.getBytes());
+        res.addCampo(c);
+        c = new Campo(MusicClient.DESAFIO, desafio.getBytes());
+        res.addCampo(c);
+
+        HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
+        Socket serv = new Socket();
+
+        for (InetAddress i : servidor.keySet()) {
+            serv = new Socket(i, servidor.get(i));
+            break;
+        }
+
+        ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
+        out.writeObject(res);
+        out.flush();
+
+        ServerSocket ss = new ServerSocket(this.bd.getPorta());
+        Socket s = ss.accept();
+        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+        Desafio d = (Desafio) in.readObject();
+
+        for (int i = 0; i < d.getQuestoes().size(); i++) {
+            res = new PDU(0, AtendimentoServidor.INFO);
+            c = new Campo(MusicClient.QUESTAO, PDU.intToByteArray(i));
+            res.addCampo(c);
+            c = new Campo(AtendimentoServidor.DESAFIO, d.getNome().getBytes());
+            res.addCampo(c);
+            out.writeObject(res);
+            out.flush();
+
+            File imagem = (File) in.readObject();
+            File audio = (File) in.readObject();
+
+            d.getQuestoes().get(i).setImagem(imagem.getPath());
+            d.getQuestoes().get(i).setMusica(audio.getPath());
+        }
+        serv.close();  //////////////////*********************************** 
+        this.bd.addDesafio(d);
+
+    }
+    //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 
+    private void sendInfoDesafio(Desafio d) throws IOException {
+
+        for (InetAddress i : this.bd.getServidores().keySet()) {
+            int portaSV = this.bd.getServidores().get(i);
+            try (Socket conhecidos = new Socket(i, portaSV)) {
+                PDU res = new PDU(0, AtendimentoServidor.INFO);
+                Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome().getBytes());
+                res.addCampo(c);
+                c = new Campo(MusicClient.DATA, d.getData());
+                res.addCampo(c);
+                c= new Campo(MusicClient.HORA, d.getTempo());
+                res.addCampo(c);
+                
+                ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
+                out.writeObject(res);
+                out.flush();
+            }
+        }
+    }
+    
+    
+    
+    
+    /*   
+     private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
+     ServerSocket ss = new ServerSocket(this.bd.getPorta());
+     Socket s2 = ss.accept();
+     ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+     PDU res;
+     Campo c;
+     Desafio d =(Desafio) in2.readObject();
+        
+     for(int i=0;i<d.getQuestoes().size();i++){
+     res = new PDU(0, AtendimentoServidor.INFO);
+     c = new Campo(MusicClient.DESAFIO,d.getNome().getBytes());
+     res.addCampo(c);
+     c = new Campo(MusicClient.QUESTAO,PDU.intToByteArray(i));
+     res.addCampo(c);
+     out.writeObject(res);
+     out.flush(); 
+            
+     File imagem =(File)in.readObject();
+     File audio = (File)in.readObject();
+        
+     d.getQuestoes().get(i).setImagem(imagem.getPath());
+     d.getQuestoes().get(i).setMusica(audio.getPath());
+     }
+     }
+     */
 
 }

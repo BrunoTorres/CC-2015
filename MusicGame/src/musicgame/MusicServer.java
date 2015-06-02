@@ -34,6 +34,7 @@ class MusicServer {
         portaUDP = ler.nextInt();
         System.out.println("Porta TCP para escuta:");
         portaTCP = ler.nextInt();
+        bd.setPorta(portaTCP);
 
         String sv;
         System.out.println("Servidor secundário? Se sim introduza o IP, caso contrário insira 0");

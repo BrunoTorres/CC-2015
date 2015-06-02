@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -260,23 +258,9 @@ public class InteracaoCliente extends Thread {
                 resposta.addCampo(des);
                 //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
-                
-                
-                
-                
-                
-                
-                
+
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
-                
                 //*************************************************************************//
-                
-                
-                
-                
-                
-                
-                
                 for (Utilizador u : utili) {
                     //    System.out.println("mandar um jogador");
                     c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
@@ -358,11 +342,14 @@ public class InteracaoCliente extends Thread {
     private void listaDesafios(byte[] data, InetAddress add, int port) throws IOException {
         ArrayList<Desafio> desafios = bd.getDesafios();
         ArrayList<Desafio> desafiosAenviar = new ArrayList<>();
+        HashMap<String, LocalDateTime> dGlobais = (HashMap<String, LocalDateTime>) bd.getDesafiosGlobais();
+
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
+        int tamGlobais = dGlobais.size();
         PDU reply;
         Campo c, da, h, f;
-        int tam = desafios.size();
+        int tam = desafios.size() + tamGlobais;
         int t = 0;
         if (tam > 0) {
             for (Desafio d : desafios) {
@@ -370,7 +357,7 @@ public class InteracaoCliente extends Thread {
                     desafiosAenviar.add(d);
                 }
             }
-            tam = desafiosAenviar.size();
+            tam = desafiosAenviar.size() + tamGlobais;
 
             if (tam > 0) {
                 for (Desafio d : desafiosAenviar) {
@@ -389,7 +376,44 @@ public class InteracaoCliente extends Thread {
                     }
                     responde(reply, add, port);
 
+                }/****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
+                for (String desafio : dGlobais.keySet()) {
+                    t++;
+                    reply = new PDU(s, (byte) 0);
+                    c = new Campo(DESAFIO, desafio.getBytes());
+                    reply.addCampo(c);
+                    int aux = dGlobais.get(desafio).getYear() % 100;
+                    int pri = aux / 10;
+                    int sec = aux % 10;
+                    BigInteger anoAux = BigInteger.valueOf(dGlobais.get(desafio).getYear());
+                    byte[] anoBytes = anoAux.toByteArray();
+                    byte[] anoF;
+                    if (anoBytes.length < 3) {
+                        anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
+                    } else {
+                        anoF = anoBytes;
+                    }
+                    byte mes = (byte) dGlobais.get(desafio).getMonthValue();
+                    byte dia = (byte) dGlobais.get(desafio).getDayOfMonth();
+                    byte hora = (byte) dGlobais.get(desafio).getHour();
+                    byte minuto = (byte) dGlobais.get(desafio).getMinute();
+                    byte segundo = (byte) dGlobais.get(desafio).getSecond();
+                    Desafio desafioGlobal = new Desafio(desafio, null, anoF, mes, dia, hora, minuto, segundo);
+
+                    c = new Campo(DESAFIO, desafioGlobal.getNome().getBytes());
+                    reply.addCampo(c);
+                    da = new Campo(DATA, desafioGlobal.getData());
+                    reply.addCampo(da);
+                    h = new Campo(HORA, desafioGlobal.getTempo());
+                    reply.addCampo(h);
+                    if (t < tam) {
+                        f = new Campo(CONTINUA, "0".getBytes());
+                        reply.addCampo(f);
+                    }
+                    responde(reply, add, port);
+
                 }
+
             } else {
                 reply = new PDU(s, (byte) 0);
                 c = new Campo(ERRO, "Zero desafios".getBytes());
@@ -695,7 +719,9 @@ public class InteracaoCliente extends Thread {
         this.bd.addDesafio(d);
 
     }
+
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 
+
     private void sendInfoDesafio(Desafio d) throws IOException {
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
@@ -706,19 +732,16 @@ public class InteracaoCliente extends Thread {
                 res.addCampo(c);
                 c = new Campo(MusicClient.DATA, d.getData());
                 res.addCampo(c);
-                c= new Campo(MusicClient.HORA, d.getTempo());
+                c = new Campo(MusicClient.HORA, d.getTempo());
                 res.addCampo(c);
-                
+
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
                 out.flush();
             }
         }
     }
-    
-    
-    
-    
+
     /*   
      private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
      ServerSocket ss = new ServerSocket(this.bd.getPorta());
@@ -745,5 +768,4 @@ public class InteracaoCliente extends Thread {
      }
      }
      */
-
 }

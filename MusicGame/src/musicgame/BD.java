@@ -53,7 +53,13 @@ class BD implements Serializable {
     }
     
     public Map<String, LocalDateTime> getDesafiosGlobais(){
-        return this.desafiosGlobais;
+        LocalDateTime agora = LocalDateTime.now();
+        HashMap<String, LocalDateTime> aux= new HashMap<>();
+        for(String s : this.desafiosGlobais.keySet()){
+            if(this.desafiosGlobais.get(s).isAfter(agora))
+                aux.put(s,this.desafiosGlobais.get(s));
+        }
+        return aux;
     }
     
     public Map<String, Integer> getRankingGlobal(){

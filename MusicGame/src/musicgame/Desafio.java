@@ -23,6 +23,7 @@ import javafx.beans.property.StringProperty;
 public class Desafio implements Serializable {
 
     private String nome;
+    private boolean comecou;
     private ArrayList<Pergunta> questoes;
     private HashMap<String, Utilizador> users;
     private HashMap<String, byte[]> labels;
@@ -56,6 +57,7 @@ public class Desafio implements Serializable {
         this.questoes = new ArrayList<>();
         this.usersEnd = new HashMap<>();
         this.status=false;
+        this.comecou=false;
         
         this.dataString = new SimpleStringProperty();
         this.horaString = new SimpleStringProperty();
@@ -81,6 +83,15 @@ public class Desafio implements Serializable {
     public boolean getStatus() {
         return status;
     }
+
+    public boolean getComecou() {
+        return comecou;
+    }
+
+    public void setComecou(boolean comecou) {
+        this.comecou = comecou;
+    }
+    
 
     public void setStatus(boolean status) {
         this.status = status;

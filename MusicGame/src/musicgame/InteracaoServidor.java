@@ -35,59 +35,57 @@ public class InteracaoServidor extends Thread {
             this.out = new ObjectOutputStream(s.getOutputStream());
             PDU input;
 
-            while (true) {
+            input = (PDU) in.readObject();
+            int op = input.getCampo(0).getId();
 
-                input = (PDU) in.readObject();
-                int op = input.getCampo(0).getId();
+            switch (op) {
+                case AtendimentoServidor.REGISTASV:
+                    registaServidor(input);
+                    break;
 
-                switch (op) {
-                    case AtendimentoServidor.REGISTASV:
-                        registaServidor(input);
-                        break;
+                case AtendimentoServidor.REGISTASVSEMRESPOSTA:
+                    adicionaSVLocal(input);
+                    break;
 
-                    case AtendimentoServidor.REGISTASVSEMRESPOSTA:
-                        adicionaSVLocal(input);
-                        break;
+                case AtendimentoServidor.LISTADESVS:
+                    adicionaSVLocal();
+                    break;
+                case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
+                    String desafio = new String(input.getCampo(1).getValor());
+                    BigInteger bg = new BigInteger(input.getCampo(0).getValor());
+                    int pergunta = bg.intValue();
+                    sendImage(desafio, pergunta);
+                    sendAudio(desafio, pergunta);
+                    break;
 
-                    case AtendimentoServidor.LISTADESVS:
-                        adicionaSVLocal();
-                        break;
-                    case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
-                        String desafio = new String(input.getCampo(1).getValor());
-                        BigInteger bg = new BigInteger(input.getCampo(0).getValor());
-                        int pergunta = bg.intValue();
-                        sendImage(desafio, pergunta);
-                        sendAudio(desafio, pergunta);
-                        break;
-                        
-                    case AtendimentoServidor.REQUESTDESAFIO:
-                        desafio = new String(input.getCampo(0).getValor());
-                        sendDesafio(desafio);
-                        break;
-                        
-                    case AtendimentoServidor.DESAFIO:
-                        desafio = new String(input.getCampo(0).getValor());
-                        byte[] b = input.getCampo(1).getValor();
-                        byte[] ano = {b[0], b[1], b[2]};
-                        byte mes = b[3];
-                        byte dia = b[4];
-                        b = input.getCampo(2).getValor();
-                        byte hora = b[0];
-                        byte min = b[1];
-                        byte seg = b[2];
-                        int anos=new BigInteger(ano).intValue();
-                       LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
-                        this.bd.addDesafioGlobal(desafio,data);
-                        break;
-                    case AtendimentoServidor.RANKINGLOCAL:
-                        adicionaRanking();
-                        break;
+                case AtendimentoServidor.REQUESTDESAFIO:
+                    desafio = new String(input.getCampo(0).getValor());
+                    sendDesafio(desafio);
+                    break;
+
+                case AtendimentoServidor.DESAFIO:
+                    desafio = new String(input.getCampo(0).getValor());
+                    byte[] b = input.getCampo(1).getValor();
+                    byte[] ano = {b[0], b[1], b[2]};
+                    byte mes = b[3];
+                    byte dia = b[4];
+                    b = input.getCampo(2).getValor();
+                    byte hora = b[0];
+                    byte min = b[1];
+                    byte seg = b[2];
+                    int anos = new BigInteger(ano).intValue();
+                    LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
+                    this.bd.addDesafioGlobal(desafio, data);
+                    break;
+                case AtendimentoServidor.RANKINGLOCAL:
+                    adicionaRanking();
+                    break;
 
                    // case AtendimentoServidor.REGISTADESAFIO:  
-                    //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
-                    //     break;
+                //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
+                //     break;
                 }
-            }
+
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -105,7 +103,7 @@ public class InteracaoServidor extends Thread {
         //Socket serv = new Socket(InetAddress.getByName(ip), porta);
 
         Campo c;
-          //                                                    falta info antes de enviar objecto?!
+        //                                                    falta info antes de enviar objecto?!
         // out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(this.bd.getServidores());
         out.flush();
@@ -220,7 +218,7 @@ public class InteracaoServidor extends Thread {
         Desafio d = this.bd.getDesafio(desafio);
         out.writeObject(d);
         out.flush();
-     
+
     }
 
     private void sendImage(String desafio, int pergunta) throws IOException {
@@ -234,7 +232,5 @@ public class InteracaoServidor extends Thread {
         out.writeObject(f);
         out.flush();
     }
-
-   
 
 }

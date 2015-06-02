@@ -79,8 +79,8 @@ public class Jogo extends Thread {
                 }
             }
             if (this.desafio.getStatus() == false) {
-                this.desafio.setStatus(true);
-                if (this.desafio.getUsers().size() < 2) {
+                if (this.desafio.getUsers().size() < 2 && this.desafio.getComecou()==false) {
+                    System.out.println("Numero insuficiente");
                     Utilizador us = this.u;
 
                     PDU reply;
@@ -90,6 +90,7 @@ public class Jogo extends Thread {
                     responde(reply, us.getIp(), us.getPort());
                 } else {
                     this.desafio = this.bd.getDesafio(this.desafio.getNome());
+                    this.desafio.setComecou(true);
 
                     if (this.desafio.getUsers().containsKey(u.getAlcunha())) {
                         if (numQuestao == 1) {
@@ -117,10 +118,10 @@ public class Jogo extends Thread {
                         }
                         responde(resposta, u.getIp(), u.getPort());
                         ////////////////// END REPLY //////////////////
-                        //System.out.println("vai enviar imagem");
+                        System.out.println("vai enviar imagem");
                         sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
 
-                        //System.out.println("vai enviar musica");
+                        System.out.println("vai enviar musica");
                         sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
                     }
                 }

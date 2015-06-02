@@ -1,12 +1,13 @@
 package musicgame;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Bruno Pereira
  */
-public class PDU {
+public class PDU implements Serializable{
 
     private byte ver;
     private byte seg;

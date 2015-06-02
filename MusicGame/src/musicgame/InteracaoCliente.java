@@ -235,16 +235,15 @@ public class InteracaoCliente extends Thread {
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         Campo c;
-
         Utilizador user = bd.getUserByIP(add);
-
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         d.addUserEnd(user);
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
             //System.out.println("Não faço nada SOU O USER: "+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
-        } else {
+        } else {            
+            d.setStatus(true);
             //System.out.println("Faço alguma coisa porque sou o ultimo sou o use:"+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
             for (Utilizador u : d.getUserEnd().values()) {
@@ -486,7 +485,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(10);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(35);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;

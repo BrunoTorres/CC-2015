@@ -85,7 +85,7 @@ public class MusicClient {
         System.out.println("Atualizou para a opcao: " + id);
         clientSocket = new DatagramSocket();
         //IPAddress = InetAddress.getByName("192.168.1.79");
-        IPAddress = InetAddress.getByName("172.26.7.192");
+        IPAddress = InetAddress.getByName("192.168.173.1");
         //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
@@ -97,7 +97,7 @@ public class MusicClient {
             }
         }
         data = packet.getBytes();
-        sendPacket = new DatagramPacket(data, data.length, IPAddress, 55555);
+        sendPacket = new DatagramPacket(data, data.length, IPAddress, 55000);
         clientSocket.send(sendPacket);
         label++;
 

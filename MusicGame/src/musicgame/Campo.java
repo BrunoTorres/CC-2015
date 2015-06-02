@@ -1,5 +1,6 @@
 package musicgame;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -7,7 +8,7 @@ import java.util.Objects;
  * 
  * @author Bruno Pereira
  */
-public class Campo {
+public class Campo implements Serializable{
     
     private int id;
     private byte[] size;

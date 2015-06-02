@@ -12,7 +12,8 @@ public class AtendimentoCliente extends Thread {
     private BD bd;
     private int portaUDP;
     
-    public AtendimentoCliente(BD bd, int porta){
+    public AtendimentoCliente(BD bd, int porta){        
+        System.out.println("Construtor atenCliente");
         this.bd = bd;
         this.portaUDP = porta;
     }

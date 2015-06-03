@@ -19,26 +19,30 @@ public class InteracaoServidor extends Thread {
     private BD bd;
     private String sExterno;
     private int portaExterna;
+    private int portaTCP;
     private Socket s;
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public InteracaoServidor(BD bd, String externo,int portaExterna ) {
+    public InteracaoServidor(BD bd, String externo,int portaExterna,int portaTCP ) {
         this.bd = bd;
         this.sExterno = externo;
         this.portaExterna=portaExterna;
+        this.portaTCP=portaTCP;
     }
 
     @Override
     public void run() {
 
-        try {
-           this.s= new Socket(InetAddress.getByName(sExterno), portaExterna);
-            this.in = new ObjectInputStream(s.getInputStream());
-            this.out = new ObjectOutputStream(s.getOutputStream());
+        try {if(sExterno!=null){
+                this.s= new Socket(InetAddress.getByName(sExterno), portaExterna);
+                this.in = new ObjectInputStream(s.getInputStream());
+                this.out = new ObjectOutputStream(s.getOutputStream());
+        }
             PDU input;
-
+            ServerSocket ss = new ServerSocket(this.portaTCP);
+            this.s = ss.accept();
             input = (PDU) in.readObject();
             int op = input.getCampo(0).getIdTcp();
 

@@ -55,18 +55,16 @@ public class AtendimentoServidor extends Thread {
                 registaServidor();
             }
             
-            try {
-                ServerSocket ss = new ServerSocket(this.portaTCP);
+            
+                //ServerSocket ss = new ServerSocket(this.portaTCP);
                 while (true) {
 
-                    this.s = ss.accept();
-                    InteracaoServidor is = new InteracaoServidor(bd,this.ipServer,this.portaTCP2);
+                    //this.s = ss.accept();
+                    InteracaoServidor is = new InteracaoServidor(bd,this.ipServer,this.portaTCP2,this.portaTCP);
                     is.start();
                     
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
-            }
+               
+            } 
 
         } catch (UnknownHostException ex) {
             Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,6 +75,7 @@ public class AtendimentoServidor extends Thread {
     }
 
     public void registaServidor() throws UnknownHostException, IOException {
+        this.s = new Socket(InetAddress.getByName(ipServer), portaTCP2);
         PDU p = new PDU(0, INFO);
         Campo c = new Campo(REGISTASV, new byte[]{(byte)0});
         System.out.println("CAMPO "+ c.getIdTcp());
@@ -98,5 +97,6 @@ public class AtendimentoServidor extends Thread {
         o = new ObjectOutputStream(this.s.getOutputStream());
         o.writeObject(p);
         o.flush();
+        s.close();
     }
 }

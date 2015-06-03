@@ -92,7 +92,7 @@ public class InteracaoServidor extends Thread {
                     this.bd.addDesafioGlobal(desafio, des.getLocalDate());
                     this.bd.addDesafio(des);
                     System.out.println("ORA$$$$$$$$$$$$ ip para guardar no desafio= "+ ip);
-                    this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip,porta);
+                    this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), this.s);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     adicionaRanking();

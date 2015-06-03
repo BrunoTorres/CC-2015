@@ -39,13 +39,13 @@ public class AtendimentoServidor extends Thread {
         this.ipServer = null;
     }
 
-    public AtendimentoServidor(BD bd, int porta, String externo, int porta2) throws IOException {
+    public AtendimentoServidor(BD bd, int porta, String sv, int porta2) throws IOException {
         this.bd = bd;
         this.portaTCP = porta;
-        this.ipServer = externo;
+        this.ipServer = sv;
         this.portaTCP2 = porta2;
         
-       // this.s = new Socket(InetAddress.getByName(sv), porta2);
+        this.s = new Socket(InetAddress.getByName(sv), porta2);
     }
 
     @Override
@@ -55,16 +55,19 @@ public class AtendimentoServidor extends Thread {
                 registaServidor();
             }
             
-            
-                //ServerSocket ss = new ServerSocket(this.portaTCP);
+            try {
+                ServerSocket ss = new ServerSocket(this.portaTCP);
                 while (true) {
 
-                    //this.s = ss.accept();
-                    InteracaoServidor is = new InteracaoServidor(bd,this.ipServer,this.portaTCP2,this.portaTCP);
+                    this.s = ss.accept();
+                    InteracaoServidor is = new InteracaoServidor(bd, this.s);
                     is.start();
-                    
-               
-            } 
+                    this.s.close();
+                    ss.close();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         } catch (UnknownHostException ex) {
             Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -75,7 +78,6 @@ public class AtendimentoServidor extends Thread {
     }
 
     public void registaServidor() throws UnknownHostException, IOException {
-        this.s = new Socket(InetAddress.getByName(ipServer), portaTCP2);
         PDU p = new PDU(0, INFO);
         Campo c = new Campo(REGISTASV, new byte[]{(byte)0});
         System.out.println("CAMPO "+ c.getIdTcp());
@@ -90,13 +92,10 @@ public class AtendimentoServidor extends Thread {
         p.addCampoTcp(c);
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
-        System.out.println(" ipppp = "+ InetAddress.getByName(ipServer));
-        System.out.println("bd registsa= "+ bd.getServidores().get(InetAddress.getByName(ipServer)));
 
         ObjectOutputStream o;
         o = new ObjectOutputStream(this.s.getOutputStream());
         o.writeObject(p);
         o.flush();
-        s.close();
     }
 }

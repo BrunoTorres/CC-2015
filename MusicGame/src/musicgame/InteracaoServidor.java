@@ -17,32 +17,24 @@ import java.util.logging.Logger;
 public class InteracaoServidor extends Thread {
 
     private BD bd;
-    private String sExterno;
-    private int portaExterna;
-    private int portaTCP;
     private Socket s;
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public InteracaoServidor(BD bd, String externo,int portaExterna,int portaTCP ) {
+    public InteracaoServidor(BD bd, Socket s) {
         this.bd = bd;
-        this.sExterno = externo;
-        this.portaExterna=portaExterna;
-        this.portaTCP=portaTCP;
+        this.s = s;
     }
 
     @Override
     public void run() {
 
-        try {if(sExterno!=null){
-                this.s= new Socket(InetAddress.getByName(sExterno), portaExterna);
-                this.in = new ObjectInputStream(s.getInputStream());
-                this.out = new ObjectOutputStream(s.getOutputStream());
-        }
+        try {
+            this.in = new ObjectInputStream(s.getInputStream());
+            this.out = new ObjectOutputStream(s.getOutputStream());
             PDU input;
-            ServerSocket ss = new ServerSocket(this.portaTCP);
-            this.s = ss.accept();
+
             input = (PDU) in.readObject();
             int op = input.getCampo(0).getIdTcp();
 
@@ -110,7 +102,6 @@ public class InteracaoServidor extends Thread {
                 //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
                 //     break;
                 }
-            s.close();
 
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -162,7 +153,6 @@ public class InteracaoServidor extends Thread {
 
 // novo servidor adiciona lista de svs que o principal conhece
     private void adicionaSVLocal() throws IOException, ClassNotFoundException {
-        
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());

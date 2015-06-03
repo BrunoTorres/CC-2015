@@ -42,19 +42,16 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.REGISTASV:
                     System.out.println("Regista");
                     registaServidor(input);
-                    s.close();
                     break;
 
                 case AtendimentoServidor.REGISTASVSEMRESPOSTA:
                     System.out.println("registasemresposta");
                     adicionaSVLocal(input);
-                    s.close();
                     break;
 
                 case AtendimentoServidor.LISTADESVS:
                     System.out.println("ListaDesafios");
                     adicionaSVLocal();
-                    s.close();
                     break;
                 case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
                     System.out.println("send ficheiros");
@@ -64,7 +61,6 @@ public class InteracaoServidor extends Thread {
                     int pergunta = Integer.valueOf(input.getCampo(0).getValue());
                     sendImage(desafio, pergunta);
                     sendAudio(desafio, pergunta);
-                    s.close();
                     break;
 
                 case AtendimentoServidor.REQUESTDESAFIO:
@@ -72,7 +68,6 @@ public class InteracaoServidor extends Thread {
                     desafio = input.getCampo(0).getValue();
                     System.out.println("DESAFIO PEDIDO = "+ desafio);
                     sendDesafio(desafio);
-                    s.close();
                     break;
 
                 case AtendimentoServidor.DESAFIO:
@@ -80,7 +75,6 @@ public class InteracaoServidor extends Thread {
                     desafio = input.getCampo(0).getValue();
                     InetAddress ip=input.getCampo(1).getIP();
                     int porta= Integer.valueOf(input.getCampo(2).getValue());
-                    s.close();
                     /*
                     byte[] b = input.getCampo(1).getValor();
                     byte[] ano = {b[0], b[1], b[2]};
@@ -99,18 +93,15 @@ public class InteracaoServidor extends Thread {
                     this.bd.addDesafio(des);
                     System.out.println("ORA$$$$$$$$$$$$ ip para guardar no desafio= "+ ip);
                     this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip,porta);
-                    s.close();
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     adicionaRanking();
-                    s.close();
                     break;
 
                    // case AtendimentoServidor.REGISTADESAFIO:  
                 //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
                 //     break;´
                 }
-            
 
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);

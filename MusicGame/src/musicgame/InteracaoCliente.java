@@ -666,17 +666,26 @@ public class InteracaoCliente extends Thread {
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
 
-        Socket s = this.bd.getDesafioByIp(desafio);
+        HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
         System.out.println("vai imprimir o ip dos servidores");
+        Socket serv = new Socket();
 
+        for (InetAddress i : servidor.keySet()) {
+            System.out.println("ip = "+ i);
+            System.out.println("Porta = "+ servidor.get(i));
+            serv = new Socket(i, servidor.get(i));
+            System.out.println("IP PARA SER PEDIDO = " +i);
+            break;
+        }
 
-      
-
-        ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+        ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(res);
         out.flush();
         //serv.close();
-        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+        
+        ServerSocket ss = new ServerSocket(this.bd.getPorta());
+         serv = ss.accept();
+        ObjectInputStream in = new ObjectInputStream(serv.getInputStream());
         Desafio d = (Desafio) in.readObject();
         
      
@@ -743,7 +752,7 @@ public class InteracaoCliente extends Thread {
                 out.writeObject(d);
                 out.flush();
                 
-                //conhecidos.close();
+                conhecidos.close();
             }
             
         }
@@ -767,7 +776,7 @@ public class InteracaoCliente extends Thread {
                 out.flush();
                 out.writeObject(this.bd.getRankingLocal());
                 out.flush();
-               // conhecidos.close();
+                conhecidos.close();
             }
         }
     }

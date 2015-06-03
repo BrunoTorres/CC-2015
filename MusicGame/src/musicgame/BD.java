@@ -11,7 +11,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ class BD implements Serializable {
     private HashMap<String, Desafio> desafiosLocais; // syc
     private HashMap<String, LocalDateTime> desafiosGlobais; // syc
     
-    private HashMap<String, Socket> listaDesafiosServidores;
+    private HashMap<String, HashMap<InetAddress,Integer>> listaDesafiosServidores;
     
     private ArrayList<Pergunta> perguntas;
     private HashMap<InetAddress, Integer> servidores;
@@ -49,7 +48,7 @@ class BD implements Serializable {
         this.servidores = new HashMap<>();
         this.desafiosGlobais = new HashMap<>();
         this.rankingGlobal = new HashMap<>();
-        this.listaDesafiosServidores= new HashMap<String,Socket>();
+        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
         
     }
     public BD() {
@@ -62,7 +61,7 @@ class BD implements Serializable {
         this.servidores = new HashMap<>();
         this.desafiosGlobais = new HashMap<>();
         this.rankingGlobal = new HashMap<>();
-        this.listaDesafiosServidores= new HashMap<String, Socket>();
+        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
         
     }
     
@@ -312,15 +311,17 @@ class BD implements Serializable {
         }
     }
 
-    public synchronized void addDesafiosGlobais(String nomeDesafio, LocalDateTime data, Socket s) {
- 
-            this.listaDesafiosServidores.put(nomeDesafio,s);
+    public synchronized void addDesafiosGlobais(String nomeDesafio, LocalDateTime data, InetAddress byName, int porta) {
+        HashMap<InetAddress,Integer>aux= new HashMap<>();
+        aux.put(byName, porta);
+    
+            this.listaDesafiosServidores.put(nomeDesafio,aux);
             this.desafiosGlobais.put(nomeDesafio, data);
         
         
     }
 
-    public synchronized Socket getDesafioByIp(String desafio) {
+    public synchronized HashMap<InetAddress, Integer> getDesafioByIp(String desafio) {
         return this.listaDesafiosServidores.get(desafio);
     }
 

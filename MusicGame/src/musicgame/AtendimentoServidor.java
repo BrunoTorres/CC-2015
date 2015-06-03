@@ -82,7 +82,7 @@ public class AtendimentoServidor extends Thread {
         p.addCampoTcp(c);
         System.out.println("ip "+ InetAddress.getLocalHost());
         c = new Campo(IP, InetAddress.getLocalHost());
-        String ip = c.getValue();
+        InetAddress ip = c.getIP();
         System.out.println("IP "+ ip);
         p.addCampoTcp(c);
         //BigInteger bg = BigInteger.valueOf(portaTCP);
@@ -90,6 +90,8 @@ public class AtendimentoServidor extends Thread {
         p.addCampoTcp(c);
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
+        System.out.println(" ipppp = "+ InetAddress.getByName(ipServer));
+        System.out.println("bd registsa= "+ bd.getServidores().get(InetAddress.getByName(ipServer)));
 
         ObjectOutputStream o;
         o = new ObjectOutputStream(this.s.getOutputStream());

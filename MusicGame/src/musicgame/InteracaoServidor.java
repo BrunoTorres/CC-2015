@@ -66,6 +66,7 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.REQUESTDESAFIO:
                     System.out.println("envia desafio");
                     desafio = input.getCampo(0).getValue();
+                    System.out.println("DESAFIO PEDIDO = "+ desafio);
                     sendDesafio(desafio);
                     break;
 
@@ -118,7 +119,7 @@ public class InteracaoServidor extends Thread {
         out.writeObject(this.bd.getServidores());
         out.flush();
 
-        this.bd.registaServidor(ip, porta);
+        
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
@@ -136,6 +137,7 @@ public class InteracaoServidor extends Thread {
             out.writeObject(res);
             out.flush();
         }
+        this.bd.registaServidor(ip, porta);
 
 ///////////////////////////////////////TODOS
     }
@@ -184,6 +186,9 @@ public class InteracaoServidor extends Thread {
         InetAddress ip = p.getCampo(1).getIP();
         //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = Integer.valueOf(p.getCampo(2).getValue());
+        
+        System.out.println("adiciona sv local ip "+ ip + " Porta= "+ porta );
+        
         this.bd.getServidores().put(ip, porta);
         Socket server = new Socket(ip, porta);
         out = new ObjectOutputStream(server.getOutputStream());
@@ -227,6 +232,7 @@ public class InteracaoServidor extends Thread {
 
     private void sendDesafio(String desafio) throws IOException {
         Desafio d = this.bd.getDesafio(desafio);
+        System.out.println("DESAFIO A SER ENVIAD como o NOME = " + d.getNome());
         out.writeObject(d);
         out.flush();
         

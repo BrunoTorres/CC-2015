@@ -538,6 +538,8 @@ public class InteracaoCliente extends Thread {
             j.start();
         }
     }
+    
+    
 
     private void respostas(byte[] data, InetAddress add, int port) throws SocketException, UserInexistenteException {
         PDU pacote = new PDU(data);
@@ -693,6 +695,7 @@ public class InteracaoCliente extends Thread {
     private void requestDesafio(String desafio) throws IOException, ClassNotFoundException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio);
+        System.out.println("REQUEST DESAFIO ITERACAO CLIENTE = " + desafio);
         res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
@@ -702,6 +705,7 @@ public class InteracaoCliente extends Thread {
 
         for (InetAddress i : servidor.keySet()) {
             serv = new Socket(i, servidor.get(i));
+            System.out.println("IP PARA SER PEDIDO = " +i);
             break;
         }
 
@@ -747,10 +751,12 @@ public class InteracaoCliente extends Thread {
     private void sendInfoDesafio(Desafio d) throws IOException {
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
+            System.out.println("##############InetAddress= " + i.getHostName());
             int portaSV = this.bd.getServidores().get(i);
+            System.out.println("##############PORTA = "+ portaSV);
             try (Socket conhecidos = new Socket(i, portaSV)) {
-                 System.out.println("IP "+ i);
-                System.out.println("portaSV "+ portaSV);
+                 
+                
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
                 res.addCampoTcp(c);
@@ -760,6 +766,7 @@ public class InteracaoCliente extends Thread {
                 res.addCampoTcp(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
+                
                 out.writeObject(res);
                 out.flush();
                 conhecidos.close();
@@ -793,7 +800,7 @@ public class InteracaoCliente extends Thread {
 }
 
 /*   
-     private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
+             private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
      ServerSocket ss = new ServerSocket(this.bd.getPorta());
      Socket s2 = ss.accept();
      ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());

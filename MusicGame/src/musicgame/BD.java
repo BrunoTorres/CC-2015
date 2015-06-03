@@ -311,13 +311,13 @@ class BD implements Serializable {
         }
     }
 
-    public synchronized void addDesafiosGlobais(HashMap<String, LocalDateTime> des, InetAddress byName, int porta) {
+    public synchronized void addDesafiosGlobais(String nomeDesafio, LocalDateTime data, InetAddress byName, int porta) {
         HashMap<InetAddress,Integer>aux= new HashMap<>();
         aux.put(byName, porta);
-        for(String s: des.keySet()){
-            this.listaDesafiosServidores.put(s,aux);
-            this.desafiosGlobais.put(s, des.get(s));
-        }
+    
+            this.listaDesafiosServidores.put(nomeDesafio,aux);
+            this.desafiosGlobais.put(nomeDesafio, data);
+        
         
     }
 

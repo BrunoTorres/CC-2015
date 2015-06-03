@@ -728,7 +728,14 @@ public class InteracaoCliente extends Thread {
                 
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-                res.addCampoTcp(c);
+                 res.addCampoTcp(c);
+                c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
+                 res.addCampoTcp(c);
+                c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bd.getPorta()));
+                 res.addCampoTcp(c);
+                
+                
+               
                 /*
                 c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
                 System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());

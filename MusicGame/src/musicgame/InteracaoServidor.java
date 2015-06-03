@@ -73,6 +73,8 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.DESAFIO:
                     System.out.println("desafiooo");
                     desafio = input.getCampo(0).getValue();
+                    InetAddress ip=input.getCampo(1).getIP();
+                    int porta= Integer.valueOf(input.getCampo(2).getValue());
                     /*
                     byte[] b = input.getCampo(1).getValor();
                     byte[] ano = {b[0], b[1], b[2]};
@@ -89,6 +91,8 @@ public class InteracaoServidor extends Thread {
                     Desafio des=(Desafio)in.readObject();
                     this.bd.addDesafioGlobal(desafio, des.getLocalDate());
                     this.bd.addDesafio(des);
+                    System.out.println("ORA$$$$$$$$$$$$ ip para guardar no desafio= "+ ip);
+                    this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip,porta);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     adicionaRanking();
@@ -173,7 +177,7 @@ public class InteracaoServidor extends Thread {
 
         HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
 
-        this.bd.addDesafiosGlobais(des, ip, porta);
+       // this.bd.addDesafiosGlobais(des, ip, porta);
 
     }
 

@@ -51,6 +51,19 @@ class BD implements Serializable {
         this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
         
     }
+    public BD() {
+        this.pastaImagem = null;
+        this.perguntas = new ArrayList<>();
+        this.pastaMusica = null;
+        this.users = new HashMap<>();
+        this.desafiosLocais = new HashMap<>();
+        this.rankingLocal = new HashMap<>();
+        this.servidores = new HashMap<>();
+        this.desafiosGlobais = new HashMap<>();
+        this.rankingGlobal = new HashMap<>();
+        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
+        
+    }
     
     public Map<String, LocalDateTime> getDesafiosGlobais(){
         LocalDateTime agora = LocalDateTime.now();

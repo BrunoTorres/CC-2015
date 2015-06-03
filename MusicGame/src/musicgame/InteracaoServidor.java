@@ -36,35 +36,42 @@ public class InteracaoServidor extends Thread {
             PDU input;
 
             input = (PDU) in.readObject();
-            int op = input.getCampo(0).getId();
+            int op = input.getCampo(0).getIdTcp();
 
             switch (op) {
                 case AtendimentoServidor.REGISTASV:
+                    System.out.println("Regista");
                     registaServidor(input);
                     break;
 
                 case AtendimentoServidor.REGISTASVSEMRESPOSTA:
+                    System.out.println("registasemresposta");
                     adicionaSVLocal(input);
                     break;
 
                 case AtendimentoServidor.LISTADESVS:
+                    System.out.println("ListaDesafios");
                     adicionaSVLocal();
                     break;
                 case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
-                    String desafio = new String(input.getCampo(1).getValor());
-                    BigInteger bg = new BigInteger(input.getCampo(0).getValor());
-                    int pergunta = bg.intValue();
+                    System.out.println("send ficheiros");
+                    String desafio = input.getCampo(1).getValue();
+                    //BigInteger bg = new BigInteger(input.getCampo(0).getValor());
+                    //int pergunta = bg.intValue();
+                    int pergunta = Integer.valueOf(input.getCampo(0).getValue());
                     sendImage(desafio, pergunta);
                     sendAudio(desafio, pergunta);
                     break;
 
                 case AtendimentoServidor.REQUESTDESAFIO:
-                    desafio = new String(input.getCampo(0).getValor());
+                    System.out.println("envia desafio");
+                    desafio = input.getCampo(0).getValue();
                     sendDesafio(desafio);
                     break;
 
                 case AtendimentoServidor.DESAFIO:
-                    desafio = new String(input.getCampo(0).getValor());
+                    System.out.println("desafiooo");
+                    desafio = input.getCampo(0).getValue();
                     byte[] b = input.getCampo(1).getValor();
                     byte[] ano = {b[0], b[1], b[2]};
                     byte mes = b[3];
@@ -96,10 +103,13 @@ public class InteracaoServidor extends Thread {
 
     private void registaServidor(PDU p) throws IOException, ClassNotFoundException { // sv principal regista novo sv, devolve-lhe lista dos que conhece e envia aos que conhece
         // o novo sv
-        String ip = new String(p.getCampo(1).getBytes());
+        System.out.println("vou resgistar o servido que vem ");
+        InetAddress ip = p.getCampo(1).getIP();
         //ObjectOutputStream o;
-        BigInteger bg = new BigInteger(p.getCampo(2).getValor());
-        int porta = bg.intValue();
+        System.out.println("ip= "+ ip);
+        //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
+        //int porta = bg.intValue();´
+        int porta=Integer.valueOf(p.getCampo(2).getValue());
         //Socket serv = new Socket(InetAddress.getByName(ip), porta);
 
         Campo c;
@@ -108,19 +118,19 @@ public class InteracaoServidor extends Thread {
         out.writeObject(this.bd.getServidores());
         out.flush();
 
-        this.bd.registaServidor(InetAddress.getByName(ip), porta);
+        this.bd.registaServidor(ip, porta);
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             Socket conhecidos = new Socket(i, portaSV);
 
             PDU res = new PDU(0, AtendimentoServidor.INFO);
-            c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, new byte[]{0});
+            c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, "");
             res.addCampo(c);
-            c = new Campo(AtendimentoServidor.IP, ip.getBytes()); // SERÁ? ************************************************************
+            c = new Campo(AtendimentoServidor.IP, ip); // SERÁ? ************************************************************
             res.addCampo(c);
-            bg = BigInteger.valueOf(porta);
-            c = new Campo(AtendimentoServidor.PORTA, bg.toByteArray());
+            //bg = BigInteger.valueOf(porta);
+            c = new Campo(AtendimentoServidor.PORTA, String.valueOf(porta));
             res.addCampo(c);
             out = new ObjectOutputStream(conhecidos.getOutputStream());
             out.writeObject(res);
@@ -143,9 +153,10 @@ public class InteracaoServidor extends Thread {
 
     //RECEBE o lista de desafios pendentes GLOBAIS///////////////////////////////////////////////////////
     private void adicionaDesafios(PDU input) throws IOException, ClassNotFoundException {
-        String ip = new String(input.getCampo(1).getBytes());
-        BigInteger bg = new BigInteger(input.getCampo(2).getValor());
-        int porta = bg.intValue();
+        InetAddress ip = input.getCampo(1).getIP();
+        //BigInteger bg = new BigInteger(input.getCampo(2).getValor());
+        //int porta = bg.intValue();
+        int porta = Integer.valueOf(input.getCampo(2).getValue());
 
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
@@ -155,7 +166,7 @@ public class InteracaoServidor extends Thread {
 
         HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
 
-        this.bd.addDesafiosGlobais(des, InetAddress.getByName(ip), porta);
+        this.bd.addDesafiosGlobais(des, ip, porta);
 
     }
 
@@ -170,24 +181,24 @@ public class InteracaoServidor extends Thread {
     }
 
     private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
-        String ip = new String(p.getCampo(1).getBytes());
-        BigInteger bg = new BigInteger(p.getCampo(2).getValor());
-        int porta = bg.intValue();
-        this.bd.getServidores().put(InetAddress.getByName(ip), porta);
+        InetAddress ip = p.getCampo(1).getIP();
+        //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
+        int porta = Integer.valueOf(p.getCampo(2).getValue());
+        this.bd.getServidores().put(ip, porta);
         Socket server = new Socket(ip, porta);
         out = new ObjectOutputStream(server.getOutputStream());
-        sendListDesafios(ip, bg);
+        sendListDesafios(ip, porta);
         sendRanking();//
     }
 // envia primeiro info a avisar que vai a seguir um MAP de desafios
 
-    private void sendListDesafios(String ip, BigInteger bg) throws IOException {
+    private void sendListDesafios(InetAddress ip, int bg) throws IOException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
-        Campo c = new Campo(AtendimentoServidor.LISTADESAFIOS, new byte[]{0});
+        Campo c = new Campo(AtendimentoServidor.LISTADESAFIOS, "");
         res.addCampo(c);
-        c = new Campo(AtendimentoServidor.IP, ip.getBytes());
+        c = new Campo(AtendimentoServidor.IP, ip);
         res.addCampo(c);
-        c = new Campo(AtendimentoServidor.PORTA, bg.toByteArray());
+        c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bg));
         res.addCampo(c);
 
         out.writeObject(res);
@@ -203,7 +214,7 @@ public class InteracaoServidor extends Thread {
 
     private void sendRanking() throws IOException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
-        Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
+        Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, "");
         res.addCampo(c);
         out.writeObject(res);
         out.flush();
@@ -218,6 +229,8 @@ public class InteracaoServidor extends Thread {
         Desafio d = this.bd.getDesafio(desafio);
         out.writeObject(d);
         out.flush();
+        
+       
 
     }
 

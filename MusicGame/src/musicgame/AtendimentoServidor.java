@@ -51,8 +51,9 @@ public class AtendimentoServidor extends Thread {
     @Override
     public void run() {
         try {
-            if(ipServer != null)
+            if(ipServer != null){
                 registaServidor();
+            }
             
             try {
                 ServerSocket ss = new ServerSocket(this.portaTCP);
@@ -76,12 +77,16 @@ public class AtendimentoServidor extends Thread {
 
     public void registaServidor() throws UnknownHostException, IOException {
         PDU p = new PDU(0, INFO);
-        Campo c = new Campo(REGISTASV, new byte[] {0} );
+        Campo c = new Campo(REGISTASV, "" );
+        System.out.println("CAMPO "+ c.getIdTcp());
         p.addCampo(c);
-        c = new Campo(IP, InetAddress.getLocalHost().getAddress());
+        System.out.println("ip "+ InetAddress.getLocalHost());
+        c = new Campo(IP, InetAddress.getLocalHost());
+        String ip = c.getValue();
+        System.out.println("IP "+ ip);
         p.addCampo(c);
-        BigInteger bg = BigInteger.valueOf(portaTCP);
-        c = new Campo(PORTA, bg.toByteArray());
+        //BigInteger bg = BigInteger.valueOf(portaTCP);
+        c = new Campo(PORTA, String.valueOf(portaTCP));
         p.addCampo(c);
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);

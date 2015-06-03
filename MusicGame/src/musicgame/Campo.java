@@ -1,6 +1,7 @@
 package musicgame;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -13,6 +14,8 @@ public class Campo implements Serializable{
     private int id;
     private byte[] size;
     private byte[] valor;
+    private String value;
+    private InetAddress ip;
 
     public Campo(int id, byte[] valor) {
         this.id = id;
@@ -21,11 +24,31 @@ public class Campo implements Serializable{
         this.size = PDU.intToByteArray(valor.length);
     }
     
-     
+     public Campo(int id, String valor) {
+        this.id = id;
+        this.value = valor;   
+        
+    }
+       public Campo(int id, InetAddress ip) {
+        this.id = id;
+        this.ip = ip;   
+        
+    }
+     public int getIdTcp(){
+         return this.id;
+     }
+    
+     public String getValue(){
+         return this.value;
+     }
+     public InetAddress getIP(){
+         return this.ip;
+     }
 
     public int getId() {
         return id+128;
     }
+    
 
     public void setId(int id) {
         this.id = id;

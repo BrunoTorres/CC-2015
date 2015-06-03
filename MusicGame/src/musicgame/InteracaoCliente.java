@@ -1,6 +1,7 @@
 package musicgame;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -151,6 +152,7 @@ public class InteracaoCliente extends Thread {
                 String desafio = new String(p.getCampo(0).getValor());
                 if (!this.bd.getDesafiosLocais().containsKey(desafio)) {
                     try {
+                        System.out.println("######################################### Desafio"+desafio);
                         requestDesafio(desafio);
 
                     } catch (ClassNotFoundException ex) {
@@ -349,10 +351,15 @@ public class InteracaoCliente extends Thread {
         ArrayList<Desafio> desafios = bd.getDesafios();
         ArrayList<Desafio> desafiosAenviar = new ArrayList<>();
         HashMap<String, LocalDateTime> dGlobais = (HashMap<String, LocalDateTime>) bd.getDesafiosGlobais();
+        
+        
+       // System.out.println("##############################"+bd.getDesafiosLocais().get("desafio1"));
 
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
-        int tamGlobais = dGlobais.size();
+        int tamGlobais = dGlobais.size(); 
+        
+        System.out.println("DESAFIO TAMANHO " + tamGlobais);
         PDU reply;
         Campo c, da, h, f;
         int tam = desafios.size() + tamGlobais;
@@ -520,6 +527,7 @@ public class InteracaoCliente extends Thread {
             this.bd.updateUser(u.getAlcunha(), add, port);
 
             try {
+                System.out.println("##################### vou enviar info desafio"+d.getNome());
                 sendInfoDesafio(d);
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -684,9 +692,9 @@ public class InteracaoCliente extends Thread {
     // Faz um pedido para ser enviado um desafio nao existente na base de dados local e recebe as imagens e musicas correspondentes.
     private void requestDesafio(String desafio) throws IOException, ClassNotFoundException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
-        Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio.getBytes());
+        Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio);
         res.addCampo(c);
-        c = new Campo(MusicClient.DESAFIO, desafio.getBytes());
+        c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampo(c);
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
@@ -705,18 +713,26 @@ public class InteracaoCliente extends Thread {
         Socket s = ss.accept();
         ObjectInputStream in = new ObjectInputStream(s.getInputStream());
         Desafio d = (Desafio) in.readObject();
+        
+     
 
         for (int i = 0; i < d.getQuestoes().size(); i++) {
             res = new PDU(0, AtendimentoServidor.INFO);
-            c = new Campo(MusicClient.QUESTAO, PDU.intToByteArray(i));
+            c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
             res.addCampo(c);
-            c = new Campo(AtendimentoServidor.DESAFIO, d.getNome().getBytes());
+            c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
             res.addCampo(c);
             out.writeObject(res);
             out.flush();
 
             File imagem = (File) in.readObject();
+           
             File audio = (File) in.readObject();
+            
+            // File f = new File("i.jpg");
+            //FileOutputStream fos = new FileOutputStream(f);
+            //fos.write(os.toByteArray());
+            
 
             d.getQuestoes().get(i).setImagem(imagem.getPath());
             d.getQuestoes().get(i).setMusica(audio.getPath());
@@ -733,12 +749,14 @@ public class InteracaoCliente extends Thread {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             try (Socket conhecidos = new Socket(i, portaSV)) {
+                 System.out.println("IP "+ i);
+                System.out.println("portaSV "+ portaSV);
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
-                Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome().getBytes());
+                Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
                 res.addCampo(c);
-                c = new Campo(MusicClient.DATA, d.getData());
+                c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
                 res.addCampo(c);
-                c = new Campo(MusicClient.HORA, d.getTempo());
+                c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
                 res.addCampo(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
@@ -751,7 +769,30 @@ public class InteracaoCliente extends Thread {
         
     }
 
-    /*   
+    
+
+    private void sendRankinLocal() throws IOException {
+        for (InetAddress i : this.bd.getServidores().keySet()) {
+            int portaSV = this.bd.getServidores().get(i);
+            try (Socket conhecidos = new Socket(i, portaSV)) {
+               
+                PDU res = new PDU(0, AtendimentoServidor.INFO);
+                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
+                res.addCampo(c);
+                
+
+                ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
+                out.writeObject(res);
+                out.flush();
+                out.writeObject(this.bd.getRankingLocal());
+                out.flush();
+                conhecidos.close();
+            }
+        }
+    }
+}
+
+/*   
      private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
      ServerSocket ss = new ServerSocket(this.bd.getPorta());
      Socket s2 = ss.accept();
@@ -777,23 +818,3 @@ public class InteracaoCliente extends Thread {
      }
      }
      */
-
-    private void sendRankinLocal() throws IOException {
-        for (InetAddress i : this.bd.getServidores().keySet()) {
-            int portaSV = this.bd.getServidores().get(i);
-            try (Socket conhecidos = new Socket(i, portaSV)) {
-                PDU res = new PDU(0, AtendimentoServidor.INFO);
-                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
-                res.addCampo(c);
-                
-
-                ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
-                out.writeObject(res);
-                out.flush();
-                out.writeObject(this.bd.getRankingLocal());
-                out.flush();
-                conhecidos.close();
-            }
-        }
-    }
-}

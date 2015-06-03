@@ -1,12 +1,14 @@
 package musicgame;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +54,11 @@ public class AtendimentoServidor extends Thread {
     public void run() {
         try {
             if(ipServer != null){
-                registaServidor();
+                try {
+                    registaServidor();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             try {
@@ -62,6 +68,7 @@ public class AtendimentoServidor extends Thread {
                     this.s = ss.accept();
                     InteracaoServidor is = new InteracaoServidor(bd, this.s);
                     is.start();
+                    
                     
                 }
             } catch (IOException ex) {
@@ -76,7 +83,7 @@ public class AtendimentoServidor extends Thread {
 
     }
 
-    public void registaServidor() throws UnknownHostException, IOException {
+    public void registaServidor() throws UnknownHostException, IOException, ClassNotFoundException {
         PDU p = new PDU(0, INFO);
         Campo c = new Campo(REGISTASV, new byte[]{(byte)0});
         System.out.println("CAMPO "+ c.getIdTcp());
@@ -89,9 +96,13 @@ public class AtendimentoServidor extends Thread {
         //BigInteger bg = BigInteger.valueOf(portaTCP);
         c = new Campo(PORTA, String.valueOf(portaTCP));
         p.addCampoTcp(c);
+        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
-
+        /////////////////////////////VER////////////////
+        HashMap<InetAddress, Integer> servidores = (HashMap<InetAddress, Integer> ) in.readObject();
+        this.bd.registaServidores(servidores);
+        
         ObjectOutputStream o;
         o = new ObjectOutputStream(this.s.getOutputStream());
         o.writeObject(p);

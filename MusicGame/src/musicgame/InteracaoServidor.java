@@ -102,7 +102,7 @@ public class InteracaoServidor extends Thread {
                 //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
                 //     break;´
                 }
-            this.s.close();
+            //this.s.close();
 
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,24 +130,26 @@ public class InteracaoServidor extends Thread {
         out.flush();
 
         
-
+       this.bd.registaServidor(ip, porta);
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
-            Socket conhecidos = new Socket(i, portaSV);
-
-            PDU res = new PDU(0, AtendimentoServidor.INFO);
-            c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, "");
-            res.addCampoTcp(c);
-            c = new Campo(AtendimentoServidor.IP, ip); // SERÁ? ************************************************************
-            res.addCampoTcp(c);
-            //bg = BigInteger.valueOf(porta);
-            c = new Campo(AtendimentoServidor.PORTA, String.valueOf(porta));
-            res.addCampoTcp(c);
-            out = new ObjectOutputStream(conhecidos.getOutputStream());
-            out.writeObject(res);
-            out.flush();
+            if(i!=ip){
+                try (Socket conhecidos = new Socket(i, portaSV)) {
+                    PDU res = new PDU(0, AtendimentoServidor.INFO);
+                    c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, "");
+                    res.addCampoTcp(c);
+                    c = new Campo(AtendimentoServidor.IP, ip);
+                    res.addCampoTcp(c);
+                    c = new Campo(AtendimentoServidor.PORTA, String.valueOf(porta));
+                    res.addCampoTcp(c);
+                    out = new ObjectOutputStream(conhecidos.getOutputStream());
+                    out.writeObject(res);
+                    out.flush();
+                }
+            
         }
-        this.bd.registaServidor(ip, porta);
+        }
+        
 
 ///////////////////////////////////////TODOS
     }
@@ -182,7 +184,7 @@ public class InteracaoServidor extends Thread {
 
     }
 
-    private void adicionaRanking() throws IOException, ClassNotFoundException {
+    private void adicionaRanking() throws IOException, ClassNotFoundException { /*************************************/
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         this.in = new ObjectInputStream(s2.getInputStream());
@@ -200,10 +202,15 @@ public class InteracaoServidor extends Thread {
         System.out.println("adiciona sv local ip "+ ip + " Porta= "+ porta );
         
         this.bd.getServidores().put(ip, porta);
-        Socket server = new Socket(ip, porta);
-        out = new ObjectOutputStream(server.getOutputStream());
-        sendListDesafios(ip, porta);
-        sendRanking();//
+        try (Socket server = new Socket(ip, porta)) {
+            out = new ObjectOutputStream(server.getOutputStream());
+            
+            
+            /**********************************************************************/
+            
+            sendListDesafios(ip, porta);
+            sendRanking();//
+        }
     }
 // envia primeiro info a avisar que vai a seguir um MAP de desafios
 

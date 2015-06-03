@@ -85,7 +85,8 @@ public class MusicClient {
         System.out.println("Atualizou para a opcao: " + id);
         clientSocket = new DatagramSocket();
         //IPAddress = InetAddress.getByName("192.168.1.79");
-        IPAddress = InetAddress.getByName("192.168.173.160");
+        IPAddress = InetAddress.getByName("172.26.35.170");
+       // IPAddress = InetAddress.getByName("192.168.173.60");      to rede privada
         //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
@@ -358,8 +359,8 @@ public class MusicClient {
 
             d = new Desafio(nome, null, ano, mes, dia, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
-            d.setDataProperty();
-            d.setHoraProperty();
+            //d.setDataProperty();
+            //d.setHoraProperty();
         }
         return d;
     }
@@ -448,8 +449,8 @@ public class MusicClient {
 
             d = new Desafio(name, alc, ano, mes, dia, hora, min, seg);
             //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
-            d.setDataProperty();
-            d.setHoraProperty();
+            //d.setDataProperty();
+            //d.setHoraProperty();
         }
 
         return d;

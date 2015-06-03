@@ -6,6 +6,7 @@
 package controller;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +35,7 @@ import musicgame.MusicClient;
 import musicgame.ServerUnreachableException;
 import musicgame.Utilizador;
 
-public class ListarDesafiosController implements Initializable {
+public class ListarDesafiosController implements Initializable, Serializable{
 
     @FXML
     private TableView<Desafio> tableDesafios;
@@ -76,7 +78,43 @@ public class ListarDesafiosController implements Initializable {
 
     /**
      * Initializes the controller class.
+     * 
+     * 
+     *  public StringProperty getDataProperty(){
+        return this.dataString;
+    }
+    
+    public void setDataProperty(){
+        this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
+    }
+    
+    public StringProperty getHoraProperty(){
+        return this.horaString;
+    }    
+    
+    public void setHoraProperty(){
+        this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
+    }    
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
      */
+    
+    public StringProperty getDataProperty(Desafio d){
+        SimpleStringProperty data= new SimpleStringProperty();
+         data.setValue(d.getLocalDate().toLocalDate().toString());
+         return data;
+        
+    }
+     public StringProperty getHoraProperty(Desafio d){
+        SimpleStringProperty data= new SimpleStringProperty();
+         data.setValue(d.getLocalDate().toLocalTime().toString());
+         return data;
+        
+    }
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -86,8 +124,10 @@ public class ListarDesafiosController implements Initializable {
             //if (desafios.size() > 0) {
             //  System.out.println("Data:" + desafios.get(0).getDataProperty().get());
             tcDesafio.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNome()));
-            tcData.setCellValueFactory(cellData -> cellData.getValue().getDataProperty());
-            tcHora.setCellValueFactory(cellData -> cellData.getValue().getHoraProperty());
+           // tcData.setCellValueFactory(cellData -> cellData.getValue().getDataProperty());
+            tcData.setCellValueFactory(cellData -> getDataProperty(cellData.getValue()));
+            tcHora.setCellValueFactory(cellData -> getHoraProperty(cellData.getValue()));
+            //tcHora.setCellValueFactory(cellData -> cellData.getValue().getHoraProperty());
             //}
         } catch (IOException ex) {
             Alert al = new Alert(AlertType.ERROR);

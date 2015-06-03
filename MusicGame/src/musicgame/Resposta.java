@@ -1,7 +1,9 @@
 package musicgame;
 
+import java.io.Serializable;
 
-public class Resposta {
+
+public class Resposta implements Serializable {
     private int nQuestao;
     private int resposta;
     private int pontos;

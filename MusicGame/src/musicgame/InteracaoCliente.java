@@ -339,6 +339,11 @@ public class InteracaoCliente extends Thread {
         } else {
             Utilizador novo = new Utilizador(nome, alc, pass, add, port);
             this.bd.addUser(novo);
+            try {
+                sendRankinLocal();
+            } catch (IOException ex) {
+                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
             reply = new PDU(s, (byte) 0);
             c = new Campo(OK, "OK".getBytes());
             reply.addCampo(c);
@@ -474,8 +479,8 @@ public class InteracaoCliente extends Thread {
             byte minuto = (byte) tempo.getMinute();
             byte segundo = (byte) tempo.getSecond();
             Desafio d = new Desafio(nome, user, anoF, mes, dia, hora, minuto, segundo);
-            d.setDataProperty();
-            d.setHoraProperty();
+           // d.setDataProperty();
+            //d.setHoraProperty();
             criaPerguntas(d);
             Utilizador u = bd.getUserByIP(add);
             d.addUser(u, tl);

@@ -39,8 +39,8 @@ public class Desafio implements Serializable {
     private byte minuto;
     private byte segundo;
     
-    private SimpleStringProperty dataString;
-    private SimpleStringProperty horaString;
+   // private SimpleStringProperty dataString;
+    //private SimpleStringProperty horaString;
 
     public Desafio(String nome, String user, byte[] ano, byte mes, byte dia, byte hora, byte minuto, byte segundo) {
         this.nome = nome;
@@ -59,8 +59,8 @@ public class Desafio implements Serializable {
         this.status=false;
         this.comecou=false;
         
-        this.dataString = new SimpleStringProperty();
-        this.horaString = new SimpleStringProperty();
+        //this.dataString = new SimpleStringProperty();
+        //this.horaString = new SimpleStringProperty();
         
         //this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
         //this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
@@ -113,21 +113,7 @@ public class Desafio implements Serializable {
         return this.usersEnd;
     }
     
-    public StringProperty getDataProperty(){
-        return this.dataString;
-    }
-    
-    public void setDataProperty(){
-        this.dataString.setValue(this.getLocalDate().toLocalDate().toString());
-    }
-    
-    public StringProperty getHoraProperty(){
-        return this.horaString;
-    }    
-    
-    public void setHoraProperty(){
-        this.horaString.setValue(this.getLocalDate().toLocalTime().toString());
-    }    
+   
     
     
     public void addUserEnd(Utilizador u){

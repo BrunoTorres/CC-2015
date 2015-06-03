@@ -62,7 +62,7 @@ public class AtendimentoServidor extends Thread {
                     this.s = ss.accept();
                     InteracaoServidor is = new InteracaoServidor(bd, this.s);
                     is.start();
-                    this.s.close();
+                    
                   
                 }
             } catch (IOException ex) {

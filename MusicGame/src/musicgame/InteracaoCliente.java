@@ -150,7 +150,7 @@ public class InteracaoCliente extends Thread {
                 PDU p = new PDU(data);
                 //Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 String desafio = new String(p.getCampo(0).getValor());
-                if (!this.bd.getDesafiosLocais().containsKey(desafio)) {
+                if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
                     try {
                         System.out.println("######################################### Desafio"+desafio);
                         requestDesafio(desafio);
@@ -362,7 +362,7 @@ public class InteracaoCliente extends Thread {
         System.out.println("DESAFIO TAMANHO " + tamGlobais);
         PDU reply;
         Campo c, da, h, f;
-        int tam = desafios.size() + tamGlobais;
+        int tam = desafios.size();
         int t = 0;
         if (tam > 0) {
             for (Desafio d : desafios) {
@@ -370,7 +370,7 @@ public class InteracaoCliente extends Thread {
                     desafiosAenviar.add(d);
                 }
             }
-            tam = desafiosAenviar.size() + tamGlobais;
+            tam = desafiosAenviar.size();
 
             if (tam > 0) {
                 for (Desafio d : desafiosAenviar) {
@@ -383,42 +383,6 @@ public class InteracaoCliente extends Thread {
                     h = new Campo(HORA, d.getTempo());
                     reply.addCampo(h);
 
-                    if (t < tam) {
-                        f = new Campo(CONTINUA, "0".getBytes());
-                        reply.addCampo(f);
-                    }
-                    responde(reply, add, port);
-
-                }/****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
-                for (String desafio : dGlobais.keySet()) {
-                    t++;
-                    reply = new PDU(s, (byte) 0);
-                    c = new Campo(DESAFIO, desafio.getBytes());
-                    reply.addCampo(c);
-                    int aux = dGlobais.get(desafio).getYear() % 100;
-                    int pri = aux / 10;
-                    int sec = aux % 10;
-                    BigInteger anoAux = BigInteger.valueOf(dGlobais.get(desafio).getYear());
-                    byte[] anoBytes = anoAux.toByteArray();
-                    byte[] anoF;
-                    if (anoBytes.length < 3) {
-                        anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
-                    } else {
-                        anoF = anoBytes;
-                    }
-                    byte mes = (byte) dGlobais.get(desafio).getMonthValue();
-                    byte dia = (byte) dGlobais.get(desafio).getDayOfMonth();
-                    byte hora = (byte) dGlobais.get(desafio).getHour();
-                    byte minuto = (byte) dGlobais.get(desafio).getMinute();
-                    byte segundo = (byte) dGlobais.get(desafio).getSecond();
-                    Desafio desafioGlobal = new Desafio(desafio, null, anoF, mes, dia, hora, minuto, segundo);
-
-                    c = new Campo(DESAFIO, desafioGlobal.getNome().getBytes());
-                    reply.addCampo(c);
-                    da = new Campo(DATA, desafioGlobal.getData());
-                    reply.addCampo(da);
-                    h = new Campo(HORA, desafioGlobal.getTempo());
-                    reply.addCampo(h);
                     if (t < tam) {
                         f = new Campo(CONTINUA, "0".getBytes());
                         reply.addCampo(f);
@@ -760,15 +724,21 @@ public class InteracaoCliente extends Thread {
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
                 res.addCampoTcp(c);
+                /*
                 c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
+                System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());
                 res.addCampoTcp(c);
                 c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
                 res.addCampoTcp(c);
-
+*/
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 
                 out.writeObject(res);
                 out.flush();
+                
+                out.writeObject(d);
+                out.flush();
+                
                 conhecidos.close();
             }
             
@@ -825,3 +795,47 @@ public class InteracaoCliente extends Thread {
      }
      }
      */
+
+
+////////LIST DESAFIOS
+
+/*
+/****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
+/*
+                for (String desafio : dGlobais.keySet()) {
+                    t++;
+                    reply = new PDU(s, (byte) 0);
+                    c = new Campo(DESAFIO, desafio.getBytes());
+                    reply.addCampo(c);
+                    int aux = dGlobais.get(desafio).getYear() % 100;
+                    int pri = aux / 10;
+                    int sec = aux % 10;
+                    BigInteger anoAux = BigInteger.valueOf(dGlobais.get(desafio).getYear());
+                    byte[] anoBytes = anoAux.toByteArray();
+                    byte[] anoF;
+                    if (anoBytes.length < 3) {
+                        anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
+                    } else {
+                        anoF = anoBytes;
+                    }
+                    byte mes = (byte) dGlobais.get(desafio).getMonthValue();
+                    byte dia = (byte) dGlobais.get(desafio).getDayOfMonth();
+                    byte hora = (byte) dGlobais.get(desafio).getHour();
+                    byte minuto = (byte) dGlobais.get(desafio).getMinute();
+                    byte segundo = (byte) dGlobais.get(desafio).getSecond();
+                    Desafio desafioGlobal = new Desafio(desafio, null, anoF, mes, dia, hora, minuto, segundo);
+
+                    c = new Campo(DESAFIO, desafioGlobal.getNome().getBytes());
+                    reply.addCampo(c);
+                    da = new Campo(DATA, desafioGlobal.getData());
+                    reply.addCampo(da);
+                    h = new Campo(HORA, desafioGlobal.getTempo());
+                    reply.addCampo(h);
+                    if (t < tam) {
+                        f = new Campo(CONTINUA, "0".getBytes());
+                        reply.addCampo(f);
+                    }
+                    responde(reply, add, port);
+
+                }
+*/

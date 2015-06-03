@@ -73,6 +73,7 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.DESAFIO:
                     System.out.println("desafiooo");
                     desafio = input.getCampo(0).getValue();
+                    /*
                     byte[] b = input.getCampo(1).getValor();
                     byte[] ano = {b[0], b[1], b[2]};
                     byte mes = b[3];
@@ -84,6 +85,10 @@ public class InteracaoServidor extends Thread {
                     int anos = new BigInteger(ano).intValue();
                     LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
                     this.bd.addDesafioGlobal(desafio, data);
+                            */
+                    Desafio des=(Desafio)in.readObject();
+                    this.bd.addDesafioGlobal(desafio, des.getLocalDate());
+                    this.bd.addDesafio(des);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     adicionaRanking();

@@ -304,11 +304,7 @@ public class InteracaoCliente extends Thread {
                 c = new Campo(SCORE, PDU.intToByteArray(bd.getRanking(u.getAlcunha())));
                 resposta.addCampo(c);
                 this.bd.updateUser(u.getAlcunha(), add, port);
-                try {
-                sendRankinLocal();
-            } catch (IOException ex) {
-                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                
                 responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
             } else { //Pacote de erro passe incorreta
                 resposta = new PDU(s, (byte) 0);
@@ -462,7 +458,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(60);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(200);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -497,7 +493,7 @@ public class InteracaoCliente extends Thread {
             this.bd.updateUser(u.getAlcunha(), add, port);
 
             try {
-                System.out.println("##################### vou enviar info desafio"+d.getNome());
+                System.out.println("##################### vou enviar info desafio "+d.getNome());
                 sendInfoDesafio(d);
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -671,9 +667,12 @@ public class InteracaoCliente extends Thread {
         res.addCampoTcp(c);
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
+        System.out.println("vai imprimir o ip dos servidores");
         Socket serv = new Socket();
 
         for (InetAddress i : servidor.keySet()) {
+            System.out.println("ip = "+ i);
+            System.out.println("Porta = "+ servidor.get(i));
             serv = new Socket(i, servidor.get(i));
             System.out.println("IP PARA SER PEDIDO = " +i);
             break;
@@ -682,7 +681,8 @@ public class InteracaoCliente extends Thread {
         ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(res);
         out.flush();
-
+        serv.close();
+        
         ServerSocket ss = new ServerSocket(this.bd.getPorta());
         Socket s = ss.accept();
         ObjectInputStream in = new ObjectInputStream(s.getInputStream());
@@ -711,7 +711,7 @@ public class InteracaoCliente extends Thread {
             d.getQuestoes().get(i).setImagem(imagem.getPath());
             d.getQuestoes().get(i).setMusica(audio.getPath());
         }
-        serv.close();  //////////////////*********************************** 
+         //////////////////*********************************** 
         this.bd.addDesafio(d);
 
     }

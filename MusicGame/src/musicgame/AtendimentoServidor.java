@@ -39,13 +39,13 @@ public class AtendimentoServidor extends Thread {
         this.ipServer = null;
     }
 
-    public AtendimentoServidor(BD bd, int porta, String sv, int porta2) throws IOException {
+    public AtendimentoServidor(BD bd, int porta, String externo, int porta2) throws IOException {
         this.bd = bd;
         this.portaTCP = porta;
-        this.ipServer = sv;
+        this.ipServer = externo;
         this.portaTCP2 = porta2;
         
-        this.s = new Socket(InetAddress.getByName(sv), porta2);
+       // this.s = new Socket(InetAddress.getByName(sv), porta2);
     }
 
     @Override
@@ -60,8 +60,9 @@ public class AtendimentoServidor extends Thread {
                 while (true) {
 
                     this.s = ss.accept();
-                    InteracaoServidor is = new InteracaoServidor(bd, this.s);
+                    InteracaoServidor is = new InteracaoServidor(bd,this.ipServer,this.portaTCP2);
                     is.start();
+                    
                 }
             } catch (IOException ex) {
                 Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);

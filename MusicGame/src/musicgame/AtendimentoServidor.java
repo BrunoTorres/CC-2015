@@ -77,17 +77,17 @@ public class AtendimentoServidor extends Thread {
 
     public void registaServidor() throws UnknownHostException, IOException {
         PDU p = new PDU(0, INFO);
-        Campo c = new Campo(REGISTASV, "" );
+        Campo c = new Campo(REGISTASV, new byte[]{(byte)0});
         System.out.println("CAMPO "+ c.getIdTcp());
-        p.addCampo(c);
+        p.addCampoTcp(c);
         System.out.println("ip "+ InetAddress.getLocalHost());
         c = new Campo(IP, InetAddress.getLocalHost());
         String ip = c.getValue();
         System.out.println("IP "+ ip);
-        p.addCampo(c);
+        p.addCampoTcp(c);
         //BigInteger bg = BigInteger.valueOf(portaTCP);
         c = new Campo(PORTA, String.valueOf(portaTCP));
-        p.addCampo(c);
+        p.addCampoTcp(c);
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
 

@@ -693,9 +693,9 @@ public class InteracaoCliente extends Thread {
     private void requestDesafio(String desafio) throws IOException, ClassNotFoundException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio);
-        res.addCampo(c);
+        res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
-        res.addCampo(c);
+        res.addCampoTcp(c);
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
         Socket serv = new Socket();
@@ -719,9 +719,9 @@ public class InteracaoCliente extends Thread {
         for (int i = 0; i < d.getQuestoes().size(); i++) {
             res = new PDU(0, AtendimentoServidor.INFO);
             c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
-            res.addCampo(c);
+            res.addCampoTcp(c);
             c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-            res.addCampo(c);
+            res.addCampoTcp(c);
             out.writeObject(res);
             out.flush();
 
@@ -753,11 +753,11 @@ public class InteracaoCliente extends Thread {
                 System.out.println("portaSV "+ portaSV);
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-                res.addCampo(c);
+                res.addCampoTcp(c);
                 c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
-                res.addCampo(c);
+                res.addCampoTcp(c);
                 c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
-                res.addCampo(c);
+                res.addCampoTcp(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
@@ -778,7 +778,7 @@ public class InteracaoCliente extends Thread {
                
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
-                res.addCampo(c);
+                res.addCampoTcp(c);
                 
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());

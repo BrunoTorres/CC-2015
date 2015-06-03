@@ -126,12 +126,12 @@ public class InteracaoServidor extends Thread {
 
             PDU res = new PDU(0, AtendimentoServidor.INFO);
             c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, "");
-            res.addCampo(c);
+            res.addCampoTcp(c);
             c = new Campo(AtendimentoServidor.IP, ip); // SERÁ? ************************************************************
-            res.addCampo(c);
+            res.addCampoTcp(c);
             //bg = BigInteger.valueOf(porta);
             c = new Campo(AtendimentoServidor.PORTA, String.valueOf(porta));
-            res.addCampo(c);
+            res.addCampoTcp(c);
             out = new ObjectOutputStream(conhecidos.getOutputStream());
             out.writeObject(res);
             out.flush();
@@ -195,11 +195,11 @@ public class InteracaoServidor extends Thread {
     private void sendListDesafios(InetAddress ip, int bg) throws IOException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.LISTADESAFIOS, "");
-        res.addCampo(c);
+        res.addCampoTcp(c);
         c = new Campo(AtendimentoServidor.IP, ip);
-        res.addCampo(c);
+        res.addCampoTcp(c);
         c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bg));
-        res.addCampo(c);
+        res.addCampoTcp(c);
 
         out.writeObject(res);
         out.flush();
@@ -215,7 +215,7 @@ public class InteracaoServidor extends Thread {
     private void sendRanking() throws IOException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, "");
-        res.addCampo(c);
+        res.addCampoTcp(c);
         out.writeObject(res);
         out.flush();
         out.reset();

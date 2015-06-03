@@ -134,6 +134,12 @@ public class PDU implements Serializable{
         this.numCampos++;
         this.tamLista += c.getSize()[0] + c.getSize()[1];
     }
+    
+     public void addCampoTcp(Campo c) {
+        this.campos.add(c);
+        this.numCampos++;
+        //this.tamLista += c.getSize()[0] + c.getSize()[1];
+    }
 
     public Campo getCampo(int ind) {
         return campos.get(ind);

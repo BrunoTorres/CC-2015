@@ -63,7 +63,7 @@ public class AtendimentoServidor extends Thread {
                     InteracaoServidor is = new InteracaoServidor(bd, this.s);
                     is.start();
                     this.s.close();
-                    ss.close();
+                  
                 }
             } catch (IOException ex) {
                 Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);

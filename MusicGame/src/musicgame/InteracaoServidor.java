@@ -100,8 +100,9 @@ public class InteracaoServidor extends Thread {
 
                    // case AtendimentoServidor.REGISTADESAFIO:  
                 //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
-                //     break;
+                //     break;´
                 }
+            s.close();
 
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);

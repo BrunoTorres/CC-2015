@@ -304,6 +304,11 @@ public class InteracaoCliente extends Thread {
                 c = new Campo(SCORE, PDU.intToByteArray(bd.getRanking(u.getAlcunha())));
                 resposta.addCampo(c);
                 this.bd.updateUser(u.getAlcunha(), add, port);
+                try {
+                sendRankinLocal();
+            } catch (IOException ex) {
+                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
                 responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
             } else { //Pacote de erro passe incorreta
                 resposta = new PDU(s, (byte) 0);
@@ -339,11 +344,7 @@ public class InteracaoCliente extends Thread {
         } else {
             Utilizador novo = new Utilizador(nome, alc, pass, add, port);
             this.bd.addUser(novo);
-            try {
-                sendRankinLocal();
-            } catch (IOException ex) {
-                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
             reply = new PDU(s, (byte) 0);
             c = new Campo(OK, "OK".getBytes());
             reply.addCampo(c);
@@ -461,7 +462,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(35);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(60);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;

@@ -90,6 +90,8 @@ public class AtendimentoServidor extends Thread {
         c = new Campo(PORTA, String.valueOf(portaTCP));
         p.addCampoTcp(c);
         
+        System.out.println("vai guardar isto :"+InetAddress.getByName(ipServer));
+        
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
 
         ObjectOutputStream o;

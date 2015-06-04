@@ -205,6 +205,7 @@ public class InteracaoServidor extends Thread {
     }
 
     private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
+        System.out.println("vou receber as cenas");
         InetAddress ip = p.getCampo(1).getIP();
         //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = Integer.valueOf(p.getCampo(2).getValue());

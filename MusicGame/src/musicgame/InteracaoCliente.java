@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -152,7 +153,7 @@ public class InteracaoCliente extends Thread {
                 String desafio = new String(p.getCampo(0).getValor());
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
                     try {
-                        System.out.println("######################################### Desafio"+desafio);
+                        System.out.println("######################################### Desafio" + desafio);
                         requestDesafio(desafio);
 
                     } catch (ClassNotFoundException ex) {
@@ -244,7 +245,7 @@ public class InteracaoCliente extends Thread {
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
             //System.out.println("Não faço nada SOU O USER: "+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
-        } else {            
+        } else {
             d.setStatus(true);
             //System.out.println("Faço alguma coisa porque sou o ultimo sou o use:"+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
@@ -259,7 +260,6 @@ public class InteracaoCliente extends Thread {
                 resposta.addCampo(des);
                 //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
-                
 
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
                 //*************************************************************************//
@@ -278,7 +278,7 @@ public class InteracaoCliente extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
     }
 
@@ -304,7 +304,7 @@ public class InteracaoCliente extends Thread {
                 c = new Campo(SCORE, PDU.intToByteArray(bd.getRanking(u.getAlcunha())));
                 resposta.addCampo(c);
                 this.bd.updateUser(u.getAlcunha(), add, port);
-                
+
                 responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
             } else { //Pacote de erro passe incorreta
                 resposta = new PDU(s, (byte) 0);
@@ -340,7 +340,7 @@ public class InteracaoCliente extends Thread {
         } else {
             Utilizador novo = new Utilizador(nome, alc, pass, add, port);
             this.bd.addUser(novo);
-            
+
             reply = new PDU(s, (byte) 0);
             c = new Campo(OK, "OK".getBytes());
             reply.addCampo(c);
@@ -353,14 +353,12 @@ public class InteracaoCliente extends Thread {
         ArrayList<Desafio> desafios = bd.getDesafios();
         ArrayList<Desafio> desafiosAenviar = new ArrayList<>();
         HashMap<String, LocalDateTime> dGlobais = (HashMap<String, LocalDateTime>) bd.getDesafiosGlobais();
-        
-        
-       // System.out.println("##############################"+bd.getDesafiosLocais().get("desafio1"));
 
+       // System.out.println("##############################"+bd.getDesafiosLocais().get("desafio1"));
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
-        int tamGlobais = dGlobais.size(); 
-        
+        int tamGlobais = dGlobais.size();
+
         System.out.println("DESAFIO TAMANHO " + tamGlobais);
         PDU reply;
         Campo c, da, h, f;
@@ -476,7 +474,7 @@ public class InteracaoCliente extends Thread {
             byte minuto = (byte) tempo.getMinute();
             byte segundo = (byte) tempo.getSecond();
             Desafio d = new Desafio(nome, user, anoF, mes, dia, hora, minuto, segundo);
-           // d.setDataProperty();
+            // d.setDataProperty();
             //d.setHoraProperty();
             criaPerguntas(d);
             Utilizador u = bd.getUserByIP(add);
@@ -493,7 +491,7 @@ public class InteracaoCliente extends Thread {
             this.bd.updateUser(u.getAlcunha(), add, port);
 
             try {
-                System.out.println("##################### vou enviar info desafio "+d.getNome());
+                System.out.println("##################### vou enviar info desafio " + d.getNome());
                 sendInfoDesafio(d);
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -504,8 +502,6 @@ public class InteracaoCliente extends Thread {
             j.start();
         }
     }
-    
-    
 
     private void respostas(byte[] data, InetAddress add, int port) throws SocketException, UserInexistenteException {
         PDU pacote = new PDU(data);
@@ -665,34 +661,34 @@ public class InteracaoCliente extends Thread {
         res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
-        
-        
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
         System.out.println("vai imprimir o ip dos servidores");
-        Socket serv = new Socket();
 
+        InetAddress j = InetAddress.getLocalHost();
+        int porta = 0;
         for (InetAddress i : servidor.keySet()) {
-            System.out.println("ip = "+ i);
-            System.out.println("Porta = "+ servidor.get(i));
-            serv = new Socket(i, servidor.get(i));
-            System.out.println("IP PARA SER PEDIDO = " +i);
+            System.out.println("ip = " + i);
+            j = i;
+            porta = servidor.get(i);
+            System.out.println("Porta = " + servidor.get(i));
+
             break;
         }
-        
-        ServerSocket ss = new ServerSocket(this.bd.getPorta());
-         serv = ss.accept();
+        Socket serv = new Socket(j, porta);
+        System.out.println("IP PARA SER PEDIDO = " + j);
+
+        //ServerSocket ss = new ServerSocket(this.bd.getPorta());
+        //serv = ss.accept();
         ObjectInputStream in = new ObjectInputStream(serv.getInputStream());
         ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(res);
         out.flush();
         //serv.close();
-        
-       
+           System.out.println("Ja foi");
         Desafio d = (Desafio) in.readObject();
-        
-     
-
+        System.out.println("recebeu desafio");
+/*
         for (int i = 0; i < d.getQuestoes().size(); i++) {
             res = new PDU(0, AtendimentoServidor.INFO);
             c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
@@ -703,76 +699,68 @@ public class InteracaoCliente extends Thread {
             out.flush();
 
             File imagem = (File) in.readObject();
-           
+
             File audio = (File) in.readObject();
-            
+
             // File f = new File("i.jpg");
             //FileOutputStream fos = new FileOutputStream(f);
             //fos.write(os.toByteArray());
-            
-
             d.getQuestoes().get(i).setImagem(imagem.getPath());
             d.getQuestoes().get(i).setMusica(audio.getPath());
         }
-         //////////////////*********************************** 
+        //////////////////*********************************** 
         this.bd.addDesafio(d);
-
+*/
     }
 
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 
-
     private void sendInfoDesafio(Desafio d) throws IOException {
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
             System.out.println("##############InetAddress= " + i.getHostName());
             int portaSV = this.bd.getServidores().get(i);
-            System.out.println("##############PORTA = "+ portaSV);
+            System.out.println("##############PORTA = " + portaSV);
             try (Socket conhecidos = new Socket(i, portaSV)) {
-                 
-                
+
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-                 res.addCampoTcp(c);
-                c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
-                 res.addCampoTcp(c);
+                res.addCampoTcp(c);
+                //c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
+                c = new Campo(AtendimentoServidor.IP,"192.168.173.1");
+                res.addCampoTcp(c);
                 c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bd.getPorta()));
-                 res.addCampoTcp(c);
-                
-                
-               
+                res.addCampoTcp(c);
+
                 /*
-                c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
-                System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());
-                res.addCampoTcp(c);
-                c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
-                res.addCampoTcp(c);
-*/
+                 c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
+                 System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());
+                 res.addCampoTcp(c);
+                 c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
+                 res.addCampoTcp(c);
+                 */
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
-                
+
                 out.writeObject(res);
                 out.flush();
-                
+
                 out.writeObject(d);
                 out.flush();
-                
+
                 conhecidos.close();
             }
-            
-        }
-        
-    }
 
-    
+        }
+
+    }
 
     private void sendRankinLocal() throws IOException {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             try (Socket conhecidos = new Socket(i, portaSV)) {
-               
+
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
-                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
+                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
                 res.addCampoTcp(c);
-                
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
@@ -786,37 +774,35 @@ public class InteracaoCliente extends Thread {
 }
 
 /*   
-             private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
-     ServerSocket ss = new ServerSocket(this.bd.getPorta());
-     Socket s2 = ss.accept();
-     ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
-     PDU res;
-     Campo c;
-     Desafio d =(Desafio) in2.readObject();
+ private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
+ ServerSocket ss = new ServerSocket(this.bd.getPorta());
+ Socket s2 = ss.accept();
+ ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+ PDU res;
+ Campo c;
+ Desafio d =(Desafio) in2.readObject();
         
-     for(int i=0;i<d.getQuestoes().size();i++){
-     res = new PDU(0, AtendimentoServidor.INFO);
-     c = new Campo(MusicClient.DESAFIO,d.getNome().getBytes());
-     res.addCampo(c);
-     c = new Campo(MusicClient.QUESTAO,PDU.intToByteArray(i));
-     res.addCampo(c);
-     out.writeObject(res);
-     out.flush(); 
+ for(int i=0;i<d.getQuestoes().size();i++){
+ res = new PDU(0, AtendimentoServidor.INFO);
+ c = new Campo(MusicClient.DESAFIO,d.getNome().getBytes());
+ res.addCampo(c);
+ c = new Campo(MusicClient.QUESTAO,PDU.intToByteArray(i));
+ res.addCampo(c);
+ out.writeObject(res);
+ out.flush(); 
             
-     File imagem =(File)in.readObject();
-     File audio = (File)in.readObject();
+ File imagem =(File)in.readObject();
+ File audio = (File)in.readObject();
         
-     d.getQuestoes().get(i).setImagem(imagem.getPath());
-     d.getQuestoes().get(i).setMusica(audio.getPath());
-     }
-     }
-     */
-
-
+ d.getQuestoes().get(i).setImagem(imagem.getPath());
+ d.getQuestoes().get(i).setMusica(audio.getPath());
+ }
+ }
+ */
 ////////LIST DESAFIOS
 
 /*
-/****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
+ /****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
 /*
                 for (String desafio : dGlobais.keySet()) {
                     t++;

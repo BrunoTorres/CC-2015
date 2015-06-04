@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -276,14 +277,16 @@ public class InteracaoServidor extends Thread {
         out.writeObject(d);
         out.flush();
         File f;
-        HashMap<String,File> imagens= new HashMap<String,File>();
-        HashMap<String,File> musicas= new HashMap<String,File>();
+        HashMap<String,byte[]> imagens= new HashMap<String,byte[]>();
+        HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
         
         for(int i=0;i<d.getQuestoes().size();i++){
            f = new File(d.getQuestoes().get(i).getImagem());
-           imagens.put(d.getQuestoes().get(i).getImagem(), f);
+           byte[] r = Files.readAllBytes(f.toPath());
+           imagens.put(d.getQuestoes().get(i).getImagem(), r);
            f = new File(d.getQuestoes().get(i).getMusica());
-           musicas.put(d.getQuestoes().get(i).getMusica(), f);
+            r = Files.readAllBytes(f.toPath());
+           musicas.put(d.getQuestoes().get(i).getMusica(), r);
         }
         out.writeObject(imagens);
         out.flush();

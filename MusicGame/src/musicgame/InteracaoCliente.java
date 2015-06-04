@@ -1,5 +1,6 @@
 package musicgame;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -699,28 +700,21 @@ public class InteracaoCliente extends Thread {
             System.out.println("Abriu o input para receber o desafio!");
             Desafio d = (Desafio) inFromServer.readObject();
             System.out.println("recebeu desafio");
-             HashMap<String,File> imagens= (HashMap<String,File>)inFromServer.readObject();
-            HashMap<String,File> musicas= (HashMap<String,File>)inFromServer.readObject();
+            HashMap<String,byte[]> imagens= (HashMap<String,byte[]>)inFromServer.readObject();
+            HashMap<String,byte[]> musicas= (HashMap<String,byte[]>)inFromServer.readObject();
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
             
-            for(String s: imagens.keySet())
-                System.out.println("NOME DA IMAGEM:"+ s);
-      /*
-            for (int i = 0; i < d.getQuestoes().size(); i++) {
-                
-                System.out.println("questoes");
-                res = new PDU(0, AtendimentoServidor.INFO);
-                c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
-                res.addCampoTcp(c);
-                c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-                res.addCampoTcp(c);
-                out.writeObject(res);
-                out.flush();
-                System.out.println("enviou pedido");
-
-                File imagem = (File) inFromServer.readObject();
-
-                File audio = (File) inFromServer.readObject();
-
+          for(String s:imagens.keySet()){
+              os.write(imagens.get(s));
+              File f = new File(s);
+              FileOutputStream fos = new FileOutputStream(f);
+              fos.write(os.toByteArray());
+                 
+              
+          }
+            
+   
+/*
          // File f = new File("i.jpg");
                 //FileOutputStream fos = new FileOutputStream(f);
                 //fos.write(os.toByteArray());
@@ -734,29 +728,7 @@ public class InteracaoCliente extends Thread {
             serv.close();
        
 
-        /*
-         for (int i = 0; i < d.getQuestoes().size(); i++) {
-         res = new PDU(0, AtendimentoServidor.INFO);
-         c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
-         res.addCampoTcp(c);
-         c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-         res.addCampoTcp(c);
-         out.writeObject(res);
-         out.flush();
-
-         File imagem = (File) in.readObject();
-
-         File audio = (File) in.readObject();
-
-         // File f = new File("i.jpg");
-         //FileOutputStream fos = new FileOutputStream(f);
-         //fos.write(os.toByteArray());
-         d.getQuestoes().get(i).setImagem(imagem.getPath());
-         d.getQuestoes().get(i).setMusica(audio.getPath());
-         }
-         //////////////////*********************************** 
-         this.bd.addDesafio(d);
-         */
+        
     }
 
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 

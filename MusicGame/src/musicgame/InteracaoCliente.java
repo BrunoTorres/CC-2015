@@ -725,8 +725,9 @@ public class InteracaoCliente extends Thread {
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
                 res.addCampoTcp(c);
-                //c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
-                c = new Campo(AtendimentoServidor.IP,"192.168.173.1");
+                c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
+                System.out.println("ip send info desafio = "+ c.getIP());
+               // c = new Campo(AtendimentoServidor.IP,"192.168.173.1");
                 res.addCampoTcp(c);
                 c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bd.getPorta()));
                 res.addCampoTcp(c);

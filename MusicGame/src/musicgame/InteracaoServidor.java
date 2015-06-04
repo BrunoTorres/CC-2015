@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,8 +67,9 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.REQUESTDESAFIO:
                     System.out.println("envia desafio");
                     desafio = input.getCampo(0).getValue();
+                    String alcunha=input.getCampo(2).getValue();
                     System.out.println("DESAFIO PEDIDO = " + desafio);
-                    sendDesafio(desafio);
+                    sendDesafio(desafio,alcunha);
                     break;
 
                 case AtendimentoServidor.DESAFIO:
@@ -152,10 +154,12 @@ public class InteracaoServidor extends Thread {
                     out.writeObject(res);
                     out.flush();
                 }
-                this.bd.registaServidor(ip, porta);
+               
 
             }
+            
         }
+         this.bd.registaServidor(ip, porta);
 
 ///////////////////////////////////////TODOS
     }
@@ -266,11 +270,31 @@ public class InteracaoServidor extends Thread {
         out.reset();
     }
 
-    private void sendDesafio(String desafio) throws IOException {
+    private void sendDesafio(String desafio,String alcunha) throws IOException {
         Desafio d = this.bd.getDesafio(desafio);
         System.out.println("DESAFIO A SER ENVIAD como o NOME = " + d.getNome());
         out.writeObject(d);
         out.flush();
+        File f;
+        HashMap<String,File> imagens= new HashMap<String,File>();
+        HashMap<String,File> musicas= new HashMap<String,File>();
+        for(Pergunta t:d.getQuestoes()){
+           f = new File(t.getImagem());
+           imagens.put(t.getImagem(), f);
+            f = new File(t.getMusica());
+            musicas.put(t.getMusica(), f);
+
+        }
+        out.writeObject(imagens);
+        out.flush();
+        out.writeObject(musicas);
+        out.flush();
+        
+        
+        
+        
+        Utilizador u= new Utilizador(alcunha, 0);
+        d.addUser(u, new byte[]{0});
 
     }
 

@@ -163,7 +163,7 @@ class BD implements Serializable {
     }
 
     public synchronized void carregaPerguntas(String path) throws IOException {
-        File f = new File(path);
+        //File f = new File(path);
         //Pattern init = Pattern.compile("\\w+=\\w+");
         //Pattern rest = Pattern.compile("\\w+=\\w+");
 

@@ -278,12 +278,12 @@ public class InteracaoServidor extends Thread {
         File f;
         HashMap<String,File> imagens= new HashMap<String,File>();
         HashMap<String,File> musicas= new HashMap<String,File>();
-        for(Pergunta t:d.getQuestoes()){
-           f = new File(t.getImagem());
-           imagens.put(t.getImagem(), f);
-            f = new File(t.getMusica());
-            musicas.put(t.getMusica(), f);
-
+        
+        for(int i=0;i<d.getQuestoes().size();i++){
+           f = new File(d.getQuestoes().get(i).getImagem());
+           imagens.put(d.getQuestoes().get(i).getImagem(), f);
+           f = new File(d.getQuestoes().get(i).getMusica());
+           musicas.put(d.getQuestoes().get(i).getMusica(), f);
         }
         out.writeObject(imagens);
         out.flush();

@@ -24,6 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class BD implements Serializable {
     private int port;
+    private InetAddress ip;
     private HashMap<String, Utilizador> users; /// syc
     private HashMap<String, Integer> rankingLocal;     /// syc
     private HashMap<String, Integer> rankingGlobal;     /// syc
@@ -239,9 +240,27 @@ class BD implements Serializable {
             return us;
         }
     }
+    
+    
+    
+    
+    
     public void setPorta(int porta){
         this.port=porta;
     }
+    public void setIP(InetAddress ip){
+        this.ip=ip;
+        
+    }
+    
+    public InetAddress getIp(){
+        return this.ip;
+    }
+    
+    
+    
+    
+    
     public int getPorta(){
         return this.port;
     }

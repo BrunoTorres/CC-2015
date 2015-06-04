@@ -2,6 +2,7 @@ package musicgame;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Scanner;
 
 class MusicServer {
@@ -32,6 +33,11 @@ class MusicServer {
 
         System.out.println("Porta UDP para escuta:");
         portaUDP = ler.nextInt();
+        System.out.println("Ip próprio:");
+        InetAddress ip = InetAddress.getByName(ler.next());
+        bd.setIP(ip);
+        
+        
         System.out.println("Porta TCP para escuta:");
         portaTCP = ler.nextInt();
         bd.setPorta(portaTCP);
@@ -41,6 +47,7 @@ class MusicServer {
         ler.nextLine();
         ipServer = ler.nextLine();
         System.out.println("");
+        System.out.println("ip====== "+ bd.getIp());
         if (!ipServer.equals("0")) {
             System.out.println("Introduza a porta TCP");
             portaTCP2 = ler.nextInt();

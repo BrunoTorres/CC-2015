@@ -130,7 +130,7 @@ public class InteracaoServidor extends Thread {
         out.flush();
 
         
-       this.bd.registaServidor(ip, porta);
+       
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             if(i!=ip){
@@ -146,6 +146,7 @@ public class InteracaoServidor extends Thread {
                     out.writeObject(res);
                     out.flush();
                 }
+        this.bd.registaServidor(ip, porta);
             
         }
         }
@@ -154,16 +155,7 @@ public class InteracaoServidor extends Thread {
 ///////////////////////////////////////TODOS
     }
 
-// novo servidor adiciona lista de svs que o principal conhece
-    private void adicionaSVLocal() throws IOException, ClassNotFoundException {
-        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
-        Socket s2 = ss.accept();
-        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
 
-        HashMap<InetAddress, Integer> svs = (HashMap<InetAddress, Integer>) in2.readObject();
-        this.bd.registaServidores(svs);
-
-    }
 
     //RECEBE o lista de desafios pendentes GLOBAIS///////////////////////////////////////////////////////
     private void adicionaDesafios(PDU input) throws IOException, ClassNotFoundException {
@@ -191,9 +183,21 @@ public class InteracaoServidor extends Thread {
         HashMap<String, Integer> rank = (HashMap<String, Integer>) in.readObject();
 
         this.bd.addRankingGlobal(rank);
+        
+        this.s.close();
 
     }
+// novo servidor adiciona lista de svs que o principal conhece
+    private void adicionaSVLocal() throws IOException, ClassNotFoundException {
+        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
+        Socket s2 = ss.accept();
+        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
 
+        HashMap<InetAddress, Integer> svs = (HashMap<InetAddress, Integer>) in2.readObject();
+        
+        this.bd.registaServidores(svs);
+
+    }
     private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
         InetAddress ip = p.getCampo(1).getIP();
         //BigInteger bg = new BigInteger(p.getCampo(2).getValor());

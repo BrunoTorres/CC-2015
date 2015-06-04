@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Bruno Pereira
+ *
  */
 public class InteracaoCliente extends Thread {
 
@@ -665,6 +665,8 @@ public class InteracaoCliente extends Thread {
         res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
+        
+        
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
         System.out.println("vai imprimir o ip dos servidores");
@@ -677,15 +679,16 @@ public class InteracaoCliente extends Thread {
             System.out.println("IP PARA SER PEDIDO = " +i);
             break;
         }
-
+        
+        ServerSocket ss = new ServerSocket(this.bd.getPorta());
+         serv = ss.accept();
+        ObjectInputStream in = new ObjectInputStream(serv.getInputStream());
         ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(res);
         out.flush();
         //serv.close();
         
-        ServerSocket ss = new ServerSocket(this.bd.getPorta());
-         serv = ss.accept();
-        ObjectInputStream in = new ObjectInputStream(serv.getInputStream());
+       
         Desafio d = (Desafio) in.readObject();
         
      

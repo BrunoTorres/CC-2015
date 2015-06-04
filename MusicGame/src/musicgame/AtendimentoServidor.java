@@ -100,12 +100,15 @@ public class AtendimentoServidor extends Thread {
         
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
         /////////////////////////////VER////////////////
-        HashMap<InetAddress, Integer> servidores = (HashMap<InetAddress, Integer> ) in.readObject();
-        this.bd.registaServidores(servidores);
+        
         
         ObjectOutputStream o;
         o = new ObjectOutputStream(this.s.getOutputStream());
         o.writeObject(p);
         o.flush();
+        
+        
+        HashMap<InetAddress, Integer> servidores = (HashMap<InetAddress, Integer> ) in.readObject();
+        this.bd.registaServidores(servidores);
     }
 }

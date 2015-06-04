@@ -66,39 +66,39 @@ public class InteracaoServidor extends Thread {
                 case AtendimentoServidor.REQUESTDESAFIO:
                     System.out.println("envia desafio");
                     desafio = input.getCampo(0).getValue();
-                    System.out.println("DESAFIO PEDIDO = "+ desafio);
+                    System.out.println("DESAFIO PEDIDO = " + desafio);
                     sendDesafio(desafio);
                     break;
 
                 case AtendimentoServidor.DESAFIO:
                     System.out.println("desafiooo");
                     desafio = input.getCampo(0).getValue();
-                    InetAddress ip=input.getCampo(1).getIP();
-                    int porta= Integer.valueOf(input.getCampo(2).getValue());
+                    InetAddress ip = input.getCampo(1).getIP();
+                    int porta = Integer.valueOf(input.getCampo(2).getValue());
                     /*
-                    byte[] b = input.getCampo(1).getValor();
-                    byte[] ano = {b[0], b[1], b[2]};
-                    byte mes = b[3];
-                    byte dia = b[4];
-                    b = input.getCampo(2).getValor();
-                    byte hora = b[0];
-                    byte min = b[1];
-                    byte seg = b[2];
-                    int anos = new BigInteger(ano).intValue();
-                    LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
-                    this.bd.addDesafioGlobal(desafio, data);
-                            */
-                    Desafio des=(Desafio)in.readObject();
+                     byte[] b = input.getCampo(1).getValor();
+                     byte[] ano = {b[0], b[1], b[2]};
+                     byte mes = b[3];
+                     byte dia = b[4];
+                     b = input.getCampo(2).getValor();
+                     byte hora = b[0];
+                     byte min = b[1];
+                     byte seg = b[2];
+                     int anos = new BigInteger(ano).intValue();
+                     LocalDateTime data = LocalDateTime.of(anos, mes, dia, hora, min, seg);
+                     this.bd.addDesafioGlobal(desafio, data);
+                     */
+                    Desafio des = (Desafio) in.readObject();
                     this.bd.addDesafioGlobal(desafio, des.getLocalDate());
                     this.bd.addDesafio(des);
-                    System.out.println("ORA$$$$$$$$$$$$ ip para guardar no desafio= "+ ip);
-                    this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip,porta);
+                    System.out.println("ORA$$$$$$$$$$$$ ip para guardar no desafio= " + ip);
+                    this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip, porta);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     adicionaRanking();
                     break;
 
-                   // case AtendimentoServidor.REGISTADESAFIO:  
+                // case AtendimentoServidor.REGISTADESAFIO:  
                 //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
                 //     break;´
                 }
@@ -117,23 +117,28 @@ public class InteracaoServidor extends Thread {
         System.out.println("vou resgistar o servido que vem ");
         InetAddress ip = p.getCampo(1).getIP();
         //ObjectOutputStream o;
-        System.out.println("ip= "+ ip);
+        System.out.println("ip= " + ip);
         //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         //int porta = bg.intValue();´
-        int porta=Integer.valueOf(p.getCampo(2).getValue());
+        int porta = Integer.valueOf(p.getCampo(2).getValue());
         //Socket serv = new Socket(InetAddress.getByName(ip), porta);
 
         Campo c;
         //                                                    falta info antes de enviar objecto?!
         // out = new ObjectOutputStream(serv.getOutputStream());
-        out.writeObject(this.bd.getServidores());
-        out.flush();
+        //out.writeObject(this.bd.getServidores());
+        //out.flush();
+        System.out.println("vou enviar cenas");
+        if (this.bd.getDesafios().size() > 0) {
+            sendListDesafios(ip, porta);
+        }
+        if (this.bd.getRankingLocal().size() > 0) {
+            sendRanking();
+        }
 
-        
-       
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
-            if(i!=ip){
+            if (i != ip) {
                 try (Socket conhecidos = new Socket(i, portaSV)) {
                     PDU res = new PDU(0, AtendimentoServidor.INFO);
                     c = new Campo(AtendimentoServidor.REGISTASVSEMRESPOSTA, "");
@@ -146,16 +151,13 @@ public class InteracaoServidor extends Thread {
                     out.writeObject(res);
                     out.flush();
                 }
-        this.bd.registaServidor(ip, porta);
-            
+                this.bd.registaServidor(ip, porta);
+
+            }
         }
-        }
-        
 
 ///////////////////////////////////////TODOS
     }
-
-
 
     //RECEBE o lista de desafios pendentes GLOBAIS///////////////////////////////////////////////////////
     private void adicionaDesafios(PDU input) throws IOException, ClassNotFoundException {
@@ -173,45 +175,56 @@ public class InteracaoServidor extends Thread {
         HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
 
        // this.bd.addDesafiosGlobais(des, ip, porta);
-
     }
 
-    private void adicionaRanking() throws IOException, ClassNotFoundException { /*************************************/
+    private void adicionaRanking() throws IOException, ClassNotFoundException {
+        /**
+         * **********************************
+         */
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         this.in = new ObjectInputStream(s2.getInputStream());
         HashMap<String, Integer> rank = (HashMap<String, Integer>) in.readObject();
 
         this.bd.addRankingGlobal(rank);
-        
+
         this.s.close();
 
     }
 // novo servidor adiciona lista de svs que o principal conhece
+
     private void adicionaSVLocal() throws IOException, ClassNotFoundException {
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
 
         HashMap<InetAddress, Integer> svs = (HashMap<InetAddress, Integer>) in2.readObject();
-        
+
         this.bd.registaServidores(svs);
 
     }
+
     private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
         InetAddress ip = p.getCampo(1).getIP();
         //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = Integer.valueOf(p.getCampo(2).getValue());
-        
-        System.out.println("adiciona sv local ip "+ ip + " Porta= "+ porta );
-        
-        this.bd.getServidores().put(ip, porta);
+
+        System.out.println("adiciona sv local ip " + ip + " Porta= " + porta);
+        if(!this.bd.getServidores().containsKey(ip))
+            this.bd.getServidores().put(ip, porta);
         try (Socket server = new Socket(ip, porta)) {
             out = new ObjectOutputStream(server.getOutputStream());
-            
-            
-            /**********************************************************************/
-            
+
+            /**
+             * *******************************************************************
+             */
+            System.out.println("Vou enviar as cenas");
+            if (this.bd.getDesafios().size() > 0) {
+                sendListDesafios(ip, porta);
+            }
+            if (this.bd.getRankingLocal().size() > 0) {
+                sendRanking();
+            }
             sendListDesafios(ip, porta);
             sendRanking();//
         }
@@ -256,8 +269,6 @@ public class InteracaoServidor extends Thread {
         System.out.println("DESAFIO A SER ENVIAD como o NOME = " + d.getNome());
         out.writeObject(d);
         out.flush();
-        
-       
 
     }
 

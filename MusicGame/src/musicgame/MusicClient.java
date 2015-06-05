@@ -454,8 +454,6 @@ public class MusicClient {
 
                 System.err.println("Recebi pergunta");
                 nome = new String(pacote.getCampo(0).getValor());
-                System.out.println("IDDDD= "+ pacote.getCampo(0).getId());
-                 System.out.println("IDDDD 2= "+ pacote.getCampo(1).getId());
                 int id = pacote.getCampo(1).getId();
                 // se == 255 -> Não existem jogadores suficientes -> Exception
                 // se não -> jogar

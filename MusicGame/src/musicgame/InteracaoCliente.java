@@ -458,7 +458,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(60);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(200);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -700,19 +700,25 @@ public class InteracaoCliente extends Thread {
             System.out.println("Abriu o input para receber o desafio!");
             Desafio d = (Desafio) inFromServer.readObject();
             System.out.println("recebeu desafio");
-            HashMap<String,File> imagens= (HashMap<String,File>)inFromServer.readObject();
-            HashMap<String,File> musicas= (HashMap<String,File>)inFromServer.readObject();
+            HashMap<String,byte[]> imagens= (HashMap<String,byte[]>)inFromServer.readObject();
+            HashMap<String,byte[]> musicas= (HashMap<String,byte[]>)inFromServer.readObject();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             
-            
+          for(String s:imagens.keySet()){
+              os.write(imagens.get(s));
+              File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/"+s);
+              FileOutputStream fos = new FileOutputStream(f);
+              fos.write(os.toByteArray());            
+          }
+          /*
           for(String s:imagens.keySet()){
               File f = imagens.get(s);
               FileOutputStream fos = new FileOutputStream(f);
               fos.write(os.toByteArray());
               System.out.println("Criou imagem = "+ s);
-                
-              
+   
           }
+          */
             
    
 /*

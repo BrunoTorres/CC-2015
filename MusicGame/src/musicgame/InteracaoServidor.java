@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -169,9 +170,9 @@ public class InteracaoServidor extends Thread {
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         this.in = new ObjectInputStream(s2.getInputStream());
-        HashMap<String, Integer> rank = (HashMap<String, Integer>) in.readObject();
+        Utilizador  rank = (Utilizador)in.readObject();
 
-        this.bd.addRankingGlobal(rank);
+        this.bd.addRankingGlobal(desafio,rank);
 
         this.s.close();
 

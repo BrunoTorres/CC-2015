@@ -14,8 +14,10 @@ import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -23,6 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 class BD implements Serializable {
+
     private int port;
     private InetAddress ip;
     private HashMap<String, Utilizador> users; /// syc
@@ -30,9 +33,9 @@ class BD implements Serializable {
     private HashMap<String, Integer> rankingGlobal;     /// syc
     private HashMap<String, Desafio> desafiosLocais; // syc
     private HashMap<String, LocalDateTime> desafiosGlobais; // syc
-    
-    private HashMap<String, HashMap<InetAddress,Integer>> listaDesafiosServidores;
-    
+
+    private HashMap<String, HashMap<InetAddress, Integer>> listaDesafiosServidores;
+
     private ArrayList<Pergunta> perguntas;
     private HashMap<InetAddress, Integer> servidores;
     private String pastaMusica;
@@ -49,9 +52,10 @@ class BD implements Serializable {
         this.servidores = new HashMap<>();
         this.desafiosGlobais = new HashMap<>();
         this.rankingGlobal = new HashMap<>();
-        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
-        
+        this.listaDesafiosServidores = new HashMap<String, HashMap<InetAddress, Integer>>();
+
     }
+
     public BD() {
         this.pastaImagem = null;
         this.perguntas = new ArrayList<>();
@@ -62,21 +66,22 @@ class BD implements Serializable {
         this.servidores = new HashMap<>();
         this.desafiosGlobais = new HashMap<>();
         this.rankingGlobal = new HashMap<>();
-        this.listaDesafiosServidores= new HashMap<String, HashMap<InetAddress,Integer>>();
-        
+        this.listaDesafiosServidores = new HashMap<String, HashMap<InetAddress, Integer>>();
+
     }
-    
-    public Map<String, LocalDateTime> getDesafiosGlobais(){
+
+    public Map<String, LocalDateTime> getDesafiosGlobais() {
         LocalDateTime agora = LocalDateTime.now();
-        HashMap<String, LocalDateTime> aux= new HashMap<>();
-        for(String s : this.desafiosGlobais.keySet()){
-            if(this.desafiosGlobais.get(s).isAfter(agora))
-                aux.put(s,this.desafiosGlobais.get(s));
+        HashMap<String, LocalDateTime> aux = new HashMap<>();
+        for (String s : this.desafiosGlobais.keySet()) {
+            if (this.desafiosGlobais.get(s).isAfter(agora)) {
+                aux.put(s, this.desafiosGlobais.get(s));
+            }
         }
         return aux;
     }
-    
-    public Map<String, Integer> getRankingGlobal(){
+
+    public Map<String, Integer> getRankingGlobal() {
         return this.rankingGlobal;
     }
 
@@ -125,19 +130,18 @@ class BD implements Serializable {
         }
         return r;
     }
-    
-    
-    public Map<String,LocalDateTime> getDesafiosLocais(){
+
+    public Map<String, LocalDateTime> getDesafiosLocais() {
         HashMap<String, LocalDateTime> aux = new HashMap<>();
-        for(String s: this.desafiosLocais.keySet()){
-            Desafio d=this.desafiosLocais.get(s);
-            if(!d.getStatus())
-                aux.put(s,d.getLocalDate());  
+        for (String s : this.desafiosLocais.keySet()) {
+            Desafio d = this.desafiosLocais.get(s);
+            if (!d.getStatus()) {
+                aux.put(s, d.getLocalDate());
+            }
         }
         return aux;
     }
-    
-    
+
     public synchronized void addDesafio(Desafio d) {
         desafiosLocais.put(d.getNome(), d);
     }
@@ -240,28 +244,21 @@ class BD implements Serializable {
             return us;
         }
     }
-    
-    
-    
-    
-    
-    public void setPorta(int porta){
-        this.port=porta;
+
+    public void setPorta(int porta) {
+        this.port = porta;
     }
-    public void setIP(InetAddress ip){
-        this.ip=ip;
-        
+
+    public void setIP(InetAddress ip) {
+        this.ip = ip;
+
     }
-    
-    public InetAddress getIp(){
+
+    public InetAddress getIp() {
         return this.ip;
     }
-    
-    
-    
-    
-    
-    public int getPorta(){
+
+    public int getPorta() {
         return this.port;
     }
 
@@ -300,8 +297,8 @@ class BD implements Serializable {
     public String getPathMusic() {
         return this.pastaMusica;
     }
-    
-    public void registaServidor(InetAddress ip, int porta){
+
+    public void registaServidor(InetAddress ip, int porta) {
         this.servidores.put(ip, porta);
     }
 
@@ -310,41 +307,43 @@ class BD implements Serializable {
     }
 
     public synchronized void registaServidores(HashMap<InetAddress, Integer> svs) {
-        for(InetAddress i : svs.keySet()){
+        for (InetAddress i : svs.keySet()) {
             this.servidores.put(i, svs.get(i));
         }
     }
 
-    public synchronized void  addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
-        
+    public synchronized void addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
+
     }
 
-    public synchronized void addRankingGlobal(HashMap<String, Integer> rank) {
-        for(String s: rank.keySet()){
-            if(this.rankingGlobal.containsKey(s)){
-                int r=this.rankingGlobal.get(s)+rank.get(s);
-                this.rankingGlobal.put(s,r);
+    public synchronized void addRankingGlobal(String desafio, Utilizador u) {
+        Desafio d = this.getDesafio(desafio);
+        
+            d.addUserEnd(u);
+            if (this.rankingGlobal.containsKey(u.getAlcunha())) {
+                int r = this.rankingGlobal.get(u.getAlcunha()) + u.getPontuacao();
+                this.rankingGlobal.put(u.getAlcunha(), r);
+            } else {
+                this.rankingGlobal.put(u.getAlcunha(),u.getPontuacao());
             }
-            else
-                this.rankingGlobal.put(s,rank.get(s));
-        }
+
+        
     }
 
     public synchronized void addDesafiosGlobais(String nomeDesafio, LocalDateTime data, InetAddress byName, int porta) {
-        HashMap<InetAddress,Integer>aux= new HashMap<>();
+        HashMap<InetAddress, Integer> aux = new HashMap<>();
         aux.put(byName, porta);
-    
-            this.listaDesafiosServidores.put(nomeDesafio,aux);
-            this.desafiosGlobais.put(nomeDesafio, data);
-        
-        
+
+        this.listaDesafiosServidores.put(nomeDesafio, aux);
+        this.desafiosGlobais.put(nomeDesafio, data);
+
     }
 
     public synchronized HashMap<InetAddress, Integer> getDesafioByIp(String desafio) {
         return this.listaDesafiosServidores.get(desafio);
     }
 
-    public synchronized void  addDesafioGlobal(String desafio, LocalDateTime data) {
+    public synchronized void addDesafioGlobal(String desafio, LocalDateTime data) {
         this.desafiosGlobais.put(desafio, data);
     }
 }

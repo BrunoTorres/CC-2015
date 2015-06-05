@@ -239,24 +239,32 @@ public class InteracaoCliente extends Thread {
     }
 
     @SuppressWarnings("empty-statement")
-    public synchronized void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException {
+    public synchronized void fimDesafio(byte[] data, InetAddress add, int port) throws UserInexistenteException, IOException {
         PDU pacote = new PDU(data);
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         Campo c;
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
+
         d.addUserEnd(user);
+
+        sendRankinLocal(user, d.getNome());
+        
+        d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
+        
+        
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
         } else {
-            
+
             d.setStatus(true);
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
             for (Utilizador u : d.getUserEnd().values()) {
                 utili.add(u);
             }
+
             utili.first().addPontuacao(3);
             for (Utilizador uaux : utili) {
                 PDU resposta = new PDU(s, (byte) 0);
@@ -271,14 +279,11 @@ public class InteracaoCliente extends Thread {
                     c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
                     resposta.addCampo(c);
                 }
+
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
-                try {
-                    sendRankinLocal(utili,d.getNome());
-                } catch (IOException ex) {
-                    Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
-                }
+
             }
-           
+
             // sendRankinLocal();
         }
     }
@@ -296,7 +301,7 @@ public class InteracaoCliente extends Thread {
         try {
             Utilizador u;
             u = this.bd.getUser(alc);
-            System.out.println("ALCUNNHA="+ alc);
+            System.out.println("ALCUNNHA=" + alc);
             byte[] passATestar = pacote.getCampo(1).getValor();
             byte[] pass = u.getPass();
             if (Arrays.equals(passATestar, pass)) { //Se a passe for correta
@@ -522,47 +527,46 @@ public class InteracaoCliente extends Thread {
         int pontuacao, certa;
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(nomeDesafio);
-        if(d.getUsers().containsKey(user.getAlcunha())){
-        
-        
-        System.out.println("Numero de questao na validação da resposta: " + (nQuestao - 2));
-        int respostaCerta = d.getPergunta(nQuestao - 2).getRespostaCerta();
-        System.out.println("A resposta que ele escolheu é a: " + escolha);
-        System.out.println("resposta certa é a numero: " + respostaCerta + " À pergunta: " + d.getPergunta(nQuestao - 2).getPergunta());
-        if (respostaCerta == escolha) {
-            user.addTempoResposta(tempoResposta);
-            user.addPontuacao(2);
-            pontuacao = 2;
-            certa = 1;
+        if (d.getUsers().containsKey(user.getAlcunha())) {
 
-        } else {
-            if (escolha == 0) {
-                pontuacao = 0;
-                certa = 0;
+            System.out.println("Numero de questao na validação da resposta: " + (nQuestao - 2));
+            int respostaCerta = d.getPergunta(nQuestao - 2).getRespostaCerta();
+            System.out.println("A resposta que ele escolheu é a: " + escolha);
+            System.out.println("resposta certa é a numero: " + respostaCerta + " À pergunta: " + d.getPergunta(nQuestao - 2).getPergunta());
+            if (respostaCerta == escolha) {
+                user.addTempoResposta(tempoResposta);
+                user.addPontuacao(2);
+                pontuacao = 2;
+                certa = 1;
+
             } else {
-                user.subPontuacao(1);
-                pontuacao = -1;
-                certa = 0;
+                if (escolha == 0) {
+                    pontuacao = 0;
+                    certa = 0;
+                } else {
+                    user.subPontuacao(1);
+                    pontuacao = -1;
+                    certa = 0;
+                }
             }
-        }
-        reply = new PDU(s, (byte) 0);
-        c = new Campo(DESAFIO, d.getNome().getBytes());
-        reply.addCampo(c);
-        c = new Campo(NQUESTAO, PDU.intToByteArray(nQuestao));
-        reply.addCampo(c);
-        c = new Campo(CERTA, new byte[]{(byte) certa});
-        reply.addCampo(c);
-        c = new Campo(PONTOS, new byte[]{(byte) pontuacao});
-        reply.addCampo(c);
+            reply = new PDU(s, (byte) 0);
+            c = new Campo(DESAFIO, d.getNome().getBytes());
+            reply.addCampo(c);
+            c = new Campo(NQUESTAO, PDU.intToByteArray(nQuestao));
+            reply.addCampo(c);
+            c = new Campo(CERTA, new byte[]{(byte) certa});
+            reply.addCampo(c);
+            c = new Campo(PONTOS, new byte[]{(byte) pontuacao});
+            reply.addCampo(c);
 
-        if (nQuestao != d.getQuestoes().size()) {
-            c = new Campo(CONTINUA, new byte[]{(byte) 0});
-        } else {
-            c = new Campo(FIM, new byte[]{(byte) 0});
-        }
-        reply.addCampo(c);
+            if (nQuestao != d.getQuestoes().size()) {
+                c = new Campo(CONTINUA, new byte[]{(byte) 0});
+            } else {
+                c = new Campo(FIM, new byte[]{(byte) 0});
+            }
+            reply.addCampo(c);
 
-        responde(reply, add, port);
+            responde(reply, add, port);
         }
 
     }
@@ -773,7 +777,7 @@ public class InteracaoCliente extends Thread {
 
     }
 
-    private void sendRankinLocal(TreeSet<Utilizador> utili,String desafio) throws IOException {
+    private void sendRankinLocal(Utilizador utili, String desafio) throws IOException {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             try (Socket conhecidos = new Socket(i, portaSV)) {
@@ -781,7 +785,7 @@ public class InteracaoCliente extends Thread {
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
                 res.addCampoTcp(c);
-                c=new Campo(MusicClient.DESAFIO, desafio);
+                c = new Campo(MusicClient.DESAFIO, desafio);
                 res.addCampo(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());

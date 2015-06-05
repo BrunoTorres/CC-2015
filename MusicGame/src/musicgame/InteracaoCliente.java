@@ -158,6 +158,7 @@ public class InteracaoCliente extends Thread {
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
 
                     try {
+                        System.out.println("vou fazer fazer request desafio");
                         requestDesafio(desafio, bd.getUserByIP(add));
                     } catch (UserInexistenteException | IOException | ClassNotFoundException e) {
                         System.out.println("erro");
@@ -248,33 +249,26 @@ public class InteracaoCliente extends Thread {
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
-            //System.out.println("Não faço nada SOU O USER: "+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
         } else {
             d.setStatus(true);
-            //System.out.println("Faço alguma coisa porque sou o ultimo sou o use:"+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
             for (Utilizador u : d.getUserEnd().values()) {
-                //System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
                 utili.add(u);
             }
             utili.first().addPontuacao(3);
-            //System.out.println("´Foram adicionados 3 pontos ao jogador"+utili.first().getAlcunha());
             for (Utilizador uaux : utili) {
                 PDU resposta = new PDU(s, (byte) 0);
                 resposta.addCampo(des);
-                //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
 
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
                 //*************************************************************************//
                 for (Utilizador u : utili) {
-                    //    System.out.println("mandar um jogador");
                     c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
                     resposta.addCampo(c);
                     c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
                     resposta.addCampo(c);
                 }
-                //System.out.println("responder");
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
             }
             try {
@@ -461,7 +455,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(200);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(10);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -496,13 +490,16 @@ public class InteracaoCliente extends Thread {
             this.bd.updateUser(u.getAlcunha(), add, port);
 
             try {
-                System.out.println("##################### vou enviar info desafio " + d.getNome());
-                sendInfoDesafio(d);
+                if (!bd.getServidores().isEmpty()) {
+                    System.out.println("##################### vou enviar info desafio " + d.getNome());
+                    sendInfoDesafio(d);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             Jogo j;
+            System.out.println("vou entrar no jogo");
             j = new Jogo(this.bd.getUserByIP(add), tempo, d, this.bd, 1, true);
             j.start();
         }

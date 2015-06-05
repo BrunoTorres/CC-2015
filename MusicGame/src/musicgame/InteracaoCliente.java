@@ -701,10 +701,13 @@ public class InteracaoCliente extends Thread {
             Desafio d = (Desafio) inFromServer.readObject();
             System.out.println("recebeu desafio");
             HashMap<String,byte[]> imagens= (HashMap<String,byte[]>)inFromServer.readObject();
+            //inFromServer.reset();
+            System.out.println("recebeu imagens");
             HashMap<String,byte[]> musicas= (HashMap<String,byte[]>)inFromServer.readObject();
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            System.out.println("recebeu musicas");
             
           for(String s:imagens.keySet()){
+              ByteArrayOutputStream os = new ByteArrayOutputStream();
               os.write(imagens.get(s));
               File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/"+s);
               FileOutputStream fos = new FileOutputStream(f);

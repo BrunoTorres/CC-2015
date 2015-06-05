@@ -291,9 +291,9 @@ public class InteracaoServidor extends Thread {
         HashMap<String, byte[]> musicas = new HashMap<String, byte[]>();
 
         for (int i = 0; i < d.getQuestoes().size(); i++) {
-            File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\music\\" + d.getQuestoes().get(i).getImagem());
+            File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
             byte[] r = Files.readAllBytes(f.toPath());
-            musicas.put(d.getQuestoes().get(i).getImagem(), r);
+            musicas.put(d.getQuestoes().get(i).getMusica(), r);
 
         }
         out.writeObject(musicas);

@@ -368,7 +368,7 @@ public class InteracaoCliente extends Thread {
         int t = 0;
         if (tam > 0) {
             for (Desafio d : desafios) {
-                if (d.getStatus() == false) {
+                if (d.getStatus() == false && d.getComecou() == false) {
                     desafiosAenviar.add(d);
                 }
             }

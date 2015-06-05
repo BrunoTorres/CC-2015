@@ -73,11 +73,13 @@ public class Jogo extends Thread {
                 }
             }
             if (this.desafio.getStatus() == false) {
-                if(this.desafio.getUsersBegin()<this.desafio.getTamanhoUsers()){ 
+                if(this.desafio.getUsersBegin()<this.desafio.getTamanhoUsers()){                     
+                    System.out.println("Incrementar o users begin");
                     this.desafio.incUsersBegin();
                 }
-                else{                                    
-                    this.desafio.setStatus(true);
+                else{           
+                    System.out.println("Pus a true o status");
+                    this.desafio.setComecou(true);
                 }
                 if (this.desafio.getUsers().size() < 2 && this.desafio.getComecou()==false) {
                     Utilizador us = this.u;

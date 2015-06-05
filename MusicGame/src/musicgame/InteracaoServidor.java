@@ -137,6 +137,7 @@ public class InteracaoServidor extends Thread {
                     out = new ObjectOutputStream(conhecidos.getOutputStream());
                     out.writeObject(res);
                     out.flush();
+                    conhecidos.close();
                 }
 
             }
@@ -146,7 +147,7 @@ public class InteracaoServidor extends Thread {
 
 ///////////////////////////////////////TODOS
     }
-
+/*
     //RECEBE o lista de desafios pendentes GLOBAIS///////////////////////////////////////////////////////
     private void adicionaDesafios(PDU input) throws IOException, ClassNotFoundException {
         InetAddress ip = input.getCampo(1).getIP();
@@ -161,9 +162,13 @@ public class InteracaoServidor extends Thread {
         this.in = new ObjectInputStream(s2.getInputStream());
 
         HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
+        
+        
+        //this.s.close();
 
         // this.bd.addDesafiosGlobais(des, ip, porta);
     }
+    */
 
     private void adicionaRanking(String desafio) throws IOException, ClassNotFoundException {
         

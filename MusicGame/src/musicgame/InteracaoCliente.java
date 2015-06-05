@@ -739,7 +739,7 @@ public class InteracaoCliente extends Thread {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
-        serv.close();
+        
         serv.shutdownInput();
 
         serv.close();
@@ -786,7 +786,7 @@ public class InteracaoCliente extends Thread {
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
                 res.addCampoTcp(c);
                 c = new Campo(MusicClient.DESAFIO, desafio);
-                res.addCampo(c);
+                res.addCampoTcp(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);

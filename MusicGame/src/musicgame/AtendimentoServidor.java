@@ -24,18 +24,18 @@ public class AtendimentoServidor extends Thread {
     public static final int REGISTASVSEMRESPOSTA = 38;
     public static final int LISTADESVS = 39;
     public static final int DESAFIO = 40;
-    
 
     private BD bd;
     private int portaTCP; // EEUUUUUUU
     private String ipServer; // Servidor externo
     private int portaTCP2; // Servidor externo
     private Socket s;
+    ServerSocket ss;
 
     public AtendimentoServidor(BD bd, int porta) {
         this.bd = bd;
         this.portaTCP = porta;
-        
+
         this.ipServer = null;
     }
 
@@ -44,17 +44,17 @@ public class AtendimentoServidor extends Thread {
         this.portaTCP = porta;
         this.ipServer = sv;
         this.portaTCP2 = porta2;
-        
+
         this.s = new Socket(InetAddress.getByName(sv), porta2);
     }
 
     @Override
     public void run() {
         try {
-            if(ipServer != null){
+            if (ipServer != null) {
                 registaServidor();
             }
-            
+
             try {
                 ServerSocket ss = new ServerSocket(this.portaTCP);
                 while (true) {
@@ -62,7 +62,7 @@ public class AtendimentoServidor extends Thread {
                     this.s = ss.accept();
                     InteracaoServidor is = new InteracaoServidor(bd, this.s);
                     is.start();
-                    
+
                 }
             } catch (IOException ex) {
                 Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -72,26 +72,32 @@ public class AtendimentoServidor extends Thread {
             Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(AtendimentoServidor.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                ss.close();
+            } catch (Exception e) {
+                // If you really want to know why you can't close the ServerSocket, like whether it's null or not
+            }
         }
 
     }
 
     public void registaServidor() throws UnknownHostException, IOException {
         PDU p = new PDU(0, INFO);
-        Campo c = new Campo(REGISTASV, new byte[]{(byte)0});
-        System.out.println("CAMPO "+ c.getIdTcp());
+        Campo c = new Campo(REGISTASV, new byte[]{(byte) 0});
+        System.out.println("CAMPO " + c.getIdTcp());
         p.addCampoTcp(c);
-        System.out.println("ip "+ InetAddress.getLocalHost());
+        System.out.println("ip " + InetAddress.getLocalHost());
         c = new Campo(IP, InetAddress.getLocalHost());
         InetAddress ip = c.getIP();
-        System.out.println("IP "+ ip);
+        System.out.println("IP " + ip);
         p.addCampoTcp(c);
         //BigInteger bg = BigInteger.valueOf(portaTCP);
         c = new Campo(PORTA, String.valueOf(portaTCP));
         p.addCampoTcp(c);
-        
-        System.out.println("vai guardar isto :"+InetAddress.getByName(ipServer));
-        
+
+        System.out.println("vai guardar isto :" + InetAddress.getByName(ipServer));
+
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
 
         ObjectOutputStream o;

@@ -171,13 +171,8 @@ public class InteracaoCliente extends Thread {
                 d.addUser(this.bd.getUserByIP(add), tl);
                 System.out.println("add user =" + bd.getUserByIP(add));
                 responde(reply, add, port);
-                System.out.println("respondeu");
-                
-                System.out.println("update");
                 Jogo j;
-                System.out.println("jogo");
                 j = new Jogo(bd.getUserByIP(add), d.getLocalDate(), d, this.bd, 1, true);
-                System.out.println("start");
                 j.start();
                 break;
             case 10:
@@ -256,6 +251,7 @@ public class InteracaoCliente extends Thread {
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
         } else {
+            
             d.setStatus(true);
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
             for (Utilizador u : d.getUserEnd().values()) {
@@ -276,13 +272,13 @@ public class InteracaoCliente extends Thread {
                     resposta.addCampo(c);
                 }
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
+                try {
+                    sendRankinLocal(utili,d.getNome());
+                } catch (IOException ex) {
+                    Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            try {
-                sendRankinLocal();  ///////////////////////////////############################################################################
-            } catch (IOException ex) {
-                Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+           
             // sendRankinLocal();
         }
     }
@@ -526,6 +522,9 @@ public class InteracaoCliente extends Thread {
         int pontuacao, certa;
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(nomeDesafio);
+        if(d.getUsers().containsKey(user.getAlcunha())){
+        
+        
         System.out.println("Numero de questao na validação da resposta: " + (nQuestao - 2));
         int respostaCerta = d.getPergunta(nQuestao - 2).getRespostaCerta();
         System.out.println("A resposta que ele escolheu é a: " + escolha);
@@ -564,6 +563,7 @@ public class InteracaoCliente extends Thread {
         reply.addCampo(c);
 
         responde(reply, add, port);
+        }
 
     }
 
@@ -773,7 +773,7 @@ public class InteracaoCliente extends Thread {
 
     }
 
-    private void sendRankinLocal() throws IOException {
+    private void sendRankinLocal(TreeSet<Utilizador> utili,String desafio) throws IOException {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             try (Socket conhecidos = new Socket(i, portaSV)) {
@@ -781,11 +781,13 @@ public class InteracaoCliente extends Thread {
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
                 res.addCampoTcp(c);
+                c=new Campo(MusicClient.DESAFIO, desafio);
+                res.addCampo(c);
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
                 out.flush();
-                out.writeObject(this.bd.getRankingLocal());
+                out.writeObject(utili);
                 out.flush();
                 conhecidos.close();
             }

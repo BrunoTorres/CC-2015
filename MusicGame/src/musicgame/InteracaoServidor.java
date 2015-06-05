@@ -80,7 +80,8 @@ public class InteracaoServidor extends Thread {
                     this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip, porta);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
-                    adicionaRanking();
+                    desafio=input.getCampo(1).getValue();
+                    adicionaRanking(desafio);
                     break;
 
                 // case AtendimentoServidor.REGISTADESAFIO:  
@@ -163,7 +164,8 @@ public class InteracaoServidor extends Thread {
         // this.bd.addDesafiosGlobais(des, ip, porta);
     }
 
-    private void adicionaRanking() throws IOException, ClassNotFoundException {
+    private void adicionaRanking(String desafio) throws IOException, ClassNotFoundException {
+        
         ServerSocket ss = new ServerSocket(this.s.getLocalPort());
         Socket s2 = ss.accept();
         this.in = new ObjectInputStream(s2.getInputStream());

@@ -58,26 +58,36 @@ public class InteracaoServidor extends Thread {
                 case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
                     System.out.println("send ficheiros");
                     String desafio = input.getCampo(0).getValue();
+                    String pacote = input.getCampo(1).getValue();
+                    switch (pacote) {
+                        case "1":
+                            sendAudio(desafio, 1);
+                            break;
+                        case "2":
+                            sendAudio(desafio, 2);
+                            break;
+
+                    }
                     //BigInteger bg = new BigInteger(input.getCampo(0).getValor());
                     //int pergunta = bg.intValue();
                     //int pergunta = Integer.valueOf(input.getCampo(0).getValue());
                     //sendImage(desafio, pergunta);
-                    sendAudio(desafio);
+
                     break;
 
                 case AtendimentoServidor.REQUESTDESAFIO:
                     System.out.println("envia desafio");
                     desafio = input.getCampo(0).getValue();
-                    String alcunha=input.getCampo(2).getValue();
+                    String alcunha = input.getCampo(2).getValue();
                     System.out.println("DESAFIO PEDIDO = " + desafio);
-                    sendDesafio(desafio,alcunha);
+                    sendDesafio(desafio, alcunha);
                     break;
 
                 case AtendimentoServidor.DESAFIO:
                     System.out.println("desafiooo");
                     desafio = input.getCampo(0).getValue();
                     InetAddress ip = input.getCampo(1).getIP();
-                    System.out.println("ip no recebe Desafio!!!= "+ ip);
+                    System.out.println("ip no recebe Desafio!!!= " + ip);
                     int porta = Integer.valueOf(input.getCampo(2).getValue());
                     /*
                      byte[] b = input.getCampo(1).getValor();
@@ -155,12 +165,11 @@ public class InteracaoServidor extends Thread {
                     out.writeObject(res);
                     out.flush();
                 }
-               
 
             }
-            
+
         }
-         this.bd.registaServidor(ip, porta);
+        this.bd.registaServidor(ip, porta);
 
 ///////////////////////////////////////TODOS
     }
@@ -180,7 +189,7 @@ public class InteracaoServidor extends Thread {
 
         HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
 
-       // this.bd.addDesafiosGlobais(des, ip, porta);
+        // this.bd.addDesafiosGlobais(des, ip, porta);
     }
 
     private void adicionaRanking() throws IOException, ClassNotFoundException {
@@ -217,8 +226,9 @@ public class InteracaoServidor extends Thread {
         int porta = Integer.valueOf(p.getCampo(2).getValue());
 
         System.out.println("adiciona sv local ip " + ip + " Porta= " + porta);
-        if(!this.bd.getServidores().containsKey(ip))
+        if (!this.bd.getServidores().containsKey(ip)) {
             this.bd.getServidores().put(ip, porta);
+        }
         try (Socket server = new Socket(ip, porta)) {
             out = new ObjectOutputStream(server.getOutputStream());
 
@@ -271,46 +281,37 @@ public class InteracaoServidor extends Thread {
         out.reset();
     }
 
-    private void sendDesafio(String desafio,String alcunha) throws IOException {
+    private void sendDesafio(String desafio, String alcunha) throws IOException {
         Desafio d = this.bd.getDesafio(desafio);
         System.out.println("DESAFIO A SER ENVIAD como o NOME = " + d.getNome());
         out.writeObject(d);
         out.flush();
         File f;
-        HashMap<String,byte[]> imagens= new HashMap<String,byte[]>();
-       
-        
-        for(int i=0;i<d.getQuestoes().size();i++){
-           f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
-           byte[] r = Files.readAllBytes(f.toPath());
-           imagens.put(d.getQuestoes().get(i).getImagem(), r);
-          
+        HashMap<String, byte[]> imagens = new HashMap<String, byte[]>();
+
+        for (int i = 0; i < d.getQuestoes().size(); i++) {
+            f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\" + d.getQuestoes().get(i).getImagem());
+            byte[] r = Files.readAllBytes(f.toPath());
+            imagens.put(d.getQuestoes().get(i).getImagem(), r);
+
         }
         out.writeObject(imagens);
         out.flush();
         out.reset();
+
+        /*
         
-        
-        
-         /*
-        
-        for(int i=0;i<d.getQuestoes().size();i++){
-           f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
-            System.out.println("Imagem a ser enviada= "+"C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
-           //byte[] r = Files.readAllBytes(f.toPath());
-           imagens.put(d.getQuestoes().get(i).getImagem(), f);
-           f = new File(d.getQuestoes().get(i).getMusica());
-           // r = Files.readAllBytes(f.toPath());
-           musicas.put(d.getQuestoes().get(i).getMusica(), f);
-        }
-        */
-       
-       
-        
-        
-        
-        
-        Utilizador u= new Utilizador(alcunha, 0);
+         for(int i=0;i<d.getQuestoes().size();i++){
+         f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
+         System.out.println("Imagem a ser enviada= "+"C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
+         //byte[] r = Files.readAllBytes(f.toPath());
+         imagens.put(d.getQuestoes().get(i).getImagem(), f);
+         f = new File(d.getQuestoes().get(i).getMusica());
+         // r = Files.readAllBytes(f.toPath());
+         musicas.put(d.getQuestoes().get(i).getMusica(), f);
+         }
+         */
+        Utilizador u = new Utilizador(alcunha, 0);
         d.addUser(u, new byte[]{0});
 
     }
@@ -321,29 +322,30 @@ public class InteracaoServidor extends Thread {
         out.flush();
     }
 
-    private void sendAudio(String desafio) throws IOException {
+    private void sendAudio(String desafio, int pacote) throws IOException {
         Desafio d = bd.getDesafio(desafio);
-        HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
-       for(int i=0;i<5;i++){
-         File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\"+d.getQuestoes().get(i).getMusica());
-         byte[]  r = Files.readAllBytes(f.toPath());
-         musicas.put(d.getQuestoes().get(i).getMusica(),r );
+        HashMap<String, byte[]> musicas = new HashMap<String, byte[]>();
+        if (pacote == 1) {
+            for (int i = 0; i < 5; i++) {
+                File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
+                byte[] r = Files.readAllBytes(f.toPath());
+                musicas.put(d.getQuestoes().get(i).getMusica(), r);
+            }
+            out.writeObject(musicas);
+            out.flush();
+            out.reset();
+        } else if (pacote == 2) {
+            musicas = new HashMap<String, byte[]>();
+            for (int i = 5; i < d.getQuestoes().size(); i++) {
+                File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
+                byte[] r = Files.readAllBytes(f.toPath());
+                musicas.put(d.getQuestoes().get(i).getMusica(), r);
+            }
+            out.writeObject(musicas);
+            out.flush();
+            out.reset();
         }
-        out.writeObject(musicas);
-        out.flush();
-        out.reset();
-        
-        musicas= new HashMap<String,byte[]>();
-       for(int i=5;i<d.getQuestoes().size();i++){
-         File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\"+d.getQuestoes().get(i).getMusica());
-         byte[]  r = Files.readAllBytes(f.toPath());
-         musicas.put(d.getQuestoes().get(i).getMusica(),r );
-        }
-        out.writeObject(musicas);
-        out.flush();
-        out.reset();
-        
-        
+
     }
 
 }

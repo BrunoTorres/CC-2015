@@ -739,7 +739,31 @@ public class InteracaoCliente extends Thread {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
+  
+        serv.close();
         
+        
+        
+        
+        
+        ////////////////// 2º pedido/////////////////////////////////////
+        serv = new Socket(j, porta);
+        System.out.println("Musicas 2 para IP PARA SER PEDIDO = " + j);
+        out = new ObjectOutputStream(serv.getOutputStream());
+
+        res = new PDU(0, AtendimentoServidor.INFO);
+        c = new Campo(MusicClient.QUESTAO, d.getNome());
+        res.addCampoTcp(c);
+        c = new Campo(MusicClient.QUESTAO, "2");
+        res.addCampoTcp(c);
+
+        out.writeObject(res);
+        out.flush();
+        out.reset();
+        System.out.println("pedido enviado");
+        inFromServer = new ObjectInputStream(serv.getInputStream());
+        System.out.println("Abriu o input para receber o musicas!");
+
         musicas = (HashMap<String, byte[]>) inFromServer.readObject();
         //serv.close();
         
@@ -752,9 +776,16 @@ public class InteracaoCliente extends Thread {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
-       
-        
+  
         serv.close();
+        
+        
+        
+        
+        
+        
+        
+        
 
         /*
          for(String s:imagens.keySet()){

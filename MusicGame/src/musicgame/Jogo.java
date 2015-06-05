@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author patricia
+ */
 public class Jogo extends Thread {
 
     private static final int OK = 0;
@@ -114,10 +118,10 @@ public class Jogo extends Thread {
                         }
                         responde(resposta, u.getIp(), u.getPort());
                         ////////////////// END REPLY //////////////////
-                        System.out.println("vai enviar imagem"+ u.getAlcunha());
+                        System.out.println("vai enviar imagem");
                         sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
 
-                        System.out.println("vai enviar musica"+ u.getAlcunha());
+                        System.out.println("vai enviar musica");
                         sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
                     }
                 }
@@ -206,7 +210,7 @@ public class Jogo extends Thread {
                 //this.bd.partes.put(i+1, p);  /////////////////////////////////#####################
                 music.addCampo(new Campo(AUDIO, p));
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
-                System.out.println("enviou a MUSICAAAAA para "+u.getAlcunha());
+
                 responde(music, add, port);
                 // System.out.println(i + 1);
 

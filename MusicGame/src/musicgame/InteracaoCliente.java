@@ -1,16 +1,13 @@
 package musicgame;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -28,7 +25,7 @@ import java.util.logging.Logger;
 
 /**
  *
- *
+ * @author Bruno Pereira
  */
 public class InteracaoCliente extends Thread {
 
@@ -89,12 +86,10 @@ public class InteracaoCliente extends Thread {
             analisaPacote(data, IPAddress, port);
         } catch (IOException | UserInexistenteException e) {
             System.out.println(e.toString());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void analisaPacote(byte[] data, InetAddress add, int port) throws IOException, UserInexistenteException, ClassNotFoundException {
+    private void analisaPacote(byte[] data, InetAddress add, int port) throws IOException, UserInexistenteException {
         PDU reply;
         int s;
         Campo c;
@@ -156,28 +151,21 @@ public class InteracaoCliente extends Thread {
                 //Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 String desafio = new String(p.getCampo(0).getValor());
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
-
                     try {
-                        System.out.println("vou fazer fazer request desafio");
-                        requestDesafio(desafio, bd.getUserByIP(add));
-                    } catch (UserInexistenteException | IOException | ClassNotFoundException e) {
-                        System.out.println("erro");
-                    }
+                        System.out.println("######################################### Desafio"+desafio);
+                        requestDesafio(desafio);
 
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
                 Desafio d = bd.getDesafio(desafio);
-                this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 d.addUser(this.bd.getUserByIP(add), tl);
-                System.out.println("add user =" + bd.getUserByIP(add));
                 responde(reply, add, port);
-                System.out.println("respondeu");
-                
-                System.out.println("update");
+                this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
                 Jogo j;
-                System.out.println("jogo");
                 j = new Jogo(bd.getUserByIP(add), d.getLocalDate(), d, this.bd, 1, true);
-                System.out.println("start");
                 j.start();
                 break;
             case 10:
@@ -255,26 +243,34 @@ public class InteracaoCliente extends Thread {
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
-        } else {
+            //System.out.println("Não faço nada SOU O USER: "+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
+        } else {            
             d.setStatus(true);
+            //System.out.println("Faço alguma coisa porque sou o ultimo sou o use:"+user.getAlcunha()+"numplayersDone: "+d.getNumPlayersDone()+"Tamanho de user:"+d.getTamanhoUsers());
             TreeSet<Utilizador> utili = new TreeSet<>(new CompareUsersByPoints());
             for (Utilizador u : d.getUserEnd().values()) {
+                //System.out.println("Pontuacao antes: c" + this.bd.getUser(u.getAlcunha()));
                 utili.add(u);
             }
             utili.first().addPontuacao(3);
+            //System.out.println("´Foram adicionados 3 pontos ao jogador"+utili.first().getAlcunha());
             for (Utilizador uaux : utili) {
                 PDU resposta = new PDU(s, (byte) 0);
                 resposta.addCampo(des);
+                //  System.out.println("Por cada jogador  vou atualizar ranking");
                 this.bd.actRanking(uaux);
+                
 
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
                 //*************************************************************************//
                 for (Utilizador u : utili) {
+                    //    System.out.println("mandar um jogador");
                     c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
                     resposta.addCampo(c);
                     c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
                     resposta.addCampo(c);
                 }
+                //System.out.println("responder");
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
             }
             try {
@@ -282,8 +278,7 @@ public class InteracaoCliente extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            // sendRankinLocal();
+            
         }
     }
 
@@ -300,7 +295,6 @@ public class InteracaoCliente extends Thread {
         try {
             Utilizador u;
             u = this.bd.getUser(alc);
-            System.out.println("ALCUNNHA="+ alc);
             byte[] passATestar = pacote.getCampo(1).getValor();
             byte[] pass = u.getPass();
             if (Arrays.equals(passATestar, pass)) { //Se a passe for correta
@@ -310,7 +304,7 @@ public class InteracaoCliente extends Thread {
                 c = new Campo(SCORE, PDU.intToByteArray(bd.getRanking(u.getAlcunha())));
                 resposta.addCampo(c);
                 this.bd.updateUser(u.getAlcunha(), add, port);
-
+                
                 responde(resposta, this.bd.getUser(alc).getIp(), this.bd.getUser(alc).getPort());
             } else { //Pacote de erro passe incorreta
                 resposta = new PDU(s, (byte) 0);
@@ -346,7 +340,7 @@ public class InteracaoCliente extends Thread {
         } else {
             Utilizador novo = new Utilizador(nome, alc, pass, add, port);
             this.bd.addUser(novo);
-
+            
             reply = new PDU(s, (byte) 0);
             c = new Campo(OK, "OK".getBytes());
             reply.addCampo(c);
@@ -359,12 +353,14 @@ public class InteracaoCliente extends Thread {
         ArrayList<Desafio> desafios = bd.getDesafios();
         ArrayList<Desafio> desafiosAenviar = new ArrayList<>();
         HashMap<String, LocalDateTime> dGlobais = (HashMap<String, LocalDateTime>) bd.getDesafiosGlobais();
+        
+        
+       // System.out.println("##############################"+bd.getDesafiosLocais().get("desafio1"));
 
-        // System.out.println("##############################"+bd.getDesafiosLocais().get("desafio1"));
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
-        int tamGlobais = dGlobais.size();
-
+        int tamGlobais = dGlobais.size(); 
+        
         System.out.println("DESAFIO TAMANHO " + tamGlobais);
         PDU reply;
         Campo c, da, h, f;
@@ -462,7 +458,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(45);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(200);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -480,7 +476,7 @@ public class InteracaoCliente extends Thread {
             byte minuto = (byte) tempo.getMinute();
             byte segundo = (byte) tempo.getSecond();
             Desafio d = new Desafio(nome, user, anoF, mes, dia, hora, minuto, segundo);
-            // d.setDataProperty();
+           // d.setDataProperty();
             //d.setHoraProperty();
             criaPerguntas(d);
             Utilizador u = bd.getUserByIP(add);
@@ -497,20 +493,19 @@ public class InteracaoCliente extends Thread {
             this.bd.updateUser(u.getAlcunha(), add, port);
 
             try {
-                if (!bd.getServidores().isEmpty()) {
-                    System.out.println("##################### vou enviar info desafio " + d.getNome());
-                    sendInfoDesafio(d);
-                }
+                System.out.println("##################### vou enviar info desafio "+d.getNome());
+                sendInfoDesafio(d);
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             Jogo j;
-            System.out.println("vou entrar no jogo");
             j = new Jogo(this.bd.getUserByIP(add), tempo, d, this.bd, 1, true);
             j.start();
         }
     }
+    
+    
 
     private void respostas(byte[] data, InetAddress add, int port) throws SocketException, UserInexistenteException {
         PDU pacote = new PDU(data);
@@ -663,124 +658,118 @@ public class InteracaoCliente extends Thread {
     }
 
     // Faz um pedido para ser enviado um desafio nao existente na base de dados local e recebe as imagens e musicas correspondentes.
-    private void requestDesafio(String desafio, Utilizador u) throws IOException, ClassNotFoundException {
+    private void requestDesafio(String desafio) throws IOException, ClassNotFoundException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio);
+        System.out.println("REQUEST DESAFIO ITERACAO CLIENTE = " + desafio);
         res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
-        c = new Campo(MusicClient.ALCUNHA, u.getAlcunha());
-        res.addCampoTcp(c);
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
+        System.out.println("vai imprimir o ip dos servidores");
+        Socket serv = new Socket();
 
-        InetAddress j = InetAddress.getLocalHost();
-        int porta = 0;
         for (InetAddress i : servidor.keySet()) {
-            System.out.println("ip = " + i);
-            j = i;
-            porta = servidor.get(i);
-
+            System.out.println("ip = "+ i);
+            System.out.println("Porta = "+ servidor.get(i));
+            serv = new Socket(i, servidor.get(i));
+            System.out.println("IP PARA SER PEDIDO = " +i);
             break;
         }
-        Socket serv = new Socket(j, porta);
 
-        //ServerSocket ss = new ServerSocket(this.bd.getPorta());
-        //serv = ss.accept();
         ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
         out.writeObject(res);
         out.flush();
-        out.reset();
-        //serv.close();
-        //Desafio d = (Desafio) in.readObject();
+        serv.close();
+        
+        ServerSocket ss = new ServerSocket(this.bd.getPorta());
+        Socket s = ss.accept();
+        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+        Desafio d = (Desafio) in.readObject();
+        
+     
 
-        ObjectInputStream inFromServer = new ObjectInputStream(serv.getInputStream());
-        Desafio d = (Desafio) inFromServer.readObject();
-        HashMap<String, byte[]> imagens = (HashMap<String, byte[]>) inFromServer.readObject();
-        //inFromServer.reset();
+        for (int i = 0; i < d.getQuestoes().size(); i++) {
+            res = new PDU(0, AtendimentoServidor.INFO);
+            c = new Campo(MusicClient.QUESTAO, String.valueOf(i));
+            res.addCampoTcp(c);
+            c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
+            res.addCampoTcp(c);
+            out.writeObject(res);
+            out.flush();
 
-        for (String s : imagens.keySet()) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            os.write(imagens.get(s));
-            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/" + s);
-            // System.out.println("CAminho da imagem = " + f.getPath());
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(os.toByteArray());
+            File imagem = (File) in.readObject();
+           
+            File audio = (File) in.readObject();
+            
+            // File f = new File("i.jpg");
+            //FileOutputStream fos = new FileOutputStream(f);
+            //fos.write(os.toByteArray());
+            
+
+            d.getQuestoes().get(i).setImagem(imagem.getPath());
+            d.getQuestoes().get(i).setMusica(audio.getPath());
         }
-        serv.close();
-///////////////////////////////////MUSICA///////////////////////////////////////////////////////////
-        serv = new Socket(j, porta);
-        out = new ObjectOutputStream(serv.getOutputStream());
-
-        res = new PDU(0, AtendimentoServidor.INFO);
-        c = new Campo(MusicClient.QUESTAO, d.getNome());
-        res.addCampoTcp(c);
-        c = new Campo(MusicClient.QUESTAO, "");
-        res.addCampoTcp(c);
-
-        out.writeObject(res);
-        out.flush();
-        out.reset();
-        serv.shutdownOutput();
-
-        inFromServer = new ObjectInputStream(serv.getInputStream());
-
-        HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
-        //inFromServer.reset();
-
-        for (String s : musicas.keySet()) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            os.write(musicas.get(s));
-            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(os.toByteArray());
-        }
-        serv.close();
-        serv.shutdownInput();
-
-        serv.close();
+         //////////////////*********************************** 
+        this.bd.addDesafio(d);
 
     }
 
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 
+
     private void sendInfoDesafio(Desafio d) throws IOException {
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
+            System.out.println("##############InetAddress= " + i.getHostName());
             int portaSV = this.bd.getServidores().get(i);
+            System.out.println("##############PORTA = "+ portaSV);
             try (Socket conhecidos = new Socket(i, portaSV)) {
-
+                 
+                
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
-                res.addCampoTcp(c);
-                c = new Campo(AtendimentoServidor.IP, bd.getIp());
-
-                res.addCampoTcp(c);
+                 res.addCampoTcp(c);
+                c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
+                 res.addCampoTcp(c);
                 c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bd.getPorta()));
+                 res.addCampoTcp(c);
+                
+                
+               
+                /*
+                c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
+                System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());
                 res.addCampoTcp(c);
-
+                c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
+                res.addCampoTcp(c);
+*/
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
-
+                
                 out.writeObject(res);
                 out.flush();
-
+                
                 out.writeObject(d);
                 out.flush();
-
+                
                 conhecidos.close();
             }
-
+            
         }
-
+        
     }
+
+    
 
     private void sendRankinLocal() throws IOException {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             int portaSV = this.bd.getServidores().get(i);
             try (Socket conhecidos = new Socket(i, portaSV)) {
-
+               
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
-                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
+                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL,new byte[]{0});
                 res.addCampoTcp(c);
+                
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
@@ -794,106 +783,72 @@ public class InteracaoCliente extends Thread {
 }
 
 /*   
- private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
- ServerSocket ss = new ServerSocket(this.bd.getPorta());
- Socket s2 = ss.accept();
- ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
- PDU res;
- Campo c;
- Desafio d =(Desafio) in2.readObject();
+             private void registaDesafio() throws IOException, ClassNotFoundException{ //////////////
+     ServerSocket ss = new ServerSocket(this.bd.getPorta());
+     Socket s2 = ss.accept();
+     ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
+     PDU res;
+     Campo c;
+     Desafio d =(Desafio) in2.readObject();
         
- for(int i=0;i<d.getQuestoes().size();i++){
- res = new PDU(0, AtendimentoServidor.INFO);
- c = new Campo(MusicClient.DESAFIO,d.getNome().getBytes());
- res.addCampo(c);
- c = new Campo(MusicClient.QUESTAO,PDU.intToByteArray(i));
- res.addCampo(c);
- out.writeObject(res);
- out.flush(); 
+     for(int i=0;i<d.getQuestoes().size();i++){
+     res = new PDU(0, AtendimentoServidor.INFO);
+     c = new Campo(MusicClient.DESAFIO,d.getNome().getBytes());
+     res.addCampo(c);
+     c = new Campo(MusicClient.QUESTAO,PDU.intToByteArray(i));
+     res.addCampo(c);
+     out.writeObject(res);
+     out.flush(); 
             
- File imagem =(File)in.readObject();
- File audio = (File)in.readObject();
+     File imagem =(File)in.readObject();
+     File audio = (File)in.readObject();
         
- d.getQuestoes().get(i).setImagem(imagem.getPath());
- d.getQuestoes().get(i).setMusica(audio.getPath());
- }
- }
- */
+     d.getQuestoes().get(i).setImagem(imagem.getPath());
+     d.getQuestoes().get(i).setMusica(audio.getPath());
+     }
+     }
+     */
+
+
 ////////LIST DESAFIOS
 
 /*
- /****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
+/****************************************************************** TESTAR AGORA COM DESAFIOS GLOBAIS ******/////////////
 /*
- for (String desafio : dGlobais.keySet()) {
- t++;
- reply = new PDU(s, (byte) 0);
- c = new Campo(DESAFIO, desafio.getBytes());
- reply.addCampo(c);
- int aux = dGlobais.get(desafio).getYear() % 100;
- int pri = aux / 10;
- int sec = aux % 10;
- BigInteger anoAux = BigInteger.valueOf(dGlobais.get(desafio).getYear());
- byte[] anoBytes = anoAux.toByteArray();
- byte[] anoF;
- if (anoBytes.length < 3) {
- anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
- } else {
- anoF = anoBytes;
- }
- byte mes = (byte) dGlobais.get(desafio).getMonthValue();
- byte dia = (byte) dGlobais.get(desafio).getDayOfMonth();
- byte hora = (byte) dGlobais.get(desafio).getHour();
- byte minuto = (byte) dGlobais.get(desafio).getMinute();
- byte segundo = (byte) dGlobais.get(desafio).getSecond();
- Desafio desafioGlobal = new Desafio(desafio, null, anoF, mes, dia, hora, minuto, segundo);
+                for (String desafio : dGlobais.keySet()) {
+                    t++;
+                    reply = new PDU(s, (byte) 0);
+                    c = new Campo(DESAFIO, desafio.getBytes());
+                    reply.addCampo(c);
+                    int aux = dGlobais.get(desafio).getYear() % 100;
+                    int pri = aux / 10;
+                    int sec = aux % 10;
+                    BigInteger anoAux = BigInteger.valueOf(dGlobais.get(desafio).getYear());
+                    byte[] anoBytes = anoAux.toByteArray();
+                    byte[] anoF;
+                    if (anoBytes.length < 3) {
+                        anoF = new byte[]{0x00, anoBytes[0], anoBytes[1]};
+                    } else {
+                        anoF = anoBytes;
+                    }
+                    byte mes = (byte) dGlobais.get(desafio).getMonthValue();
+                    byte dia = (byte) dGlobais.get(desafio).getDayOfMonth();
+                    byte hora = (byte) dGlobais.get(desafio).getHour();
+                    byte minuto = (byte) dGlobais.get(desafio).getMinute();
+                    byte segundo = (byte) dGlobais.get(desafio).getSecond();
+                    Desafio desafioGlobal = new Desafio(desafio, null, anoF, mes, dia, hora, minuto, segundo);
 
- c = new Campo(DESAFIO, desafioGlobal.getNome().getBytes());
- reply.addCampo(c);
- da = new Campo(DATA, desafioGlobal.getData());
- reply.addCampo(da);
- h = new Campo(HORA, desafioGlobal.getTempo());
- reply.addCampo(h);
- if (t < tam) {
- f = new Campo(CONTINUA, "0".getBytes());
- reply.addCampo(f);
- }
- responde(reply, add, port);
+                    c = new Campo(DESAFIO, desafioGlobal.getNome().getBytes());
+                    reply.addCampo(c);
+                    da = new Campo(DATA, desafioGlobal.getData());
+                    reply.addCampo(da);
+                    h = new Campo(HORA, desafioGlobal.getTempo());
+                    reply.addCampo(h);
+                    if (t < tam) {
+                        f = new Campo(CONTINUA, "0".getBytes());
+                        reply.addCampo(f);
+                    }
+                    responde(reply, add, port);
 
- }
- */
-/*
-
-
- ////////////////// 2º pedido/////////////////////////////////////
- serv = new Socket(j, porta);
- System.out.println("Musicas 2 para IP PARA SER PEDIDO = " + j);
- out = new ObjectOutputStream(serv.getOutputStream());
-
- res = new PDU(0, AtendimentoServidor.INFO);
- c = new Campo(MusicClient.QUESTAO, d.getNome());
- res.addCampoTcp(c);
- c = new Campo(MusicClient.QUESTAO, "2");
- res.addCampoTcp(c);
-
- out.writeObject(res);
- out.flush();
- out.reset();
- serv.shutdownOutput();
- System.out.println("pedido enviado");
- inFromServer = new ObjectInputStream(serv.getInputStream());
- System.out.println("Abriu o input para receber o musicas!");
-
- musicas = (HashMap<String, byte[]>) inFromServer.readObject();
- serv.shutdownInput();
- serv.close();
-        
- System.out.println("recebeu musicas");
-
- for (String s : musicas.keySet()) {
- ByteArrayOutputStream os = new ByteArrayOutputStream();
- os.write(musicas.get(s));
- File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
- FileOutputStream fos = new FileOutputStream(f);
- fos.write(os.toByteArray());
- }
- */
+                }
+*/

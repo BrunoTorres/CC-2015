@@ -277,16 +277,17 @@ public class InteracaoServidor extends Thread {
         out.writeObject(d);
         out.flush();
         File f;
-        HashMap<String,byte[]> imagens= new HashMap<String,byte[]>();
-        HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
+        HashMap<String,File> imagens= new HashMap<String,File>();
+        HashMap<String,File> musicas= new HashMap<String,File>();
         
         for(int i=0;i<d.getQuestoes().size();i++){
-           f = new File(d.getQuestoes().get(i).getImagem());
-           byte[] r = Files.readAllBytes(f.toPath());
-           imagens.put(d.getQuestoes().get(i).getImagem(), r);
+           f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
+            System.out.println("Imagem a ser enviada= "+"C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
+           //byte[] r = Files.readAllBytes(f.toPath());
+           imagens.put(d.getQuestoes().get(i).getImagem(), f);
            f = new File(d.getQuestoes().get(i).getMusica());
-            r = Files.readAllBytes(f.toPath());
-           musicas.put(d.getQuestoes().get(i).getMusica(), r);
+           // r = Files.readAllBytes(f.toPath());
+           musicas.put(d.getQuestoes().get(i).getMusica(), f);
         }
         out.writeObject(imagens);
         out.flush();

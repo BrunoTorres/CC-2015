@@ -70,13 +70,16 @@ public class Jogo extends Thread {
             if (this.init) {
                 while (this.data.isAfter(agora)) {
                     agora = LocalDateTime.now();
-
-                    /// vai ter aqui cenas para recber pacote de delete//
                 }
             }
             if (this.desafio.getStatus() == false) {
+                if(this.desafio.getUsersBegin()<this.desafio.getTamanhoUsers()){ 
+                    this.desafio.incUsersBegin();
+                }
+                else{                                    
+                    this.desafio.setStatus(true);
+                }
                 if (this.desafio.getUsers().size() < 2 && this.desafio.getComecou()==false) {
-                    System.out.println("Numero insuficiente");
                     Utilizador us = this.u;
 
                     PDU reply;
@@ -206,7 +209,6 @@ public class Jogo extends Thread {
                 //this.bd.partes.put(i+1, p);  /////////////////////////////////#####################
                 music.addCampo(new Campo(AUDIO, p));
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
-                System.out.println("enviou a MUSICAAAAA para "+u.getAlcunha());
                 responde(music, add, port);
                 // System.out.println(i + 1);
 

@@ -31,6 +31,7 @@ public class Desafio implements Serializable {
     private boolean status; // false->não foi feito true->já ocorreu
     private int numPlayersDone;
     private String user;
+    private int usersBegin;
     
     private byte[] ano;
     private byte dia;
@@ -57,7 +58,8 @@ public class Desafio implements Serializable {
         this.questoes = new ArrayList<>();
         this.usersEnd = new HashMap<>();
         this.status=false;
-        this.comecou=false;
+        this.comecou=false;   
+        this.usersBegin=1;
         
         //this.dataString = new SimpleStringProperty();
         //this.horaString = new SimpleStringProperty();
@@ -309,6 +311,14 @@ public class Desafio implements Serializable {
         for(Pergunta p :this.questoes)
             p.toString();
         return sb.toString();
+    }
+
+    int getUsersBegin() {
+        return this.usersBegin;
+    }
+
+    void incUsersBegin() {
+        this.usersBegin++;
     }
 
 }

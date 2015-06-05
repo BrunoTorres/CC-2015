@@ -58,16 +58,7 @@ public class InteracaoServidor extends Thread {
                 case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
                     System.out.println("send ficheiros");
                     String desafio = input.getCampo(0).getValue();
-                    String pacote = input.getCampo(1).getValue();
-                    switch (pacote) {
-                        case "1":
-                            sendAudio(desafio, 1);
-                            break;
-                        case "2":
-                            sendAudio(desafio, 2);
-                            break;
-
-                    }
+                    sendAudio(desafio);
                     //BigInteger bg = new BigInteger(input.getCampo(0).getValor());
                     //int pergunta = bg.intValue();
                     //int pergunta = Integer.valueOf(input.getCampo(0).getValue());
@@ -322,18 +313,23 @@ public class InteracaoServidor extends Thread {
         out.flush();
     }
 
-    private void sendAudio(String desafio, int pacote) throws IOException {
+    private void sendAudio(String desafio) throws IOException {
         Desafio d = bd.getDesafio(desafio);
         HashMap<String, byte[]> musicas = new HashMap<String, byte[]>();
-        if (pacote == 1) {
-            for (int i = 0; i < 5; i++) {
+        //if (pacote == 1) {
+            for (int i = 0; i < d.getQuestoes().size(); i++) {
                 File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
                 byte[] r = Files.readAllBytes(f.toPath());
+                out.writeObject(d.getQuestoes().get(i).getMusica());
+                out.flush();
+                out.writeObject(r);
+                out.flush();
                 musicas.put(d.getQuestoes().get(i).getMusica(), r);
             }
             out.writeObject(musicas);
             out.flush();
             out.reset();
+            /*
         } else if (pacote == 2) {
             musicas = new HashMap<String, byte[]>();
             for (int i = 5; i < d.getQuestoes().size(); i++) {
@@ -345,6 +341,7 @@ public class InteracaoServidor extends Thread {
             out.flush();
             out.reset();
         }
+                    */
 
     }
 

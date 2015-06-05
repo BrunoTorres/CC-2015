@@ -158,7 +158,12 @@ public class InteracaoCliente extends Thread {
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
 
                     System.out.println("######################################### Desafio" + desafio);
+                    try{
                     requestDesafio(desafio, bd.getUserByIP(add));
+                    }
+                    catch(UserInexistenteException | IOException | ClassNotFoundException e){
+                        System.out.println("erro");
+                    }
 
                 }
 
@@ -279,6 +284,8 @@ public class InteracaoCliente extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(InteracaoCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+           // sendRankinLocal();
 
         }
     }
@@ -717,77 +724,51 @@ public class InteracaoCliente extends Thread {
         res = new PDU(0, AtendimentoServidor.INFO);
         c = new Campo(MusicClient.QUESTAO, d.getNome());
         res.addCampoTcp(c);
-        c = new Campo(MusicClient.QUESTAO, "1");
+        c = new Campo(MusicClient.QUESTAO, "");
         res.addCampoTcp(c);
 
         out.writeObject(res);
         out.flush();
         out.reset();
+        serv.shutdownOutput();
+        
         System.out.println("pedido enviado");
         inFromServer = new ObjectInputStream(serv.getInputStream());
         System.out.println("Abriu o input para receber o musicas!");
 
-        HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+       // HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        for(int i=0;i<d.getQuestoes().size();i++){
+            System.out.println("Musica a chegar");
+            String nomeMusica=(String)inFromServer.readObject();
+            byte[] r= (byte[])inFromServer.readObject();
+            System.out.println("bytes musica chegou"+i);
+            
+        }
+        serv.shutdownInput();
+       
+        serv.close();
         //serv.close();
         
         System.out.println("recebeu musicas");
 
-        for (String s : musicas.keySet()) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            os.write(musicas.get(s));
-            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(os.toByteArray());
-        }
-  
-        serv.close();
-        
-        
-        
-        
-        
-        ////////////////// 2º pedido/////////////////////////////////////
-        serv = new Socket(j, porta);
-        System.out.println("Musicas 2 para IP PARA SER PEDIDO = " + j);
-        out = new ObjectOutputStream(serv.getOutputStream());
-
-        res = new PDU(0, AtendimentoServidor.INFO);
-        c = new Campo(MusicClient.QUESTAO, d.getNome());
-        res.addCampoTcp(c);
-        c = new Campo(MusicClient.QUESTAO, "2");
-        res.addCampoTcp(c);
-
-        out.writeObject(res);
-        out.flush();
-        out.reset();
-        System.out.println("pedido enviado");
-        inFromServer = new ObjectInputStream(serv.getInputStream());
-        System.out.println("Abriu o input para receber o musicas!");
-
-        musicas = (HashMap<String, byte[]>) inFromServer.readObject();
-        //serv.close();
-        
-        System.out.println("recebeu musicas");
-
-        for (String s : musicas.keySet()) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            os.write(musicas.get(s));
-            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(os.toByteArray());
-        }
-  
-        serv.close();
-        
-        
-        
-        
-        
-        
         
         
 
         /*
+        
+        
+        
+        for (String s : musicas.keySet()) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os.write(musicas.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(os.toByteArray());
+        }
+        
+        
+        
+        
          for(String s:imagens.keySet()){
          File f = imagens.get(s);
          FileOutputStream fos = new FileOutputStream(f);
@@ -938,3 +919,44 @@ public class InteracaoCliente extends Thread {
 
  }
  */
+
+
+
+
+
+/*
+
+
+ ////////////////// 2º pedido/////////////////////////////////////
+        serv = new Socket(j, porta);
+        System.out.println("Musicas 2 para IP PARA SER PEDIDO = " + j);
+        out = new ObjectOutputStream(serv.getOutputStream());
+
+        res = new PDU(0, AtendimentoServidor.INFO);
+        c = new Campo(MusicClient.QUESTAO, d.getNome());
+        res.addCampoTcp(c);
+        c = new Campo(MusicClient.QUESTAO, "2");
+        res.addCampoTcp(c);
+
+        out.writeObject(res);
+        out.flush();
+        out.reset();
+        serv.shutdownOutput();
+        System.out.println("pedido enviado");
+        inFromServer = new ObjectInputStream(serv.getInputStream());
+        System.out.println("Abriu o input para receber o musicas!");
+
+        musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        serv.shutdownInput();
+        serv.close();
+        
+        System.out.println("recebeu musicas");
+
+        for (String s : musicas.keySet()) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os.write(musicas.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(os.toByteArray());
+        }
+*/

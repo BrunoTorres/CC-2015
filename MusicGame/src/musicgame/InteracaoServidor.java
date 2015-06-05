@@ -324,7 +324,7 @@ public class InteracaoServidor extends Thread {
     private void sendAudio(String desafio) throws IOException {
         Desafio d = bd.getDesafio(desafio);
         HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
-       for(int i=0;i<1;i++){
+       for(int i=0;i<d.getQuestoes().size();i++){
          File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\"+d.getQuestoes().get(i).getMusica());
          byte[]  r = Files.readAllBytes(f.toPath());
          musicas.put(d.getQuestoes().get(i).getMusica(),r );

@@ -704,7 +704,7 @@ public class InteracaoCliente extends Thread {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             os.write(imagens.get(s));
             File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/" + s);
-
+           // System.out.println("CAminho da imagem = " + f.getPath());
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
@@ -728,11 +728,10 @@ public class InteracaoCliente extends Thread {
         HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
         System.out.println("recebeu musicas");
 
-        for (String s : imagens.keySet()) {
+        for (String s : musicas.keySet()) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            os.write(imagens.get(s));
-            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/" + s);
-
+            os.write(musicas.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }

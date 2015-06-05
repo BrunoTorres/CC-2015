@@ -717,6 +717,8 @@ public class InteracaoCliente extends Thread {
         res = new PDU(0, AtendimentoServidor.INFO);
         c = new Campo(MusicClient.QUESTAO, d.getNome());
         res.addCampoTcp(c);
+        c = new Campo(MusicClient.QUESTAO, "1");
+        res.addCampoTcp(c);
 
         out.writeObject(res);
         out.flush();
@@ -726,6 +728,8 @@ public class InteracaoCliente extends Thread {
         System.out.println("Abriu o input para receber o musicas!");
 
         HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        //serv.close();
+        
         System.out.println("recebeu musicas");
 
         for (String s : musicas.keySet()) {
@@ -735,6 +739,21 @@ public class InteracaoCliente extends Thread {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
+        
+        musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        //serv.close();
+        
+        System.out.println("recebeu musicas");
+
+        for (String s : musicas.keySet()) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os.write(musicas.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(os.toByteArray());
+        }
+       
+        
         serv.close();
 
         /*

@@ -114,10 +114,10 @@ public class Jogo extends Thread {
                         }
                         responde(resposta, u.getIp(), u.getPort());
                         ////////////////// END REPLY //////////////////
-                        System.out.println("vai enviar imagem");
+                        System.out.println("vai enviar imagem"+ u.getAlcunha());
                         sendImage(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
 
-                        System.out.println("vai enviar musica");
+                        System.out.println("vai enviar musica"+ u.getAlcunha());
                         sendMusic(desafio.getNome(), s, numQuestao, u.getIp(), u.getPort());
                     }
                 }
@@ -206,7 +206,7 @@ public class Jogo extends Thread {
                 //this.bd.partes.put(i+1, p);  /////////////////////////////////#####################
                 music.addCampo(new Campo(AUDIO, p));
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
-
+                System.out.println("enviou a MUSICAAAAA para "+u.getAlcunha());
                 responde(music, add, port);
                 // System.out.println(i + 1);
 

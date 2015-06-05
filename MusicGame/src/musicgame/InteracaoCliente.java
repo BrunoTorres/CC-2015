@@ -167,11 +167,17 @@ public class InteracaoCliente extends Thread {
                 }
 
                 Desafio d = bd.getDesafio(desafio);
-                d.addUser(this.bd.getUserByIP(add), tl);
-                responde(reply, add, port);
                 this.bd.updateUser(this.bd.getUserByIP(add).getAlcunha(), add, port);
+                d.addUser(this.bd.getUserByIP(add), tl);
+                System.out.println("add user =" + bd.getUserByIP(add));
+                responde(reply, add, port);
+                System.out.println("respondeu");
+                
+                System.out.println("update");
                 Jogo j;
+                System.out.println("jogo");
                 j = new Jogo(bd.getUserByIP(add), d.getLocalDate(), d, this.bd, 1, true);
+                System.out.println("start");
                 j.start();
                 break;
             case 10:
@@ -294,6 +300,7 @@ public class InteracaoCliente extends Thread {
         try {
             Utilizador u;
             u = this.bd.getUser(alc);
+            System.out.println("ALCUNNHA="+ alc);
             byte[] passATestar = pacote.getCampo(1).getValor();
             byte[] pass = u.getPass();
             if (Arrays.equals(passATestar, pass)) { //Se a passe for correta
@@ -455,7 +462,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(10);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(45);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;

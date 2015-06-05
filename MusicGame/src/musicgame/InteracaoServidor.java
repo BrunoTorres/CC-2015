@@ -57,12 +57,12 @@ public class InteracaoServidor extends Thread {
                     break;
                 case MusicClient.QUESTAO: // Recebe um PDU com o nome do desafio e o nº da pergunta e envia a imagem e o audio correspondente
                     System.out.println("send ficheiros");
-                    String desafio = input.getCampo(1).getValue();
+                    String desafio = input.getCampo(0).getValue();
                     //BigInteger bg = new BigInteger(input.getCampo(0).getValor());
                     //int pergunta = bg.intValue();
-                    int pergunta = Integer.valueOf(input.getCampo(0).getValue());
-                    sendImage(desafio, pergunta);
-                    sendAudio(desafio, pergunta);
+                    //int pergunta = Integer.valueOf(input.getCampo(0).getValue());
+                    //sendImage(desafio, pergunta);
+                    sendAudio(desafio);
                     break;
 
                 case AtendimentoServidor.REQUESTDESAFIO:
@@ -278,7 +278,7 @@ public class InteracaoServidor extends Thread {
         out.flush();
         File f;
         HashMap<String,byte[]> imagens= new HashMap<String,byte[]>();
-        HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
+       
         
         for(int i=0;i<d.getQuestoes().size();i++){
            f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getImagem());
@@ -289,14 +289,7 @@ public class InteracaoServidor extends Thread {
         out.writeObject(imagens);
         out.flush();
         out.reset();
-        for(int i=0;i<d.getQuestoes().size();i++){
-         f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\"+d.getQuestoes().get(i).getMusica());
-         byte[]  r = Files.readAllBytes(f.toPath());
-         musicas.put(d.getQuestoes().get(i).getMusica(),r );
-        }
-        out.writeObject(musicas);
-        out.flush();
-        out.reset();
+        
         
         
          /*
@@ -328,10 +321,17 @@ public class InteracaoServidor extends Thread {
         out.flush();
     }
 
-    private void sendAudio(String desafio, int pergunta) throws IOException {
-        File f = new File(bd.getDesafio(desafio).getPergunta(pergunta).getMusica());
-        out.writeObject(f);
+    private void sendAudio(String desafio) throws IOException {
+        Desafio d = bd.getDesafio(desafio);
+        HashMap<String,byte[]> musicas= new HashMap<String,byte[]>();
+       for(int i=0;i<1;i++){
+         File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\"+d.getQuestoes().get(i).getMusica());
+         byte[]  r = Files.readAllBytes(f.toPath());
+         musicas.put(d.getQuestoes().get(i).getMusica(),r );
+        }
+        out.writeObject(musicas);
         out.flush();
+        out.reset();
     }
 
 }

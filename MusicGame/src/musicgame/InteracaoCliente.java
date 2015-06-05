@@ -156,11 +156,10 @@ public class InteracaoCliente extends Thread {
                 //Desafio d = bd.getDesafio(new String(p.getCampo(0).getValor()));
                 String desafio = new String(p.getCampo(0).getValor());
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
-                    
-                        System.out.println("######################################### Desafio" + desafio);
-                        requestDesafio(desafio, bd.getUserByIP(add));
 
-                    
+                    System.out.println("######################################### Desafio" + desafio);
+                    requestDesafio(desafio, bd.getUserByIP(add));
+
                 }
 
                 Desafio d = bd.getDesafio(desafio);
@@ -692,53 +691,71 @@ public class InteracaoCliente extends Thread {
         //serv.close();
         System.out.println("Ja foi");
         //Desafio d = (Desafio) in.readObject();
-        
 
-        
+        ObjectInputStream inFromServer = new ObjectInputStream(serv.getInputStream());
+        System.out.println("Abriu o input para receber o desafio!");
+        Desafio d = (Desafio) inFromServer.readObject();
+        System.out.println("recebeu desafio");
+        HashMap<String, byte[]> imagens = (HashMap<String, byte[]>) inFromServer.readObject();
+        //inFromServer.reset();
+        System.out.println("recebeu imagens");
 
-            ObjectInputStream inFromServer = new ObjectInputStream(serv.getInputStream());
-            System.out.println("Abriu o input para receber o desafio!");
-            Desafio d = (Desafio) inFromServer.readObject();
-            System.out.println("recebeu desafio");
-            HashMap<String,byte[]> imagens= (HashMap<String,byte[]>)inFromServer.readObject();
-            //inFromServer.reset();
-            System.out.println("recebeu imagens");
-            HashMap<String,byte[]> musicas= (HashMap<String,byte[]>)inFromServer.readObject();
-            System.out.println("recebeu musicas");
-            
-          for(String s:imagens.keySet()){
-              ByteArrayOutputStream os = new ByteArrayOutputStream();
-              os.write(imagens.get(s));
-              File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/"+s);
-              FileOutputStream fos = new FileOutputStream(f);
-              fos.write(os.toByteArray());            
-          }
-          /*
-          for(String s:imagens.keySet()){
-              File f = imagens.get(s);
-              FileOutputStream fos = new FileOutputStream(f);
-              fos.write(os.toByteArray());
-              System.out.println("Criou imagem = "+ s);
+        for (String s : imagens.keySet()) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os.write(imagens.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/" + s);
+
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(os.toByteArray());
+        }
+        serv.close();
+///////////////////////////////////MUSICA///////////////////////////////////////////////////////////
+        serv = new Socket(j, porta);
+        System.out.println("Musicas para IP PARA SER PEDIDO = " + j);
+        out = new ObjectOutputStream(serv.getOutputStream());
+
+        res = new PDU(0, AtendimentoServidor.INFO);
+        c = new Campo(MusicClient.QUESTAO, d.getNome());
+        res.addCampoTcp(c);
+
+        out.writeObject(res);
+        out.flush();
+        out.reset();
+        System.out.println("pedido enviado");
+        inFromServer = new ObjectInputStream(serv.getInputStream());
+        System.out.println("Abriu o input para receber o musicas!");
+
+        HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        System.out.println("recebeu musicas");
+
+        for (String s : imagens.keySet()) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os.write(imagens.get(s));
+            File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/imagens/" + s);
+
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(os.toByteArray());
+        }
+        serv.close();
+
+        /*
+         for(String s:imagens.keySet()){
+         File f = imagens.get(s);
+         FileOutputStream fos = new FileOutputStream(f);
+         fos.write(os.toByteArray());
+         System.out.println("Criou imagem = "+ s);
    
-          }
-          */
-            
-   
-/*
+         }
+         */
+        /*
          // File f = new File("i.jpg");
-                //FileOutputStream fos = new FileOutputStream(f);
-                //fos.write(os.toByteArray());
-                d.getQuestoes().get(i).setImagem(imagem.getPath());
-                System.out.println("");
-                d.getQuestoes().get(i).setMusica(audio.getPath());
-            }
-            */
-           
-
-            serv.close();
-       
-
-        
+         //FileOutputStream fos = new FileOutputStream(f);
+         //fos.write(os.toByteArray());
+         d.getQuestoes().get(i).setImagem(imagem.getPath());
+         System.out.println("");
+         d.getQuestoes().get(i).setMusica(audio.getPath());
+         }
+         */
     }
 
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 

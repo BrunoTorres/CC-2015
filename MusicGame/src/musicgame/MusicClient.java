@@ -86,7 +86,7 @@ public class MusicClient {
         clientSocket = new DatagramSocket();
         //IPAddress = InetAddress.getByName("192.168.1.79");
         //IPAddress = InetAddress.getByName("172.26.114.224");
-        IPAddress = InetAddress.getByName("192.168.173.113");      
+        IPAddress = InetAddress.getByName("192.168.173.175");      
         //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
@@ -392,7 +392,7 @@ public class MusicClient {
         Campo m = new Campo(DESAFIO, nome.getBytes());
         campos.add(m);
         sendPDU(ACCEPT_CHALLENGE, campos);
-        PDU pacote = receivePDU();
+        PDU pacote = receivePDUNoExeception();
 
         return pacote.getCampo(0).getValor()[0] == 0; /*try {
          System.out.println("vamos jogar");

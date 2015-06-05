@@ -457,20 +457,24 @@ public class MusicClient {
                 int id = pacote.getCampo(1).getId();
                 // se == 255 -> Não existem jogadores suficientes -> Exception
                 // se não -> jogar
-
-                if (id != 255) {
+                System.out.println("Antes de ver se é final!");
+                if (id != 255) {                    
+                    System.out.println("Continua!");
                     nQuestao = pacote.getCampo(1).getValor()[0];
                     pergunta = new String(pacote.getCampo(2).getValor());
                     respostas.add(new String(pacote.getCampo(4).getValor()));
                     respostas.add(new String(pacote.getCampo(6).getValor()));
                     respostas.add(new String(pacote.getCampo(8).getValor()));
 
+                    System.out.println("Receber Imagem!");
                     // 2ª parte -> receber pacotes de uma imagem
                     blocosImagem = (TreeMap) recebeBlocos(IMAGEM);
                     System.err.println("Recebi imagem");
                     checkBlocos(blocosImagem, nome, nQuestao, 16);
                     String fImage = constroiFicheiroImagem(blocosImagem);
 
+                    
+                    System.out.println("Receber Música!");
                     // 3º parte -> receber pacotes de uma musica
                     blocosMusica = (TreeMap) recebeBlocos(AUDIO);
                     System.err.println("Recebi musica");
@@ -497,17 +501,20 @@ public class MusicClient {
         int num;
         TreeMap<Integer, PDU> blocos = new TreeMap<>();
         // 2º pacote -> primeiro pacote de com uma imagem
-
+        System.out.println("Antes de receber pacote");
         pacote = receivePDUNoExeception();
-        int numero = pacote.getCampo(4).getId();
+        int numero = pacote.getCampo(4).getId();        
+        System.out.println("Depois de receber pacote");
 
         while (numero == 254 && pacote.getCampo(3).getId() == tipo) {
-            num = (byte) pacote.getCampo(2).getValor()[0];
+            num = (byte) pacote.getCampo(2).getValor()[0];            
+            System.out.println("A receber bloco: "+num);
             blocos.put(num, pacote);
             pacote = receivePDUNoExeception();
             numero = pacote.getCampo(4).getId();
         }
         if (numero == 250) {
+            System.out.println("O campo era 250!!");
             b = pacote.getCampo(2).getValor();
             num = (byte) b[0];
             blocos.put(num, pacote);
@@ -523,6 +530,7 @@ public class MusicClient {
     private static void askBlockRetransmit(TreeMap<Integer, PDU> blocos, int n, String nome, int nQuestao, int tipo) throws SocketTimeoutException, IOException, ServerUnreachableException {
         ArrayList<Campo> campos = new ArrayList<>();
         int num;
+        System.out.println("Pediu retransmissao de bloco!!!!!");
         Campo c = new Campo(DESAFIO, nome.getBytes());
         campos.add(c);
         c = new Campo(NQUESTAO, PDU.intToByteArray(nQuestao));

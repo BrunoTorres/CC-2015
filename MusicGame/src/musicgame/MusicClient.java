@@ -86,7 +86,7 @@ public class MusicClient {
         clientSocket = new DatagramSocket();
         //IPAddress = InetAddress.getByName("192.168.1.79");
         //IPAddress = InetAddress.getByName("172.26.114.224");
-        IPAddress = InetAddress.getByName("192.168.173.175");      
+        IPAddress = InetAddress.getByName("192.168.173.175");
         //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
@@ -231,23 +231,23 @@ public class MusicClient {
         sendPDU(DELETE_CHALLENGE, campos);
         //boolean flag;
         /*PDU pacote = receivePDU();
-        Desafio d = null;
-        if (pacote.getCampo(0).getId() == 255) {
-            throw new ChallengeException("Data");
-        } else {
-            String nome = new String(pacote.getCampo(0).getValor());
-            byte[] b = pacote.getCampo(1).getValor();
-            byte[] ano = new byte[]{b[0], b[1]};
-            byte[] mes = new byte[]{b[2], b[3]};
-            byte[] dia = new byte[]{b[4], b[5]};
-            b = pacote.getCampo(2).getValor();
-            byte[] hora = new byte[]{b[0], b[1]};
-            byte[] min = new byte[]{b[2], b[3]};
-            byte[] seg = new byte[]{b[4], b[5]};
-            // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
+         Desafio d = null;
+         if (pacote.getCampo(0).getId() == 255) {
+         throw new ChallengeException("Data");
+         } else {
+         String nome = new String(pacote.getCampo(0).getValor());
+         byte[] b = pacote.getCampo(1).getValor();
+         byte[] ano = new byte[]{b[0], b[1]};
+         byte[] mes = new byte[]{b[2], b[3]};
+         byte[] dia = new byte[]{b[4], b[5]};
+         b = pacote.getCampo(2).getValor();
+         byte[] hora = new byte[]{b[0], b[1]};
+         byte[] min = new byte[]{b[2], b[3]};
+         byte[] seg = new byte[]{b[4], b[5]};
+         // d = new Desafio(nome, ano, mes, dia, hora, min, seg);
 
-        }
-        return d;*/
+         }
+         return d;*/
     }
 
     public static Resposta answer(String nDesafio, int escolha, int nQuestao, int tempo) throws IOException, SocketTimeoutException, ServerUnreachableException {
@@ -423,34 +423,14 @@ public class MusicClient {
             byte[] ano = {b[0], b[1], b[2]};
             byte mes = b[3];
             byte dia = b[4];
-            /*byte[] mes = new byte[]{b[2], b[3]};
-             byte[] dia = new byte[]{b[4], b[5]};
-
-             int anoAux = 2000 + Integer.parseInt(new String(ano));
-             int aux = anoAux % 100;
-             int pri = aux / 10;
-             int sec = aux % 10;
-             ano = new byte[]{(byte) pri, (byte) sec};
-             int mes2 = Integer.parseInt(new String(mes));
-             int dia2 = Integer.parseInt(new String(dia));*/
-            System.err.println("DataC: " + new String(b));
 
             b = pacote.getCampo(2).getValor();
             byte hora = b[0];
             byte min = b[1];
             byte seg = b[2];
-            /*byte[] hora = new byte[]{b[0], b[1]};
-             byte[] min = new byte[]{b[2], b[3]};
-             byte[] seg = new byte[]{b[4], b[5]};
-
-             int hora2 = Integer.parseInt(new String(hora));
-             int min2 = Integer.parseInt(new String(min));
-             int seg2 = Integer.parseInt(new String(seg));*/
 
             d = new Desafio(name, alc, ano, mes, dia, hora, min, seg);
-            //d = new Desafio(name, ano, PDU.intToByteArray(mes2), PDU.intToByteArray(dia2), PDU.intToByteArray(hora2), PDU.intToByteArray(min2), PDU.intToByteArray(seg2));  */
-            //d.setDataProperty();
-            //d.setHoraProperty();
+
         }
 
         return d;

@@ -157,7 +157,6 @@ public class InteracaoCliente extends Thread {
                 String desafio = new String(p.getCampo(0).getValor());
                 if (this.bd.getDesafiosGlobais().containsKey(desafio)) {
 
-                    System.out.println("######################################### Desafio" + desafio);
                     try {
                         requestDesafio(desafio, bd.getUserByIP(add));
                     } catch (UserInexistenteException | IOException | ClassNotFoundException e) {
@@ -663,7 +662,6 @@ public class InteracaoCliente extends Thread {
     private void requestDesafio(String desafio, Utilizador u) throws IOException, ClassNotFoundException {
         PDU res = new PDU(0, AtendimentoServidor.INFO);
         Campo c = new Campo(AtendimentoServidor.REQUESTDESAFIO, desafio);
-        System.out.println("REQUEST DESAFIO ITERACAO CLIENTE = " + desafio);
         res.addCampoTcp(c);
         c = new Campo(MusicClient.DESAFIO, desafio);
         res.addCampoTcp(c);
@@ -671,7 +669,6 @@ public class InteracaoCliente extends Thread {
         res.addCampoTcp(c);
 
         HashMap<InetAddress, Integer> servidor = this.bd.getDesafioByIp(desafio);
-        System.out.println("vai imprimir o ip dos servidores");
 
         InetAddress j = InetAddress.getLocalHost();
         int porta = 0;
@@ -679,31 +676,24 @@ public class InteracaoCliente extends Thread {
             System.out.println("ip = " + i);
             j = i;
             porta = servidor.get(i);
-            System.out.println("Porta = " + servidor.get(i));
 
             break;
         }
         Socket serv = new Socket(j, porta);
-        System.out.println("IP PARA SER PEDIDO = " + j);
 
         //ServerSocket ss = new ServerSocket(this.bd.getPorta());
         //serv = ss.accept();
         ObjectOutputStream out = new ObjectOutputStream(serv.getOutputStream());
-        System.out.println("pedido enviado");
         out.writeObject(res);
         out.flush();
         out.reset();
         //serv.close();
-        System.out.println("Ja foi");
         //Desafio d = (Desafio) in.readObject();
 
         ObjectInputStream inFromServer = new ObjectInputStream(serv.getInputStream());
-        System.out.println("Abriu o input para receber o desafio!");
         Desafio d = (Desafio) inFromServer.readObject();
-        System.out.println("recebeu desafio");
         HashMap<String, byte[]> imagens = (HashMap<String, byte[]>) inFromServer.readObject();
         //inFromServer.reset();
-        System.out.println("recebeu imagens");
 
         for (String s : imagens.keySet()) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -716,7 +706,6 @@ public class InteracaoCliente extends Thread {
         serv.close();
 ///////////////////////////////////MUSICA///////////////////////////////////////////////////////////
         serv = new Socket(j, porta);
-        System.out.println("Musicas para IP PARA SER PEDIDO = " + j);
         out = new ObjectOutputStream(serv.getOutputStream());
 
         res = new PDU(0, AtendimentoServidor.INFO);
@@ -731,13 +720,9 @@ public class InteracaoCliente extends Thread {
         serv.shutdownOutput();
 
         inFromServer = new ObjectInputStream(serv.getInputStream());
-        
-        System.out.println("Abriu o input para receber o musicas!");
 
         HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
         //inFromServer.reset();
-
-        System.out.println("Abriu o input para receber o musicas!");
 
         for (String s : musicas.keySet()) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -750,72 +735,25 @@ public class InteracaoCliente extends Thread {
         serv.shutdownInput();
 
         serv.close();
-        //serv.close();
 
-        System.out.println("recebeu musicas");
-
-        /*
-        
-        
-        
-         for (String s : musicas.keySet()) {
-         ByteArrayOutputStream os = new ByteArrayOutputStream();
-         os.write(musicas.get(s));
-         File f = new File("/Users/brunopereira/Documents/SourceTree/CC/MusicGame/build/classes/musicgame/musica/" + s);
-         FileOutputStream fos = new FileOutputStream(f);
-         fos.write(os.toByteArray());
-         }
-        
-        
-        
-        
-         for(String s:imagens.keySet()){
-         File f = imagens.get(s);
-         FileOutputStream fos = new FileOutputStream(f);
-         fos.write(os.toByteArray());
-         System.out.println("Criou imagem = "+ s);
-   
-         }
-         */
-        /*
-         // File f = new File("i.jpg");
-         //FileOutputStream fos = new FileOutputStream(f);
-         //fos.write(os.toByteArray());
-         d.getQuestoes().get(i).setImagem(imagem.getPath());
-         System.out.println("");
-         d.getQuestoes().get(i).setMusica(audio.getPath());
-         }
-         */
     }
 
     //Envia a nome e data correspondente ao desafio novo que acabou de ser criado 
     private void sendInfoDesafio(Desafio d) throws IOException {
 
         for (InetAddress i : this.bd.getServidores().keySet()) {
-            System.out.println("##############InetAddress= " + i.getHostName());
             int portaSV = this.bd.getServidores().get(i);
-            System.out.println("##############PORTA = " + portaSV);
             try (Socket conhecidos = new Socket(i, portaSV)) {
 
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.DESAFIO, d.getNome());
                 res.addCampoTcp(c);
-                // c = new Campo(AtendimentoServidor.IP, InetAddress.getLocalHost());
                 c = new Campo(AtendimentoServidor.IP, bd.getIp());
 
-                System.out.println("ip send info desafio = " + c.getIP());
-                // c = new Campo(AtendimentoServidor.IP,"192.168.173.1");
                 res.addCampoTcp(c);
                 c = new Campo(AtendimentoServidor.PORTA, String.valueOf(bd.getPorta()));
                 res.addCampoTcp(c);
 
-                /*
-                 c = new Campo(MusicClient.DATA, d.getData());  ///////////////////////DATA byte?!
-                 System.out.println("DATA DE DESAFIO CRIADO = "+ d.getData());
-                 res.addCampoTcp(c);
-                 c = new Campo(MusicClient.HORA, d.getTempo());  ///////////////////////DATA byte?!
-                 res.addCampoTcp(c);
-                 */
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
 
                 out.writeObject(res);

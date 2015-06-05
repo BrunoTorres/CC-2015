@@ -13,10 +13,6 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author patricia
- */
 public class Jogo extends Thread {
 
     private static final int OK = 0;

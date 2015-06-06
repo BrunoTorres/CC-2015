@@ -502,7 +502,10 @@ public class MusicClient {
         TreeMap<Integer, PDU> blocos = new TreeMap<>();
         // 2º pacote -> primeiro pacote de com uma imagem
         System.out.println("Antes de receber pacote");
+        //pacote = receivePDUNoExeception();
+        
         pacote = receivePDUNoExeception();
+        
         int numero = pacote.getCampo(4).getId();        
         System.out.println("Depois de receber pacote");
 
@@ -510,6 +513,9 @@ public class MusicClient {
             num = (byte) pacote.getCampo(2).getValor()[0];            
             System.out.println("A receber bloco: "+num);
             blocos.put(num, pacote);
+            //pacote = receivePDUNoExeception();
+            
+            
             pacote = receivePDUNoExeception();
             numero = pacote.getCampo(4).getId();
         }

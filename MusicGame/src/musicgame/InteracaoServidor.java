@@ -82,6 +82,7 @@ public class InteracaoServidor extends Thread {
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
                     desafio=input.getCampo(1).getValue();
+                    System.out.println("DESAFIO ONDE VAI ATUALIZAR O RANKING= "+ desafio);
                     adicionaRanking(desafio);
                     break;
 
@@ -175,11 +176,15 @@ public class InteracaoServidor extends Thread {
 //        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
        // Socket s2 = ss.accept();
         //this.in = new ObjectInputStream(s2.getInputStream());
+        System.out.println("CHEGOU UTILIZADOR");
         Utilizador  rank = (Utilizador)in.readObject();
+        System.out.println("JA TEM O UTILIZADOR");
 
         this.bd.addRankingGlobal(desafio,rank);
+        System.out.println("ACABOU");
+        
 
-        this.s.close();
+        //this.s.close();
 
     }
 // novo servidor adiciona lista de svs que o principal conhece

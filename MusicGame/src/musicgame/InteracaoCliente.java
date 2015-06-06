@@ -248,10 +248,12 @@ public class InteracaoCliente extends Thread {
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
 
         d.addUserEnd(user);
+        System.out.println("USERRRRR "+ user.getAlcunha());
 
         sendRankinLocal(user, d.getNome());
-        
+        System.out.println("ACABOUUUU RANKING");
         d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
+        System.out.println("DESAFIO update!!!!!");
         
         
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
@@ -714,7 +716,6 @@ public class InteracaoCliente extends Thread {
         serv.close();
 ///////////////////////////////////MUSICA///////////////////////////////////////////////////////////
         serv = new Socket(j, porta);
-        
         out = new ObjectOutputStream(serv.getOutputStream());
 
         res = new PDU(0, AtendimentoServidor.INFO);
@@ -726,14 +727,11 @@ public class InteracaoCliente extends Thread {
         out.writeObject(res);
         out.flush();
         out.reset();
-        
+        serv.shutdownOutput();
 
         inFromServer = new ObjectInputStream(serv.getInputStream());
 
         HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
-        
-        serv.close();
-
         //inFromServer.reset();
 
         for (String s : musicas.keySet()) {
@@ -744,7 +742,9 @@ public class InteracaoCliente extends Thread {
             fos.write(os.toByteArray());
         }
         
-        
+        serv.shutdownInput();
+
+        serv.close();
 
     }
 
@@ -780,10 +780,12 @@ public class InteracaoCliente extends Thread {
     }
 
     private void sendRankinLocal(Utilizador utili, String desafio) throws IOException {
+        System.out.println("Envia ranking a todos");
         for (InetAddress i : this.bd.getServidores().keySet()) {
-            System.out.println("vai enviar ranking");
+            System.out.println(" enviou x vezez");
             int portaSV = this.bd.getServidores().get(i);
-            Socket conhecidos = new Socket(i, portaSV); 
+               Socket conhecidos = new Socket(i, portaSV);
+               System.out.println("Abriu socket de ranking");
 
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
@@ -793,11 +795,13 @@ public class InteracaoCliente extends Thread {
 
                 ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
                 out.writeObject(res);
+                System.out.println("enviou pdu");
                 out.flush();
                 out.writeObject(utili);
+                System.out.println("enviou utilizadores");
                 out.flush();
-                
-           conhecidos.close();
+                conhecidos.close();
+                System.out.println("Fexou");
             
         }
     }

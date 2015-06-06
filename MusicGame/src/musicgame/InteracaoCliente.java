@@ -285,13 +285,17 @@ public class InteracaoCliente extends Thread {
             }
             
             TreeSet<Utilizador> utiliSend=utili; 
+            
             for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
                 System.out.println("UTilizador Global= "+u.getAlcunha());
                 
-                if(utili.contains(u)){
-                    System.out.println("Utilizador em utili e presente no global"+u.getAlcunha());
-                    utiliSend.remove(u);
-                }
+                for(Utilizador us:utili){
+                      if(us.getAlcunha().equals(u.getAlcunha())){
+                          System.out.println("remove user golbal de treeset user send");
+                          utiliSend.remove(us); 
+                      }
+            }
+                
                 
             }
             

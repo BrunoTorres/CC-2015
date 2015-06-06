@@ -255,12 +255,15 @@ public class InteracaoCliente extends Thread {
         System.out.println("ACABOUUUU RANKING");
         d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         System.out.println("DESAFIO update!!!!!");
-
+        boolean cenas=false;
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
+        
+        while(cenas==false){
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             System.out.println("MENOR NAO PODE ACABAR= "+ d.getNumPlayersDone());
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
             System.out.println("Incrementou");
+            cenas=false;
         } else {
 
             d.setStatus(true);
@@ -285,12 +288,15 @@ public class InteracaoCliente extends Thread {
                 }
 
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
-
+                 cenas=true;
             }
 
             // sendRankinLocal();
         }
     }
+    }
+    
+    
 
     private synchronized void processaLogin(byte[] data, InetAddress add, int port) {
 
@@ -467,7 +473,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(60);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(20);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -803,7 +809,7 @@ public class InteracaoCliente extends Thread {
             out.writeObject(utili);
             System.out.println("enviou utilizadores");
             out.flush();
-            conhecidos.close();
+            //conhecidos.close();
             System.out.println("Fexou");
 
         }

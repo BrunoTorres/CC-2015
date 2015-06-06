@@ -182,6 +182,8 @@ public class InteracaoServidor extends Thread {
         System.out.println("JA TEM O UTILIZADOR");
 
         this.bd.addRankingGlobal(desafio,rank);
+        
+       
         System.out.println("ACABOU");
         
 

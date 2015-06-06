@@ -279,10 +279,14 @@ public class InteracaoCliente extends Thread {
             
 
             utili.first().addPontuacao(3);
+            for(Utilizador u:utili){
+                System.out.println("o UTILI TEM : "+ u.getAlcunha());
+            }
             
             TreeSet<Utilizador> utiliSend=utili; 
             for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
                 if(utili.contains(u)){
+                    System.out.println("Utilizador em utili e presente no global"+u.getAlcunha());
                     utiliSend.remove(u);
                 }
                 

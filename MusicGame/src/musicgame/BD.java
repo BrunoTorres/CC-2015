@@ -228,10 +228,15 @@ class BD implements Serializable {
     public Utilizador getUser(String alc) throws UserInexistenteException {
         if (existeUser(alc)) {
             return users.get(alc);
-        } else {
-            throw new UserInexistenteException("Utilizador inexistente!");
+        } else if(this.utilizadoresGlobais.containsValue(alc)){
+            return this.utilizadoresGlobais.get(alc);
+        }
+            else{
+            
+            throw new UserInexistenteException("Utilizador inexistente em getUser!");
         }
     }
+    
 
     public Utilizador getUserByIP(InetAddress ip) throws UserInexistenteException {
         boolean enc = false;

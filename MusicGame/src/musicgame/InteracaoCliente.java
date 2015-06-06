@@ -245,6 +245,7 @@ public class InteracaoCliente extends Thread {
         byte[] tl = {data[2], data[3]};
         int s = PDU.byteArrayToInt(tl);
         Campo c;
+        boolean inc=false;
         Utilizador user = bd.getUserByIP(add);
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
 
@@ -261,7 +262,10 @@ public class InteracaoCliente extends Thread {
         while(cenas==false){
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             System.out.println("MENOR NAO PODE ACABAR= "+ d.getNumPlayersDone());
-            d.setNumPlayersDone(d.getNumPlayersDone() + 1);
+            if(!inc){
+                d.setNumPlayersDone(d.getNumPlayersDone() + 1);
+                inc=true;
+            }
             System.out.println("Incrementou");
             cenas=false;
         } else {
@@ -430,17 +434,31 @@ public class InteracaoCliente extends Thread {
         PDU reply;
         Campo c;
         int tam = this.bd.getRankingLocal().size();
+        int tam2=0;
         int t = 0;
 
+        
         for (String a : this.bd.getRankingLocal().keySet()) {
             Utilizador u = this.bd.getUser(a).clone();
             u.initPontuacao();
             u.addPontuacao(this.bd.getRanking(a));
             utili.add(u);
         }
+        
 
         t = 0;
+        for(String u:this.bd.getRankingGlobal().keySet()){
+            if(!this.bd.getRankingLocal().containsKey(u)){
+                Utilizador user = new Utilizador(u, this.bd.getRankingGlobal().get(u));
+                utili.add(user);  
+                tam2++;
+            }
+                
+        }
+        tam+=tam2;
+        
         for (Utilizador u : utili) {
+            
             t++;
 
             reply = new PDU(s, (byte) 0);

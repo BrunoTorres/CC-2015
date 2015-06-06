@@ -176,6 +176,7 @@ public class InteracaoServidor extends Thread {
 //        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
        // Socket s2 = ss.accept();
         //this.in = new ObjectInputStream(s2.getInputStream());
+        this.bd.getDesafio(desafio).incNumPlayersDone();
         System.out.println("CHEGOU UTILIZADOR");
         Utilizador  rank = (Utilizador)in.readObject();
         System.out.println("JA TEM O UTILIZADOR");

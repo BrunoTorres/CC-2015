@@ -165,6 +165,9 @@ public class Desafio implements Serializable {
     public void setNumPlayersDone(int numPlayersDone) {
         this.numPlayersDone = numPlayersDone;
     }
+     public void incNumPlayersDone() {
+        this.numPlayersDone ++;
+    }
 
     
     public String getNome() {

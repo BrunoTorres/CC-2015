@@ -326,10 +326,14 @@ class BD implements Serializable {
     public synchronized Map<String,Utilizador> getUtilizadoresGlobais(){
         return this.utilizadoresGlobais;
     }
-    public synchronized void addRankingGlobal(String desafio, Utilizador u) {
-        Desafio d = this.getDesafio(desafio);
+    public synchronized  void addUserEndDesafio(String desafio, Utilizador u){
+         Desafio d = this.getDesafio(desafio);
         
             d.addUserEnd(u);
+            this.utilizadoresGlobais.put(u.getAlcunha(), u);
+    }
+    public synchronized void addRankingGlobal(String desafio, Utilizador u) {
+       
             if(!this.utilizadoresGlobais.containsKey(u.getAlcunha()))
                  this.utilizadoresGlobais.put(u.getAlcunha(), u);
             

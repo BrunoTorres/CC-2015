@@ -181,8 +181,8 @@ public class InteracaoServidor extends Thread {
         Utilizador  rank = (Utilizador)in.readObject();
         System.out.println("JA TEM O UTILIZADOR");
 
-        this.bd.addRankingGlobal(desafio,rank);
-        
+       // this.bd.addRankingGlobal(desafio,rank);
+        this.bd.addUserEndDesafio(desafio, rank);
        
         System.out.println("ACABOU");
         

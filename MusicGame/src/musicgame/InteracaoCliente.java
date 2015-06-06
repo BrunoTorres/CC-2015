@@ -253,6 +253,7 @@ public class InteracaoCliente extends Thread {
         System.out.println("USERRRRR " + user.getAlcunha());
 
         sendRankinLocal(user, d.getNome());
+        
         System.out.println("ACABOUUUU RANKING");
         d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         System.out.println("DESAFIO update!!!!!");
@@ -285,6 +286,8 @@ public class InteracaoCliente extends Thread {
             
             TreeSet<Utilizador> utiliSend=utili; 
             for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
+                System.out.println("UTilizador Global= "+u.getAlcunha());
+                
                 if(utili.contains(u)){
                     System.out.println("Utilizador em utili e presente no global"+u.getAlcunha());
                     utiliSend.remove(u);

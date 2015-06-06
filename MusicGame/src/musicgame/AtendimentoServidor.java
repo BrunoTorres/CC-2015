@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -45,7 +46,8 @@ public class AtendimentoServidor extends Thread {
         this.ipServer = sv;
         this.portaTCP2 = porta2;
 
-        this.s = new Socket(InetAddress.getByName(sv), porta2);
+        this.s = new Socket();
+        s.connect(new InetSocketAddress(InetAddress.getByName(sv), porta2), 600000);
     }
 
     @Override

@@ -258,7 +258,9 @@ public class InteracaoCliente extends Thread {
 
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
+            System.out.println("MENOR NAO PODE ACABAR= "+ d.getNumPlayersDone());
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
+            System.out.println("Incrementou");
         } else {
 
             d.setStatus(true);

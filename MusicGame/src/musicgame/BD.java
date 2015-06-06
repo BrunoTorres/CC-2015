@@ -33,6 +33,8 @@ class BD implements Serializable {
     private HashMap<String, Integer> rankingGlobal;     /// syc
     private HashMap<String, Desafio> desafiosLocais; // syc
     private HashMap<String, LocalDateTime> desafiosGlobais; // syc
+    
+    private HashMap<String,Utilizador> utilizadoresGlobais;
 
     private HashMap<String, HashMap<InetAddress, Integer>> listaDesafiosServidores;
 
@@ -47,6 +49,7 @@ class BD implements Serializable {
         this.perguntas = new ArrayList<>();
         this.pastaMusica = pMusica;
         this.users = new HashMap<>();
+        this.utilizadoresGlobais = new HashMap<>();
         this.desafiosLocais = new HashMap<>();
         this.rankingLocal = new HashMap<>();
         this.servidores = new HashMap<>();
@@ -61,6 +64,7 @@ class BD implements Serializable {
         this.perguntas = new ArrayList<>();
         this.pastaMusica = null;
         this.users = new HashMap<>();
+        this.utilizadoresGlobais = new HashMap<>();
         this.desafiosLocais = new HashMap<>();
         this.rankingLocal = new HashMap<>();
         this.servidores = new HashMap<>();
@@ -312,14 +316,18 @@ class BD implements Serializable {
         }
     }
 
-    public synchronized void addDesafiosGlobais(HashMap<String, LocalDateTime> des) {
+    
 
+    public synchronized Map<String,Utilizador> getUtilizadoresGlobais(){
+        return this.utilizadoresGlobais;
     }
-
     public synchronized void addRankingGlobal(String desafio, Utilizador u) {
         Desafio d = this.getDesafio(desafio);
         
             d.addUserEnd(u);
+            if(!this.utilizadoresGlobais.containsKey(u.getAlcunha()))
+                 this.utilizadoresGlobais.put(u.getAlcunha(), u);
+            
             if (this.rankingGlobal.containsKey(u.getAlcunha())) {
                 int r = this.rankingGlobal.get(u.getAlcunha()) + u.getPontuacao();
                 this.rankingGlobal.put(u.getAlcunha(), r);

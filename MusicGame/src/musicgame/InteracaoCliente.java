@@ -260,7 +260,7 @@ public class InteracaoCliente extends Thread {
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         
         while(cenas==false){
-        if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
+        if (d.getNumPlayersDone()-1 < d.getTamanhoUsers()) {
             System.out.println("MENOR NAO PODE ACABAR= "+ d.getNumPlayersDone());
             if(!inc){
                 d.setNumPlayersDone(d.getNumPlayersDone() + 1);
@@ -275,21 +275,36 @@ public class InteracaoCliente extends Thread {
             for (Utilizador u : d.getUserEnd().values()) {
                 utili.add(u);
             }
+            
+            
 
             utili.first().addPontuacao(3);
-            for (Utilizador uaux : utili) {
+            
+            TreeSet<Utilizador> utiliSend=utili; 
+            for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
+                if(utili.contains(u)){
+                    utiliSend.remove(u);
+                }
+                
+            }
+            
+            for (Utilizador uaux : utiliSend) {
                 PDU resposta = new PDU(s, (byte) 0);
                 resposta.addCampo(des);
                 this.bd.actRanking(uaux);
 
                 //******************** SEND INF DE ACTUALIZACAO DE RANKING*****************//
                 //*************************************************************************//
+          
                 for (Utilizador u : utili) {
                     c = new Campo(ALCUNHA, u.getAlcunha().getBytes());
                     resposta.addCampo(c);
                     c = new Campo(PONTOS, PDU.intToByteArray(u.getPontuacao()));
                     resposta.addCampo(c);
                 }
+                
+         
+                
 
                 responde(resposta, this.bd.getUser(uaux.getAlcunha()).getIp(), this.bd.getUser(uaux.getAlcunha()).getPort());
                  cenas=true;

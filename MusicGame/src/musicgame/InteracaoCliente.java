@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -248,14 +249,13 @@ public class InteracaoCliente extends Thread {
         Desafio d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
 
         d.addUserEnd(user);
-        System.out.println("USERRRRR "+ user.getAlcunha());
+        System.out.println("USERRRRR " + user.getAlcunha());
 
         sendRankinLocal(user, d.getNome());
         System.out.println("ACABOUUUU RANKING");
         d = bd.getDesafio(new String(pacote.getCampo(0).getValor()));
         System.out.println("DESAFIO update!!!!!");
-        
-        
+
         Campo des = new Campo(DESAFIO, pacote.getCampo(0).getValor());
         if (d.getNumPlayersDone() < d.getTamanhoUsers()) {
             d.setNumPlayersDone(d.getNumPlayersDone() + 1);
@@ -741,7 +741,7 @@ public class InteracaoCliente extends Thread {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(os.toByteArray());
         }
-        
+
         serv.shutdownInput();
 
         serv.close();
@@ -784,25 +784,26 @@ public class InteracaoCliente extends Thread {
         for (InetAddress i : this.bd.getServidores().keySet()) {
             System.out.println(" enviou x vezez");
             int portaSV = this.bd.getServidores().get(i);
-               Socket conhecidos = new Socket(i, portaSV);
-               System.out.println("Abriu socket de ranking");
+            Socket conhecidos = new Socket();
+            conhecidos.connect(new InetSocketAddress(i, portaSV), 600000);
+            System.out.println("Abriu socket de ranking");
 
-                PDU res = new PDU(0, AtendimentoServidor.INFO);
-                Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
-                res.addCampoTcp(c);
-                c = new Campo(MusicClient.DESAFIO, desafio);
-                res.addCampoTcp(c);
+            PDU res = new PDU(0, AtendimentoServidor.INFO);
+            Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
+            res.addCampoTcp(c);
+            c = new Campo(MusicClient.DESAFIO, desafio);
+            res.addCampoTcp(c);
 
-                ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
-                out.writeObject(res);
-                System.out.println("enviou pdu");
-                out.flush();
-                out.writeObject(utili);
-                System.out.println("enviou utilizadores");
-                out.flush();
-                conhecidos.close();
-                System.out.println("Fexou");
-            
+            ObjectOutputStream out = new ObjectOutputStream(conhecidos.getOutputStream());
+            out.writeObject(res);
+            System.out.println("enviou pdu");
+            out.flush();
+            out.writeObject(utili);
+            System.out.println("enviou utilizadores");
+            out.flush();
+            conhecidos.close();
+            System.out.println("Fexou");
+
         }
     }
 }

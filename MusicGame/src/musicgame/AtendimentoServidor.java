@@ -59,6 +59,7 @@ public class AtendimentoServidor extends Thread {
 
             try {
                 ServerSocket ss = new ServerSocket(this.portaTCP);
+                ss.setSoTimeout(600000);
                 while (true) {
 
                     this.s = ss.accept();

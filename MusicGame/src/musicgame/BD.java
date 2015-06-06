@@ -332,11 +332,8 @@ class BD implements Serializable {
             d.addUserEnd(u);
             this.utilizadoresGlobais.put(u.getAlcunha(), u);
     }
-    public synchronized void addRankingGlobal(String desafio, Utilizador u) {
-       
-            if(!this.utilizadoresGlobais.containsKey(u.getAlcunha()))
-                 this.utilizadoresGlobais.put(u.getAlcunha(), u);
-            
+    
+    public synchronized void addRankingGlobal( Utilizador u) {
             if (this.rankingGlobal.containsKey(u.getAlcunha())) {
                 int r = this.rankingGlobal.get(u.getAlcunha()) + u.getPontuacao();
                 this.rankingGlobal.put(u.getAlcunha(), r);
@@ -346,6 +343,7 @@ class BD implements Serializable {
 
         
     }
+    
 
     public synchronized void addDesafiosGlobais(String nomeDesafio, LocalDateTime data, InetAddress byName, int porta) {
         HashMap<InetAddress, Integer> aux = new HashMap<>();

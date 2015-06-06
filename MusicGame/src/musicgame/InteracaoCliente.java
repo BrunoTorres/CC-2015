@@ -281,10 +281,10 @@ public class InteracaoCliente extends Thread {
 
             utili.first().addPontuacao(3);
             for(Utilizador u:utili){
-                System.out.println("o UTILI TEM : "+ u.getAlcunha());
+               this.bd.addRankingGlobal(u);
             }
             
-            TreeSet<Utilizador> utiliSend=new TreeSet<>(); 
+            TreeSet<Utilizador> utiliSend=new TreeSet<>(new CompareUsersByPoints()); 
             
             for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
                 System.out.println("UTilizador Global= "+u.getAlcunha());

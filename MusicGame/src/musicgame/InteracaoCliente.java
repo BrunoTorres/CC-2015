@@ -284,22 +284,21 @@ public class InteracaoCliente extends Thread {
                 System.out.println("o UTILI TEM : "+ u.getAlcunha());
             }
             
-            TreeSet<Utilizador> utiliSend=utili; 
+            TreeSet<Utilizador> utiliSend=new TreeSet<>(); 
             
             for(Utilizador u : this.bd.getUtilizadoresGlobais().values()){
                 System.out.println("UTilizador Global= "+u.getAlcunha());
                 
                 for(Utilizador us:utili){
-                      if(us.getAlcunha().equals(u.getAlcunha())){
-                          System.out.println("remove user golbal de treeset user send");
-                          utiliSend.remove(us); 
+                      if(!us.getAlcunha().equals(u.getAlcunha())){
+                          System.out.println("add user a not golbal");
+                          utiliSend.add(us);
                       }
             }
-                
-                
-            }
+        }
             
             for (Utilizador uaux : utiliSend) {
+                System.out.println("uaux= " + uaux.getAlcunha());
                 PDU resposta = new PDU(s, (byte) 0);
                 resposta.addCampo(des);
                 this.bd.actRanking(uaux);

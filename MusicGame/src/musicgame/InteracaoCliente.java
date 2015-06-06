@@ -516,7 +516,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(20);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(30);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;

@@ -9,7 +9,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -273,7 +275,8 @@ public class InteracaoServidor extends Thread {
         HashMap<String, byte[]> imagens = new HashMap<String, byte[]>();
 
         for (int i = 0; i < d.getQuestoes().size(); i++) {
-            f = new File(this.bd.getPathImage() + d.getQuestoes().get(i).getImagem());
+            f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\imagens\\" + d.getQuestoes().get(i).getImagem());
+            System.out.println(bd.getPathImage());
             byte[] r = Files.readAllBytes(f.toPath());
             imagens.put(d.getQuestoes().get(i).getImagem(), r);
 
@@ -298,7 +301,8 @@ public class InteracaoServidor extends Thread {
         HashMap<String, byte[]> musicas = new HashMap<String, byte[]>();
 
         for (int i = 0; i < d.getQuestoes().size(); i++) {
-            File f = new File(bd.getPathMusic() + d.getQuestoes().get(i).getMusica());
+            File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
+            bd.getPathMusic();
             byte[] r = Files.readAllBytes(f.toPath());
             musicas.put(d.getQuestoes().get(i).getMusica(), r);
 

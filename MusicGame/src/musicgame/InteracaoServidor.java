@@ -172,9 +172,9 @@ public class InteracaoServidor extends Thread {
 
     private void adicionaRanking(String desafio) throws IOException, ClassNotFoundException {
         
-        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
-        Socket s2 = ss.accept();
-        this.in = new ObjectInputStream(s2.getInputStream());
+//        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
+       // Socket s2 = ss.accept();
+        //this.in = new ObjectInputStream(s2.getInputStream());
         Utilizador  rank = (Utilizador)in.readObject();
 
         this.bd.addRankingGlobal(desafio,rank);

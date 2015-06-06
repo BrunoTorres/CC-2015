@@ -463,7 +463,7 @@ public class InteracaoCliente extends Thread {
             responde(reply, add, port);
         } else {
             //LocalDateTime tempo = LocalDateTime.now().plusMinutes(5);
-            LocalDateTime tempo = LocalDateTime.now().plusSeconds(15);
+            LocalDateTime tempo = LocalDateTime.now().plusSeconds(60);
             int aux = tempo.getYear() % 100;
             int pri = aux / 10;
             int sec = aux % 10;
@@ -714,6 +714,7 @@ public class InteracaoCliente extends Thread {
         serv.close();
 ///////////////////////////////////MUSICA///////////////////////////////////////////////////////////
         serv = new Socket(j, porta);
+        
         out = new ObjectOutputStream(serv.getOutputStream());
 
         res = new PDU(0, AtendimentoServidor.INFO);
@@ -725,11 +726,14 @@ public class InteracaoCliente extends Thread {
         out.writeObject(res);
         out.flush();
         out.reset();
-        serv.shutdownOutput();
+        
 
         inFromServer = new ObjectInputStream(serv.getInputStream());
 
         HashMap<String, byte[]> musicas = (HashMap<String, byte[]>) inFromServer.readObject();
+        
+        serv.close();
+
         //inFromServer.reset();
 
         for (String s : musicas.keySet()) {
@@ -740,9 +744,7 @@ public class InteracaoCliente extends Thread {
             fos.write(os.toByteArray());
         }
         
-        serv.shutdownInput();
-
-        serv.close();
+        
 
     }
 
@@ -779,8 +781,9 @@ public class InteracaoCliente extends Thread {
 
     private void sendRankinLocal(Utilizador utili, String desafio) throws IOException {
         for (InetAddress i : this.bd.getServidores().keySet()) {
+            System.out.println("vai enviar ranking");
             int portaSV = this.bd.getServidores().get(i);
-            try (Socket conhecidos = new Socket(i, portaSV)) {
+            Socket conhecidos = new Socket(i, portaSV); 
 
                 PDU res = new PDU(0, AtendimentoServidor.INFO);
                 Campo c = new Campo(AtendimentoServidor.RANKINGLOCAL, new byte[]{0});
@@ -793,8 +796,9 @@ public class InteracaoCliente extends Thread {
                 out.flush();
                 out.writeObject(utili);
                 out.flush();
-                conhecidos.close();
-            }
+                
+           conhecidos.close();
+            
         }
     }
 }

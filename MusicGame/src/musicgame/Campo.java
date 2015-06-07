@@ -7,7 +7,6 @@ import java.util.Objects;
 
 /**
  * 
- * @author Bruno Pereira
  */
 public class Campo implements Serializable{
     

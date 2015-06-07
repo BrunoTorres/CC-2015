@@ -9,9 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,12 +62,10 @@ public class InteracaoServidor extends Thread {
                     System.out.println("envia desafio");
                     desafio = input.getCampo(0).getValue();
                     String alcunha = input.getCampo(2).getValue();
-                    System.out.println("DESAFIO PEDIDO = " + desafio);
                     sendDesafio(desafio, alcunha);
                     break;
 
                 case AtendimentoServidor.DESAFIO:
-                    System.out.println("desafiooo");
                     desafio = input.getCampo(0).getValue();
                     InetAddress ip = input.getCampo(1).getIP();
                     System.out.println("ip no recebe Desafio!!!= " + ip);
@@ -81,16 +77,12 @@ public class InteracaoServidor extends Thread {
                     this.bd.addDesafiosGlobais(des.getNome(), des.getLocalDate(), ip, porta);
                     break;
                 case AtendimentoServidor.RANKINGLOCAL:
-                    desafio=input.getCampo(1).getValue();
-                    System.out.println("DESAFIO ONDE VAI ATUALIZAR O RANKING= "+ desafio);
+                    desafio = input.getCampo(1).getValue();
+                    System.out.println("DESAFIO ONDE VAI ATUALIZAR O RANKING= " + desafio);
                     adicionaRanking(desafio);
                     break;
 
-                // case AtendimentoServidor.REGISTADESAFIO:  
-                //  registaDesafio();// RECEBE um DESAFIO e pede musica e imagem para cada pergunta do desafio
-                //     break;´
-                }
-            //this.s.close();
+            }
 
         } catch (IOException ex) {
             Logger.getLogger(InteracaoServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -101,22 +93,11 @@ public class InteracaoServidor extends Thread {
     }
 
     private void registaServidor(PDU p) throws IOException, ClassNotFoundException { // sv principal regista novo sv, devolve-lhe lista dos que conhece e envia aos que conhece
-        // o novo sv
-        System.out.println("vou resgistar o servido que vem ");
         InetAddress ip = p.getCampo(1).getIP();
-        //ObjectOutputStream o;
-        System.out.println("ip= " + ip);
-        //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
-        //int porta = bg.intValue();´
         int porta = Integer.valueOf(p.getCampo(2).getValue());
-        //Socket serv = new Socket(InetAddress.getByName(ip), porta);
 
         Campo c;
-        //                                                    falta info antes de enviar objecto?!
-        // out = new ObjectOutputStream(serv.getOutputStream());
-        //out.writeObject(this.bd.getServidores());
-        //out.flush();
-        System.out.println("vou enviar cenas");
+
         if (this.bd.getDesafios().size() > 0) {
             sendListDesafios(ip, porta);
         }
@@ -146,50 +127,15 @@ public class InteracaoServidor extends Thread {
         }
         this.bd.registaServidor(ip, porta);
 
-///////////////////////////////////////TODOS
     }
-/*
-    //RECEBE o lista de desafios pendentes GLOBAIS///////////////////////////////////////////////////////
-    private void adicionaDesafios(PDU input) throws IOException, ClassNotFoundException {
-        InetAddress ip = input.getCampo(1).getIP();
-        //BigInteger bg = new BigInteger(input.getCampo(2).getValor());
-        //int porta = bg.intValue();
-        int porta = Integer.valueOf(input.getCampo(2).getValue());
 
-        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
-        Socket s2 = ss.accept();
-        ObjectInputStream in2 = new ObjectInputStream(s2.getInputStream());
-
-        this.in = new ObjectInputStream(s2.getInputStream());
-
-        HashMap<String, LocalDateTime> des = (HashMap<String, LocalDateTime>) in.readObject();
-        
-        
-        //this.s.close();
-
-        // this.bd.addDesafiosGlobais(des, ip, porta);
-    }
-    */
 
     private void adicionaRanking(String desafio) throws IOException, ClassNotFoundException {
-        
-//        ServerSocket ss = new ServerSocket(this.s.getLocalPort());
-       // Socket s2 = ss.accept();
-        //this.in = new ObjectInputStream(s2.getInputStream());
-       
-        System.out.println("CHEGOU UTILIZADOR");
-        Utilizador  rank = (Utilizador)in.readObject();
-        System.out.println("JA TEM O UTILIZADOR");
 
-       // this.bd.addRankingGlobal(desafio,rank);
+        Utilizador rank = (Utilizador) in.readObject();
+
         this.bd.addUserEndDesafio(desafio, rank);
         this.bd.getDesafio(desafio).incNumPlayersDone();
-       
-        System.out.println("ACABOU");
-        
-
-        //this.s.close();
-
     }
 // novo servidor adiciona lista de svs que o principal conhece
 
@@ -205,12 +151,9 @@ public class InteracaoServidor extends Thread {
     }
 
     private void adicionaSVLocal(PDU p) throws UnknownHostException, IOException {
-        System.out.println("vou receber as cenas");
         InetAddress ip = p.getCampo(1).getIP();
-        //BigInteger bg = new BigInteger(p.getCampo(2).getValor());
         int porta = Integer.valueOf(p.getCampo(2).getValue());
 
-        System.out.println("adiciona sv local ip " + ip + " Porta= " + porta);
         if (!this.bd.getServidores().containsKey(ip)) {
             this.bd.getServidores().put(ip, porta);
         }
@@ -220,7 +163,6 @@ public class InteracaoServidor extends Thread {
             /**
              * *******************************************************************
              */
-            System.out.println("Vou enviar as cenas");
             if (this.bd.getDesafios().size() > 0) {
                 sendListDesafios(ip, porta);
             }
@@ -261,14 +203,13 @@ public class InteracaoServidor extends Thread {
         out.flush();
         out.reset();
 
-        out.writeObject(bd.getRankingLocal());////////////////////////////////////////////
+        out.writeObject(bd.getRankingLocal());
         out.flush();
         out.reset();
     }
 
     private void sendDesafio(String desafio, String alcunha) throws IOException {
         Desafio d = this.bd.getDesafio(desafio);
-        System.out.println("DESAFIO A SER ENVIAD como o NOME = " + d.getNome());
         out.writeObject(d);
         out.flush();
         File f;
@@ -311,19 +252,6 @@ public class InteracaoServidor extends Thread {
         out.flush();
         out.reset();
 
-        /*
-         } else if (pacote == 2) {
-         musicas = new HashMap<String, byte[]>();
-         for (int i = 5; i < d.getQuestoes().size(); i++) {
-         File f = new File("C:\\Users\\patricia\\Desktop\\CC-2015\\Kit TP2-LEI-CC\\musica\\" + d.getQuestoes().get(i).getMusica());
-         byte[] r = Files.readAllBytes(f.toPath());
-         musicas.put(d.getQuestoes().get(i).getMusica(), r);
-         }
-         out.writeObject(musicas);
-         out.flush();
-         out.reset();
-         }
-         */
     }
 
 }

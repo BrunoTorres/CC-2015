@@ -87,7 +87,6 @@ public class MusicClient {
         //IPAddress = InetAddress.getByName("192.168.1.79");
         //IPAddress = InetAddress.getByName("172.26.114.224");
         IPAddress = InetAddress.getByName("192.168.173.167");
-        //System.out.println(IPAddress);
         receiveData = new byte[50000];
         byte[] data;
         label++;
@@ -394,13 +393,7 @@ public class MusicClient {
         sendPDU(ACCEPT_CHALLENGE, campos);
         PDU pacote = receivePDUNoExeception();
 
-        return pacote.getCampo(0).getValor()[0] == 0; /*try {
-         System.out.println("vamos jogar");
-         jogar();
-         } catch (SocketException | UnsupportedAudioFileException | LineUnavailableException | InsuficientPlayersException ex) {
-         Logger.getLogger(MusicClient.class
-         .getName()).log(Level.SEVERE, null, ex);
-         }*/
+        return pacote.getCampo(0).getValor()[0] == 0; 
 
     }
 
@@ -455,9 +448,7 @@ public class MusicClient {
                 System.err.println("Recebi pergunta");
                 nome = new String(pacote.getCampo(0).getValor());
                 int id = pacote.getCampo(1).getId();
-                // se == 255 -> Não existem jogadores suficientes -> Exception
-                // se não -> jogar
-                System.out.println("Antes de ver se é final!");
+                
                 if (id != 255) {                    
                     System.out.println("Continua!");
                     nQuestao = pacote.getCampo(1).getValor()[0];
@@ -466,15 +457,12 @@ public class MusicClient {
                     respostas.add(new String(pacote.getCampo(6).getValor()));
                     respostas.add(new String(pacote.getCampo(8).getValor()));
 
-                    System.out.println("Receber Imagem!");
-                    // 2ª parte -> receber pacotes de uma imagem
                     blocosImagem = (TreeMap) recebeBlocos(IMAGEM);
                     System.err.println("Recebi imagem");
                     checkBlocos(blocosImagem, nome, nQuestao, 16);
                     String fImage = constroiFicheiroImagem(blocosImagem);
 
                     
-                    System.out.println("Receber Música!");
                     // 3º parte -> receber pacotes de uma musica
                     blocosMusica = (TreeMap) recebeBlocos(AUDIO);
                     System.err.println("Recebi musica");
@@ -501,35 +489,23 @@ public class MusicClient {
         int num;
         TreeMap<Integer, PDU> blocos = new TreeMap<>();
         // 2º pacote -> primeiro pacote de com uma imagem
-        System.out.println("Antes de receber pacote");
-        //pacote = receivePDUNoExeception();
         
         pacote = receivePDUNoExeception();
         
         int numero = pacote.getCampo(4).getId();        
-        System.out.println("Depois de receber pacote");
 
         while (numero == 254 && pacote.getCampo(3).getId() == tipo) {
             num = (byte) pacote.getCampo(2).getValor()[0];            
-            System.out.println("A receber bloco: "+num);
             blocos.put(num, pacote);
-            //pacote = receivePDUNoExeception();
-            
-            
             pacote = receivePDUNoExeception();
             numero = pacote.getCampo(4).getId();
         }
         if (numero == 250) {
-            System.out.println("O campo era 250!!");
             b = pacote.getCampo(2).getValor();
             num = (byte) b[0];
             blocos.put(num, pacote);
         }
-        /*
-         for (Integer c : blocos.keySet()) {
-         System.out.println(c);
-         }
-         */
+      
         return blocos;
     }
 

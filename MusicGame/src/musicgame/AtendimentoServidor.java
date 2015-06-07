@@ -2,7 +2,6 @@ package musicgame;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -79,7 +78,7 @@ public class AtendimentoServidor extends Thread {
             try {
                 ss.close();
             } catch (Exception e) {
-                // If you really want to know why you can't close the ServerSocket, like whether it's null or not
+                
             }
         }
 
@@ -88,21 +87,13 @@ public class AtendimentoServidor extends Thread {
     public void registaServidor() throws UnknownHostException, IOException {
         PDU p = new PDU(0, INFO);
         Campo c = new Campo(REGISTASV, new byte[]{(byte) 0});
-        System.out.println("CAMPO " + c.getIdTcp());
         p.addCampoTcp(c);
-        System.out.println("ip " + InetAddress.getLocalHost());
         c = new Campo(IP, InetAddress.getLocalHost());
         InetAddress ip = c.getIP();
-        System.out.println("IP " + ip);
         p.addCampoTcp(c);
-        //BigInteger bg = BigInteger.valueOf(portaTCP);
         c = new Campo(PORTA, String.valueOf(portaTCP));
         p.addCampoTcp(c);
-
-        System.out.println("vai guardar isto :" + InetAddress.getByName(ipServer));
-
         this.bd.registaServidor(InetAddress.getByName(ipServer), portaTCP2);
-
         ObjectOutputStream o;
         o = new ObjectOutputStream(this.s.getOutputStream());
         o.writeObject(p);

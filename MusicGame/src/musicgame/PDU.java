@@ -138,7 +138,6 @@ public class PDU implements Serializable{
      public void addCampoTcp(Campo c) {
         this.campos.add(c);
         this.numCampos++;
-        //this.tamLista += c.getSize()[0] + c.getSize()[1];
     }
 
     public Campo getCampo(int ind) {
@@ -163,7 +162,6 @@ public class PDU implements Serializable{
 
         for (Campo c : campos) {
             soma += PDU.byteArrayToInt(c.getSize()) + 3;
-            //c.getSize()[0]+c.getSize()[1] + 3;
         }
 
         byte[] s;

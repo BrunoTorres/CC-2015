@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AtendimentoCliente extends Thread {
     
     private BD bd;
     private int portaUDP;
     
+    /**
+     *
+     * @param bd
+     * @param porta
+     */
     public AtendimentoCliente(BD bd, int porta){        
-        System.out.println("Construtor atenCliente");
         this.bd = bd;
         this.portaUDP = porta;
     }
@@ -30,11 +32,11 @@ public class AtendimentoCliente extends Thread {
                 at.start();
             }
         } catch (SocketException ex) {
-            Logger.getLogger(AtendimentoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Falha: Socket Tcp");
         } catch (IOException ex) {
-            Logger.getLogger(AtendimentoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Falha");
         } catch (UserInexistenteException ex) {
-            Logger.getLogger(AtendimentoCliente.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Falha: User");
         }
     }
 

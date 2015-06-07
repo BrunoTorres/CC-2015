@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 class BD implements Serializable {
 
     private int port;
+    
     private InetAddress ip;
     private HashMap<String, Utilizador> users; /// syc
     private HashMap<String, Integer> rankingLocal;     /// syc

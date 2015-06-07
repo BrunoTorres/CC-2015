@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package musicgame;
 
 import java.io.IOException;
@@ -74,11 +70,9 @@ public class Jogo extends Thread {
             }
             if (this.desafio.getStatus() == false) {
                 if(this.desafio.getUsersBegin()<this.desafio.getTamanhoUsers()){                     
-                    System.out.println("Incrementar o users begin");
                     this.desafio.incUsersBegin();
                 }
                 else{           
-                    System.out.println("Pus a true o status");
                     this.desafio.setComecou(true);
                 }
                 if (this.desafio.getUsers().size() < 2 && this.desafio.getComecou()==false) {
@@ -151,7 +145,6 @@ public class Jogo extends Thread {
 
         byte[] p;
         for (i = 0; i < nPackets; i++) {
-            //System.out.println("Enviou pacote numero: " + i);
 
             image = new PDU(s, (byte) 0);
             c = new Campo(DESAFIO, desafio.getNome().getBytes());
@@ -167,7 +160,6 @@ public class Jogo extends Thread {
             image.addCampo(new Campo(IMAGEM, p));
             image.addCampo(new Campo(CONTINUA, new byte[]{0}));
             responde(image, add, port);
-            //System.out.println(i + 1);
         }
         p = new byte[lastPackBytes];
         for (int j = 0; j < lastPackBytes; j++) {
@@ -181,7 +173,6 @@ public class Jogo extends Thread {
         image.addCampo(new Campo(BLOCO, new byte[]{(byte) (i + 1)}));
         image.addCampo(new Campo(IMAGEM, p));
         image.addCampo(new Campo(FIM, new byte[]{0}));  ////////////////////////////// last block
-        //System.out.println(i + 1);
         responde(image, add, port);
     }
 
@@ -208,18 +199,15 @@ public class Jogo extends Thread {
                 for (int j = 0; j < 49152; j++) {
                     p[j] = m[i * 49152 + j];
                 }
-                //this.bd.partes.put(i+1, p);  /////////////////////////////////#####################
                 music.addCampo(new Campo(AUDIO, p));
                 music.addCampo(new Campo(CONTINUA, new byte[]{0}));
                 responde(music, add, port);
-                // System.out.println(i + 1);
 
             } else {
                 p = new byte[49152];
                 for (int j = 0; j < 49152; j++) {
                     p[j] = m[i * 49152 + j];
                 }
-                // this.bd.partes.put(i+1, p);
 
             }
         }
@@ -232,12 +220,10 @@ public class Jogo extends Thread {
         music.addCampo(c);
         c = new Campo(NQUESTAO, PDU.intToByteArray(numQuestao));
 
-        //this.bd.partes.put(i+1, p);
         music.addCampo(c);
         music.addCampo(new Campo(BLOCO, new byte[]{(byte) (i + 1)}));
         music.addCampo(new Campo(AUDIO, p));
         music.addCampo(new Campo(FIM, new byte[]{0}));  ////////////////////////////// last block
-        //System.out.println(i + 1);
         responde(music, add, port);
     }
 

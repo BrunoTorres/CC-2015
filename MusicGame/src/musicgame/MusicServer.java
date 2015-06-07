@@ -1,7 +1,5 @@
 package musicgame;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Scanner;
 
@@ -47,7 +45,6 @@ class MusicServer {
         ler.nextLine();
         ipServer = ler.nextLine();
         System.out.println("");
-        System.out.println("ip====== "+ bd.getIp());
         if (!ipServer.equals("0")) {
             System.out.println("Introduza a porta TCP");
             portaTCP2 = ler.nextInt();
@@ -58,7 +55,7 @@ class MusicServer {
             AtendimentoServidor as = new AtendimentoServidor(bd, portaTCP);
             as.start();
         }
-        System.out.println("Vou abrir a thread cliente");
+        System.out.println("Escuta Clientes");
         AtendimentoCliente ac = new AtendimentoCliente(bd, portaUDP);
         ac.start();
 
